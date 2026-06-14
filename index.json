@@ -970,7 +970,7 @@
         "irc.action",
         "logic.chance"
       ],
-      "file": "workflows/Russian Roulette.ircbot",
+      "file": "workflows/RussianRoulette.ircbot",
       "workflow": {
         "format": "ircuitry.workflow.v1",
         "name": "Russian Roulette",
