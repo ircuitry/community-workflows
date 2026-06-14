@@ -1,0 +1,429 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "DuckHunt",
+  "description": "The classic IRC duck hunt game. Ducks appear in the channel; be first to !bang or !befriend them to score.",
+  "author": "ircuitry",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "tmr",
+      "type": "event.timer",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ambient spawn",
+      "params": {
+        "seconds": "600"
+      }
+    },
+    {
+      "id": "tGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 146,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "duck active?",
+      "params": {
+        "table": "duckhunt",
+        "mode": "value",
+        "key": "active",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "tIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "already a duck?",
+      "params": {
+        "op": "=",
+        "b": "1",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "tSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "channel": "#bots",
+        "message": "・゜゜・。 \\_o< QUACK! A wild duck waddles in! Type !bang to shoot it. 🦆"
+      }
+    },
+    {
+      "id": "spCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 316,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "duckspawn",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "spSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 194,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "release duck",
+      "params": {
+        "table": "duckhunt",
+        "key": "active",
+        "value": "1"
+      }
+    },
+    {
+      "id": "spSay",
+      "type": "action.reply",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "message": "・゜゜・。 \\_o< QUACK! A wild duck appears! Type !bang to shoot it. 🦆"
+      }
+    },
+    {
+      "id": "baCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 534,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "bang",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "baGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 752,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "duck active?",
+      "params": {
+        "table": "duckhunt",
+        "mode": "value",
+        "key": "active",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "baIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 364,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "hit a duck?",
+      "params": {
+        "op": "=",
+        "b": "1",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "baSGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 922,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "my kills",
+      "params": {
+        "table": "ducks_shot",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "baInc",
+      "type": "data.math",
+      "x": 286,
+      "y": 558,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "baFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 680,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "template": "{nick} blasts the duck out of the sky! 🦆💥 That's #{a} bagged."
+      }
+    },
+    {
+      "id": "baRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 194,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "hit",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "baSave",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save score",
+      "params": {
+        "table": "ducks_shot",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "baMiss",
+      "type": "action.reply",
+      "x": 572,
+      "y": 510,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "miss",
+      "params": {
+        "message": "{nick} fires into an empty sky… 🌫️ no duck right now — wasted a bullet!"
+      }
+    },
+    {
+      "id": "dkCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 1092,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "ducks",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "dkShot",
+      "type": "db.get",
+      "x": 0,
+      "y": 1310,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "table": "ducks_shot",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "dkFmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 728,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "template": "{nick} — 🦆 {a} ducks bagged."
+      }
+    },
+    {
+      "id": "dkRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 820,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "baClear",
+      "type": "db.set",
+      "x": 572,
+      "y": 340,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "duck flies off",
+      "params": {
+        "table": "duckhunt",
+        "key": "active",
+        "value": ""
+      }
+    },
+    {
+      "id": "tSet",
+      "type": "db.set",
+      "x": 572,
+      "y": -1.7623444,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "release duck",
+      "params": {
+        "table": "duckhunt",
+        "key": "active",
+        "value": "1"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "tmr",
+      "fromPin": 0,
+      "to": "tIf",
+      "toPin": 0
+    },
+    {
+      "from": "tGet",
+      "fromPin": 0,
+      "to": "tIf",
+      "toPin": 1
+    },
+    {
+      "from": "tIf",
+      "fromPin": 1,
+      "to": "tSet",
+      "toPin": 0
+    },
+    {
+      "from": "tSet",
+      "fromPin": 0,
+      "to": "tSay",
+      "toPin": 0
+    },
+    {
+      "from": "spCmd",
+      "fromPin": 0,
+      "to": "spSet",
+      "toPin": 0
+    },
+    {
+      "from": "spSet",
+      "fromPin": 0,
+      "to": "spSay",
+      "toPin": 0
+    },
+    {
+      "from": "baCmd",
+      "fromPin": 0,
+      "to": "baIf",
+      "toPin": 0
+    },
+    {
+      "from": "baGet",
+      "fromPin": 0,
+      "to": "baIf",
+      "toPin": 1
+    },
+    {
+      "from": "baIf",
+      "fromPin": 0,
+      "to": "baClear",
+      "toPin": 0
+    },
+    {
+      "from": "baClear",
+      "fromPin": 0,
+      "to": "baRep",
+      "toPin": 0
+    },
+    {
+      "from": "baRep",
+      "fromPin": 0,
+      "to": "baSave",
+      "toPin": 0
+    },
+    {
+      "from": "baIf",
+      "fromPin": 1,
+      "to": "baMiss",
+      "toPin": 0
+    },
+    {
+      "from": "baSGet",
+      "fromPin": 0,
+      "to": "baInc",
+      "toPin": 0
+    },
+    {
+      "from": "baInc",
+      "fromPin": 0,
+      "to": "baFmt",
+      "toPin": 0
+    },
+    {
+      "from": "baInc",
+      "fromPin": 0,
+      "to": "baSave",
+      "toPin": 1
+    },
+    {
+      "from": "baFmt",
+      "fromPin": 0,
+      "to": "baRep",
+      "toPin": 1
+    },
+    {
+      "from": "dkCmd",
+      "fromPin": 0,
+      "to": "dkRep",
+      "toPin": 0
+    },
+    {
+      "from": "dkShot",
+      "fromPin": 0,
+      "to": "dkFmt",
+      "toPin": 0
+    },
+    {
+      "from": "dkFmt",
+      "fromPin": 0,
+      "to": "dkRep",
+      "toPin": 1
+    }
+  ]
+}

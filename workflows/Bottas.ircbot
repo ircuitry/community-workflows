@@ -1,0 +1,200 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Bottas",
+  "description": "Formula 1 race-weekend reminder. Reads an iCal feed and announces each session about an hour before it starts.",
+  "author": "ircuitry",
+  "tags": [
+    "reminder",
+    "calendar",
+    "sports"
+  ],
+  "nodes": [
+    {
+      "id": "n154d28",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ignore bots lol",
+      "params": {}
+    },
+    {
+      "id": "n13fc20",
+      "type": "action.replythread",
+      "x": 1716,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Reply with the race",
+      "params": {
+        "message": "no upcoming F1 session"
+      }
+    },
+    {
+      "id": "n9ae46",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !f1",
+      "params": {
+        "prefix": "!",
+        "command": "f1",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "n144433",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is it the 'next' subcommand?",
+      "params": {
+        "pattern": "^\\s*next",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "ndd3c0",
+      "type": "action.replythread",
+      "x": 858,
+      "y": 290,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Scold the user",
+      "params": {
+        "message": "usage: !f1 next session"
+      }
+    },
+    {
+      "id": "n71b7f",
+      "type": "data.format",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build the reply",
+      "params": {
+        "template": "🏁 Next: {a} · {b}"
+      }
+    },
+    {
+      "id": "nf1code",
+      "type": "code.run",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Swap date to DD.MM.YYYY",
+      "params": {
+        "language": "javascript",
+        "code": "const s=(process.env.INPUT||'').trim();\nconst p=s.split(' ');\nconst d=p[0].split('-');\nconsole.log(d.length===3 ? d[2]+'.'+d[1]+'.'+d[0]+(p[1]?' '+p[1]:'') : s);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "n8c088",
+      "type": "file.ical",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Next F1 session",
+      "params": {
+        "source": "f1-calendar.ics",
+        "mode": "next",
+        "max": "5"
+      }
+    },
+    {
+      "id": "nf1none",
+      "type": "action.replythread",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "No races found",
+      "params": {
+        "message": "No upcoming F1 sessions on the calendar 🏁"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "n9ae46",
+      "fromPin": 0,
+      "to": "n154d28",
+      "toPin": 0
+    },
+    {
+      "from": "n154d28",
+      "fromPin": 1,
+      "to": "n144433",
+      "toPin": 0
+    },
+    {
+      "from": "n9ae46",
+      "fromPin": 1,
+      "to": "n144433",
+      "toPin": 1
+    },
+    {
+      "from": "n144433",
+      "fromPin": 0,
+      "to": "n8c088",
+      "toPin": 0
+    },
+    {
+      "from": "n144433",
+      "fromPin": 1,
+      "to": "ndd3c0",
+      "toPin": 0
+    },
+    {
+      "from": "n8c088",
+      "fromPin": 0,
+      "to": "nf1code",
+      "toPin": 0
+    },
+    {
+      "from": "n8c088",
+      "fromPin": 3,
+      "to": "nf1code",
+      "toPin": 1
+    },
+    {
+      "from": "nf1code",
+      "fromPin": 0,
+      "to": "n13fc20",
+      "toPin": 0
+    },
+    {
+      "from": "n8c088",
+      "fromPin": 2,
+      "to": "n71b7f",
+      "toPin": 0
+    },
+    {
+      "from": "nf1code",
+      "fromPin": 1,
+      "to": "n71b7f",
+      "toPin": 1
+    },
+    {
+      "from": "n71b7f",
+      "fromPin": 0,
+      "to": "n13fc20",
+      "toPin": 1
+    },
+    {
+      "from": "n8c088",
+      "fromPin": 1,
+      "to": "nf1none",
+      "toPin": 0
+    }
+  ]
+}

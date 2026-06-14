@@ -1,0 +1,2051 @@
+{
+  "count": 6,
+  "workflows": [
+    {
+      "name": "Bottas",
+      "description": "Formula 1 race-weekend reminder. Reads an iCal feed and announces each session about an hour before it starts.",
+      "author": "ircuitry",
+      "tags": [
+        "reminder",
+        "calendar",
+        "sports"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 12,
+      "nodeTypes": [
+        "action.replythread",
+        "code.run",
+        "data.format",
+        "event.command",
+        "file.ical",
+        "filter.isBot",
+        "logic.regex"
+      ],
+      "file": "workflows/Bottas.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Bottas",
+        "description": "Formula 1 race-weekend reminder. Reads an iCal feed and announces each session about an hour before it starts.",
+        "author": "ircuitry",
+        "tags": [
+          "reminder",
+          "calendar",
+          "sports"
+        ],
+        "nodes": [
+          {
+            "id": "n154d28",
+            "type": "filter.isBot",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Ignore bots lol",
+            "params": {}
+          },
+          {
+            "id": "n13fc20",
+            "type": "action.replythread",
+            "x": 1716,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Reply with the race",
+            "params": {
+              "message": "no upcoming F1 session"
+            }
+          },
+          {
+            "id": "n9ae46",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !f1",
+            "params": {
+              "prefix": "!",
+              "command": "f1",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "n144433",
+            "type": "logic.regex",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Is it the 'next' subcommand?",
+            "params": {
+              "pattern": "^\\s*next",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "ndd3c0",
+            "type": "action.replythread",
+            "x": 858,
+            "y": 290,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Scold the user",
+            "params": {
+              "message": "usage: !f1 next session"
+            }
+          },
+          {
+            "id": "n71b7f",
+            "type": "data.format",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build the reply",
+            "params": {
+              "template": "🏁 Next: {a} · {b}"
+            }
+          },
+          {
+            "id": "nf1code",
+            "type": "code.run",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Swap date to DD.MM.YYYY",
+            "params": {
+              "language": "javascript",
+              "code": "const s=(process.env.INPUT||'').trim();\nconst p=s.split(' ');\nconst d=p[0].split('-');\nconsole.log(d.length===3 ? d[2]+'.'+d[1]+'.'+d[0]+(p[1]?' '+p[1]:'') : s);",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "n8c088",
+            "type": "file.ical",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Next F1 session",
+            "params": {
+              "source": "f1-calendar.ics",
+              "mode": "next",
+              "max": "5"
+            }
+          },
+          {
+            "id": "nf1none",
+            "type": "action.replythread",
+            "x": 1144,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "No races found",
+            "params": {
+              "message": "No upcoming F1 sessions on the calendar 🏁"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "n9ae46",
+            "fromPin": 0,
+            "to": "n154d28",
+            "toPin": 0
+          },
+          {
+            "from": "n154d28",
+            "fromPin": 1,
+            "to": "n144433",
+            "toPin": 0
+          },
+          {
+            "from": "n9ae46",
+            "fromPin": 1,
+            "to": "n144433",
+            "toPin": 1
+          },
+          {
+            "from": "n144433",
+            "fromPin": 0,
+            "to": "n8c088",
+            "toPin": 0
+          },
+          {
+            "from": "n144433",
+            "fromPin": 1,
+            "to": "ndd3c0",
+            "toPin": 0
+          },
+          {
+            "from": "n8c088",
+            "fromPin": 0,
+            "to": "nf1code",
+            "toPin": 0
+          },
+          {
+            "from": "n8c088",
+            "fromPin": 3,
+            "to": "nf1code",
+            "toPin": 1
+          },
+          {
+            "from": "nf1code",
+            "fromPin": 0,
+            "to": "n13fc20",
+            "toPin": 0
+          },
+          {
+            "from": "n8c088",
+            "fromPin": 2,
+            "to": "n71b7f",
+            "toPin": 0
+          },
+          {
+            "from": "nf1code",
+            "fromPin": 1,
+            "to": "n71b7f",
+            "toPin": 1
+          },
+          {
+            "from": "n71b7f",
+            "fromPin": 0,
+            "to": "n13fc20",
+            "toPin": 1
+          },
+          {
+            "from": "n8c088",
+            "fromPin": 1,
+            "to": "nf1none",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "DuckHunt",
+      "description": "The classic IRC duck hunt game. Ducks appear in the channel; be first to !bang or !befriend them to score.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "fun"
+      ],
+      "nodeCount": 22,
+      "connectionCount": 19,
+      "nodeTypes": [
+        "action.reply",
+        "action.say",
+        "data.format",
+        "data.math",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.timer",
+        "logic.if"
+      ],
+      "file": "workflows/DuckHunt.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "DuckHunt",
+        "description": "The classic IRC duck hunt game. Ducks appear in the channel; be first to !bang or !befriend them to score.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "tmr",
+            "type": "event.timer",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ambient spawn",
+            "params": {
+              "seconds": "600"
+            }
+          },
+          {
+            "id": "tGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 146,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "duck active?",
+            "params": {
+              "table": "duckhunt",
+              "mode": "value",
+              "key": "active",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "tIf",
+            "type": "logic.if",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "already a duck?",
+            "params": {
+              "op": "=",
+              "b": "1",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "tSay",
+            "type": "action.say",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "channel": "#bots",
+              "message": "・゜゜・。 \\_o< QUACK! A wild duck waddles in! Type !bang to shoot it. 🦆"
+            }
+          },
+          {
+            "id": "spCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 316,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "duckspawn",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "spSet",
+            "type": "db.set",
+            "x": 286,
+            "y": 194,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "release duck",
+            "params": {
+              "table": "duckhunt",
+              "key": "active",
+              "value": "1"
+            }
+          },
+          {
+            "id": "spSay",
+            "type": "action.reply",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": "・゜゜・。 \\_o< QUACK! A wild duck appears! Type !bang to shoot it. 🦆"
+            }
+          },
+          {
+            "id": "baCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 534,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "bang",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "baGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 752,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "duck active?",
+            "params": {
+              "table": "duckhunt",
+              "mode": "value",
+              "key": "active",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "baIf",
+            "type": "logic.if",
+            "x": 286,
+            "y": 364,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "hit a duck?",
+            "params": {
+              "op": "=",
+              "b": "1",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "baSGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 922,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "my kills",
+            "params": {
+              "table": "ducks_shot",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "baInc",
+            "type": "data.math",
+            "x": 286,
+            "y": 558,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "+1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "baFmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 680,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "template": "{nick} blasts the duck out of the sky! 🦆💥 That's #{a} bagged."
+            }
+          },
+          {
+            "id": "baRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 194,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "hit",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "baSave",
+            "type": "db.set",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save score",
+            "params": {
+              "table": "ducks_shot",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "baMiss",
+            "type": "action.reply",
+            "x": 572,
+            "y": 510,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "miss",
+            "params": {
+              "message": "{nick} fires into an empty sky… 🌫️ no duck right now — wasted a bullet!"
+            }
+          },
+          {
+            "id": "dkCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 1092,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "ducks",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "dkShot",
+            "type": "db.get",
+            "x": 0,
+            "y": 1310,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "table": "ducks_shot",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "dkFmt",
+            "type": "data.format",
+            "x": 286,
+            "y": 728,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "template": "{nick} — 🦆 {a} ducks bagged."
+            }
+          },
+          {
+            "id": "dkRep",
+            "type": "action.reply",
+            "x": 572,
+            "y": 820,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "baClear",
+            "type": "db.set",
+            "x": 572,
+            "y": 340,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "duck flies off",
+            "params": {
+              "table": "duckhunt",
+              "key": "active",
+              "value": ""
+            }
+          },
+          {
+            "id": "tSet",
+            "type": "db.set",
+            "x": 572,
+            "y": -1.7623444,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "release duck",
+            "params": {
+              "table": "duckhunt",
+              "key": "active",
+              "value": "1"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "tmr",
+            "fromPin": 0,
+            "to": "tIf",
+            "toPin": 0
+          },
+          {
+            "from": "tGet",
+            "fromPin": 0,
+            "to": "tIf",
+            "toPin": 1
+          },
+          {
+            "from": "tIf",
+            "fromPin": 1,
+            "to": "tSet",
+            "toPin": 0
+          },
+          {
+            "from": "tSet",
+            "fromPin": 0,
+            "to": "tSay",
+            "toPin": 0
+          },
+          {
+            "from": "spCmd",
+            "fromPin": 0,
+            "to": "spSet",
+            "toPin": 0
+          },
+          {
+            "from": "spSet",
+            "fromPin": 0,
+            "to": "spSay",
+            "toPin": 0
+          },
+          {
+            "from": "baCmd",
+            "fromPin": 0,
+            "to": "baIf",
+            "toPin": 0
+          },
+          {
+            "from": "baGet",
+            "fromPin": 0,
+            "to": "baIf",
+            "toPin": 1
+          },
+          {
+            "from": "baIf",
+            "fromPin": 0,
+            "to": "baClear",
+            "toPin": 0
+          },
+          {
+            "from": "baClear",
+            "fromPin": 0,
+            "to": "baRep",
+            "toPin": 0
+          },
+          {
+            "from": "baRep",
+            "fromPin": 0,
+            "to": "baSave",
+            "toPin": 0
+          },
+          {
+            "from": "baIf",
+            "fromPin": 1,
+            "to": "baMiss",
+            "toPin": 0
+          },
+          {
+            "from": "baSGet",
+            "fromPin": 0,
+            "to": "baInc",
+            "toPin": 0
+          },
+          {
+            "from": "baInc",
+            "fromPin": 0,
+            "to": "baFmt",
+            "toPin": 0
+          },
+          {
+            "from": "baInc",
+            "fromPin": 0,
+            "to": "baSave",
+            "toPin": 1
+          },
+          {
+            "from": "baFmt",
+            "fromPin": 0,
+            "to": "baRep",
+            "toPin": 1
+          },
+          {
+            "from": "dkCmd",
+            "fromPin": 0,
+            "to": "dkRep",
+            "toPin": 0
+          },
+          {
+            "from": "dkShot",
+            "fromPin": 0,
+            "to": "dkFmt",
+            "toPin": 0
+          },
+          {
+            "from": "dkFmt",
+            "fromPin": 0,
+            "to": "dkRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hangman",
+      "description": "Play hangman in your channel. Guess letters to reveal the word before the tries run out.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "word",
+        "fun"
+      ],
+      "nodeCount": 11,
+      "connectionCount": 15,
+      "nodeTypes": [
+        "action.reply",
+        "code.run",
+        "db.get",
+        "db.set",
+        "event.command",
+        "logic.regex"
+      ],
+      "file": "workflows/Hangman.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Hangman",
+        "description": "Play hangman in your channel. Guess letters to reveal the word before the tries run out.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "word",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "hmCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "start",
+            "params": {
+              "prefix": "!",
+              "command": "hangman",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "hcode",
+            "type": "code.run",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "new word",
+            "params": {
+              "language": "python",
+              "code": "import random\nwords=['banana','python','wizard','guitar','rocket','puzzle','dragon','coffee','jungle','planet','diamond','volcano']\nw=random.choice(words)\nprint(w+'||0@@@🪢 Hangman! '+str(len(w))+' letters: '+' '.join('_' for _ in w)+'  — !guess <letter>')",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "hregex",
+            "type": "logic.regex",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split",
+            "params": {
+              "pattern": "^(.*?)@@@(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "hSet",
+            "type": "db.set",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save state",
+            "params": {
+              "table": "hangman_state",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "hRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "gCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "guess",
+            "params": {
+              "prefix": "!",
+              "command": "guess",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "gcode",
+            "type": "code.run",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "play letter",
+            "params": {
+              "language": "python",
+              "code": "import os\nst=os.environ.get('INPUT','').strip()\ng=os.environ.get('ARGS','').strip().lower()\nnick=os.environ.get('NICK','someone')\nL=6\ndef out(s):\n    print(s)\n    raise SystemExit\ndef show(gd):\n    return ' '.join(c if c in gd else '_' for c in word)\nif not st: out('@@@No game running — !hangman to start. 🪢')\np=st.split('|')\nword=p[0]\nguessed=p[1] if len(p)>1 else ''\nwrong=int(p[2]) if len(p)>2 and p[2] else 0\nif not g: out(st+'@@@'+show(guessed)+'  ('+str(L-wrong)+' lives) — !guess a letter')\nif len(g)>1:\n    if g==word: out('@@@🎉 '+nick+' guessed the word: '+word.upper()+'! 🪢')\n    wrong+=1\n    if wrong>=L: out('@@@💀 Out of lives! The word was '+word.upper()+'. !hangman to play again.')\n    out(word+'|'+guessed+'|'+str(wrong)+'@@@Nope, not '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nif not g.isalpha(): out(st+'@@@Letters only, '+nick+'. '+show(guessed))\nif g in guessed: out(st+'@@@Already tried '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nguessed=guessed+g\nif g in word:\n    if all(c in guessed for c in word): out('@@@🎉 '+nick+' solved it: '+word.upper()+'! 🪢')\n    out(word+'|'+guessed+'|'+str(wrong)+'@@@Yes! '+g+' is in. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nwrong+=1\nif wrong>=L: out('@@@💀 Out of lives! The word was '+word.upper()+'. !hangman to play again.')\nout(word+'|'+guessed+'|'+str(wrong)+'@@@No '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "gregex",
+            "type": "logic.regex",
+            "x": 572,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split",
+            "params": {
+              "pattern": "^(.*?)@@@(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "gSet",
+            "type": "db.set",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save state",
+            "params": {
+              "table": "hangman_state",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "gRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "stGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 436,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "load state",
+            "params": {
+              "table": "hangman_state",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "hmCmd",
+            "fromPin": 0,
+            "to": "hcode",
+            "toPin": 0
+          },
+          {
+            "from": "hcode",
+            "fromPin": 0,
+            "to": "hregex",
+            "toPin": 0
+          },
+          {
+            "from": "hcode",
+            "fromPin": 1,
+            "to": "hregex",
+            "toPin": 1
+          },
+          {
+            "from": "hregex",
+            "fromPin": 0,
+            "to": "hSet",
+            "toPin": 0
+          },
+          {
+            "from": "hSet",
+            "fromPin": 0,
+            "to": "hRep",
+            "toPin": 0
+          },
+          {
+            "from": "hregex",
+            "fromPin": 2,
+            "to": "hSet",
+            "toPin": 1
+          },
+          {
+            "from": "hregex",
+            "fromPin": 3,
+            "to": "hRep",
+            "toPin": 1
+          },
+          {
+            "from": "gCmd",
+            "fromPin": 0,
+            "to": "gcode",
+            "toPin": 0
+          },
+          {
+            "from": "stGet",
+            "fromPin": 0,
+            "to": "gcode",
+            "toPin": 1
+          },
+          {
+            "from": "gcode",
+            "fromPin": 0,
+            "to": "gregex",
+            "toPin": 0
+          },
+          {
+            "from": "gcode",
+            "fromPin": 1,
+            "to": "gregex",
+            "toPin": 1
+          },
+          {
+            "from": "gregex",
+            "fromPin": 0,
+            "to": "gSet",
+            "toPin": 0
+          },
+          {
+            "from": "gSet",
+            "fromPin": 0,
+            "to": "gRep",
+            "toPin": 0
+          },
+          {
+            "from": "gregex",
+            "fromPin": 2,
+            "to": "gSet",
+            "toPin": 1
+          },
+          {
+            "from": "gregex",
+            "fromPin": 3,
+            "to": "gRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Russian Roulette",
+      "description": "A game of !roulette. Pull the trigger and hope the chamber is empty.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "fun"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "data.format",
+        "data.math",
+        "db.get",
+        "db.set",
+        "event.command",
+        "irc.action",
+        "logic.chance"
+      ],
+      "file": "workflows/Russian Roulette.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Russian Roulette",
+        "description": "A game of !roulette. Pull the trigger and hope the chamber is empty.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "roulette",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "chance",
+            "type": "logic.chance",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "1 in 6",
+            "params": {
+              "percent": "17"
+            }
+          },
+          {
+            "id": "hrep",
+            "type": "irc.action",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "text": "spins the cylinder and pulls the trigger on {nick}… 🔫 *BANG* — {nick} is dead. ☠️ rip"
+            }
+          },
+          {
+            "id": "hset",
+            "type": "db.set",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reset streak",
+            "params": {
+              "table": "roulette",
+              "key": "{nick}",
+              "value": "0"
+            }
+          },
+          {
+            "id": "mrep",
+            "type": "irc.action",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "text": ""
+            }
+          },
+          {
+            "id": "sset",
+            "type": "db.set",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save streak",
+            "params": {
+              "table": "roulette",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "sget",
+            "type": "db.get",
+            "x": 0,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "table": "roulette",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "inc",
+            "type": "data.math",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "streak+1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "mfmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "template": "spins the cylinder and pulls the trigger on {nick}… *click* — survived! 😅 ({a} in a row)"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "chance",
+            "toPin": 0
+          },
+          {
+            "from": "chance",
+            "fromPin": 0,
+            "to": "hrep",
+            "toPin": 0
+          },
+          {
+            "from": "hrep",
+            "fromPin": 0,
+            "to": "hset",
+            "toPin": 0
+          },
+          {
+            "from": "chance",
+            "fromPin": 1,
+            "to": "mrep",
+            "toPin": 0
+          },
+          {
+            "from": "mrep",
+            "fromPin": 0,
+            "to": "sset",
+            "toPin": 0
+          },
+          {
+            "from": "sget",
+            "fromPin": 0,
+            "to": "inc",
+            "toPin": 0
+          },
+          {
+            "from": "inc",
+            "fromPin": 0,
+            "to": "mfmt",
+            "toPin": 0
+          },
+          {
+            "from": "inc",
+            "fromPin": 0,
+            "to": "sset",
+            "toPin": 1
+          },
+          {
+            "from": "mfmt",
+            "fromPin": 0,
+            "to": "mrep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Trivia",
+      "description": "A trivia quiz that asks questions, tracks scores, and crowns a winner.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "quiz",
+        "fun"
+      ],
+      "nodeCount": 19,
+      "connectionCount": 21,
+      "nodeTypes": [
+        "action.reply",
+        "code.run",
+        "data.format",
+        "data.math",
+        "db.get",
+        "db.set",
+        "event.command",
+        "logic.if",
+        "logic.regex"
+      ],
+      "file": "workflows/Trivia.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Trivia",
+        "description": "A trivia quiz that asks questions, tracks scores, and crowns a winner.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "quiz",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "triviaCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "trivia",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "code",
+            "type": "code.run",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "pick question",
+            "params": {
+              "language": "python",
+              "code": "import random\nqs=[['What is the capital of France?','paris'],['How many legs does a spider have?','8'],['What gas do plants take in for photosynthesis?','carbon dioxide'],['Chemical symbol for gold?','au'],['Who wrote Romeo and Juliet?','shakespeare'],['Which planet is the Red Planet?','mars'],['How many continents are there?','7'],['What is 9 times 7?','63'],['Largest ocean on Earth?','pacific'],['Year WW2 ended in Europe?','1945']]\nq,a=random.choice(qs)\nprint(q+'@@@'+a)",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "ansSet",
+            "type": "db.set",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "store answer",
+            "params": {
+              "table": "trivia_answer",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "qRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ask",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "answerCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "answer",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "ansGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 436,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "stored answer",
+            "params": {
+              "table": "trivia_answer",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "ansIf",
+            "type": "logic.if",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "right?",
+            "params": {
+              "op": "=",
+              "b": "",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "ansClear",
+            "type": "db.set",
+            "x": 572,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "consume answer",
+            "params": {
+              "table": "trivia_answer",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "cScoreGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 606,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "my score",
+            "params": {
+              "table": "trivia_score",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "cInc",
+            "type": "data.math",
+            "x": 286,
+            "y": 364,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "+1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "cFmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 558,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "template": "✅ Correct, {nick}! +1 — you're on {a} points."
+            }
+          },
+          {
+            "id": "cRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "correct",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "cSave",
+            "type": "db.set",
+            "x": 1144,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save score",
+            "params": {
+              "table": "trivia_score",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "wRep",
+            "type": "action.reply",
+            "x": 572,
+            "y": 388,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "wrong",
+            "params": {
+              "message": "❌ Not quite, {nick}. !trivia for a fresh one."
+            }
+          },
+          {
+            "id": "tsCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 776,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "prefix": "!",
+              "command": "triviascore",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "tsGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 994,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "table": "trivia_score",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "tsFmt",
+            "type": "data.format",
+            "x": 286,
+            "y": 534,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "template": "{nick} — 🧠 {a} trivia points."
+            }
+          },
+          {
+            "id": "tsRep",
+            "type": "action.reply",
+            "x": 572,
+            "y": 698,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "regex",
+            "type": "logic.regex",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split q@@@a",
+            "params": {
+              "pattern": "^(.*)@@@(.*)$",
+              "ci": "false"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "triviaCmd",
+            "fromPin": 0,
+            "to": "code",
+            "toPin": 0
+          },
+          {
+            "from": "code",
+            "fromPin": 0,
+            "to": "regex",
+            "toPin": 0
+          },
+          {
+            "from": "code",
+            "fromPin": 1,
+            "to": "regex",
+            "toPin": 1
+          },
+          {
+            "from": "regex",
+            "fromPin": 0,
+            "to": "ansSet",
+            "toPin": 0
+          },
+          {
+            "from": "ansSet",
+            "fromPin": 0,
+            "to": "qRep",
+            "toPin": 0
+          },
+          {
+            "from": "regex",
+            "fromPin": 3,
+            "to": "ansSet",
+            "toPin": 1
+          },
+          {
+            "from": "regex",
+            "fromPin": 2,
+            "to": "qRep",
+            "toPin": 1
+          },
+          {
+            "from": "answerCmd",
+            "fromPin": 0,
+            "to": "ansIf",
+            "toPin": 0
+          },
+          {
+            "from": "answerCmd",
+            "fromPin": 1,
+            "to": "ansIf",
+            "toPin": 1
+          },
+          {
+            "from": "ansGet",
+            "fromPin": 0,
+            "to": "ansIf",
+            "toPin": 2
+          },
+          {
+            "from": "ansIf",
+            "fromPin": 0,
+            "to": "ansClear",
+            "toPin": 0
+          },
+          {
+            "from": "ansClear",
+            "fromPin": 0,
+            "to": "cRep",
+            "toPin": 0
+          },
+          {
+            "from": "cRep",
+            "fromPin": 0,
+            "to": "cSave",
+            "toPin": 0
+          },
+          {
+            "from": "cScoreGet",
+            "fromPin": 0,
+            "to": "cInc",
+            "toPin": 0
+          },
+          {
+            "from": "cInc",
+            "fromPin": 0,
+            "to": "cFmt",
+            "toPin": 0
+          },
+          {
+            "from": "cInc",
+            "fromPin": 0,
+            "to": "cSave",
+            "toPin": 1
+          },
+          {
+            "from": "cFmt",
+            "fromPin": 0,
+            "to": "cRep",
+            "toPin": 1
+          },
+          {
+            "from": "ansIf",
+            "fromPin": 1,
+            "to": "wRep",
+            "toPin": 0
+          },
+          {
+            "from": "tsCmd",
+            "fromPin": 0,
+            "to": "tsRep",
+            "toPin": 0
+          },
+          {
+            "from": "tsGet",
+            "fromPin": 0,
+            "to": "tsFmt",
+            "toPin": 0
+          },
+          {
+            "from": "tsFmt",
+            "fromPin": 0,
+            "to": "tsRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Werewolf",
+      "description": "A social-deduction party game for your channel: villagers hunt the hidden wolves at night.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "social",
+        "fun"
+      ],
+      "nodeCount": 19,
+      "connectionCount": 27,
+      "nodeTypes": [
+        "action.reply",
+        "code.run",
+        "db.get",
+        "db.set",
+        "event.command",
+        "logic.regex",
+        "logic.switch"
+      ],
+      "file": "workflows/Werewolf.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Werewolf",
+        "description": "A social-deduction party game for your channel: villagers hunt the hidden wolves at night.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "social",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 340,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!wolf",
+            "params": {
+              "prefix": "!",
+              "command": "wolf",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "sw",
+            "type": "logic.switch",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "subcommand",
+            "params": {
+              "case1": "join",
+              "case2": "start",
+              "case3": "myrole",
+              "case4": "reveal",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "usage",
+            "type": "action.reply",
+            "x": 572,
+            "y": 510,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "help",
+            "params": {
+              "message": "🐺 Werewolf — !wolf join · !wolf start · !wolf myrole (PM me!) · !wolf reveal"
+            }
+          },
+          {
+            "id": "jGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "players",
+            "params": {
+              "table": "ww_players",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "jcode",
+            "type": "code.run",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "add player",
+            "params": {
+              "language": "python",
+              "code": "import os\nlst=[x for x in os.environ.get('INPUT','').split(',') if x]\nnick=os.environ.get('NICK','')\nif nick in lst:\n    print(','.join(lst)+'@@@'+nick+' is already in the village ('+str(len(lst))+' players).')\nelse:\n    lst.append(nick)\n    print(','.join(lst)+'@@@🏡 '+nick+' joins the village — '+str(len(lst))+' gathered. !wolf start when ready.')",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "jregex",
+            "type": "logic.regex",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split",
+            "params": {
+              "pattern": "^(.*?)@@@(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "jSet",
+            "type": "db.set",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save players",
+            "params": {
+              "table": "ww_players",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "jRep",
+            "type": "action.reply",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "pGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "players",
+            "params": {
+              "table": "ww_players",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "scode",
+            "type": "code.run",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "deal roles",
+            "params": {
+              "language": "python",
+              "code": "import os,random\nlst=[x for x in os.environ.get('INPUT','').split(',') if x]\nif len(lst)<4:\n    print('@@@🐺 Need at least 4 players ('+str(len(lst))+' so far). !wolf join')\n    raise SystemExit\nrandom.shuffle(lst)\nroles=dict()\nroles[lst[0]]='wolf'\nroles[lst[1]]='seer'\nfor n in lst[2:]:\n    roles[n]='villager'\nassign=','.join(n+':'+r for n,r in roles.items())\nv=sum(1 for r in roles.values() if r=='villager')\nprint(assign+'@@@🌙 Night falls over the village of '+str(len(lst))+'. Roles dealt in secret — PM me !wolf myrole. (1 werewolf, 1 seer, '+str(v)+' villagers)')",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "sregex",
+            "type": "logic.regex",
+            "x": 858,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split",
+            "params": {
+              "pattern": "^(.*?)@@@(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "aSet",
+            "type": "db.set",
+            "x": 1144,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save roles",
+            "params": {
+              "table": "ww_assign",
+              "key": "{channel}",
+              "value": ""
+            }
+          },
+          {
+            "id": "aRep",
+            "type": "action.reply",
+            "x": 1430,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "aGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 558,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "roles",
+            "params": {
+              "table": "ww_assign",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "rcode",
+            "type": "code.run",
+            "x": 572,
+            "y": 340,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "your role",
+            "params": {
+              "language": "python",
+              "code": "import os\nd=dict(x.split(':') for x in os.environ.get('INPUT','').split(',') if ':' in x)\nnick=os.environ.get('NICK','')\nr=d.get(nick,'')\ninfo=dict(wolf='🐺 You are the WEREWOLF. Each night, secretly choose a victim. Blend in by day!', seer='🔮 You are the SEER. Each night you learn whether one player is a wolf.', villager='🧑 You are a VILLAGER. Find the wolf by day and vote to lynch them.')\nif not r:\n    print('You are not in this game, '+nick+'. !wolf join then !wolf start.')\nelse:\n    print(info.get(r,'Your role: '+r))",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "rRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 436,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "vGet",
+            "type": "db.get",
+            "x": 0,
+            "y": 728,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "roles",
+            "params": {
+              "table": "ww_assign",
+              "mode": "value",
+              "key": "{channel}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "vcode",
+            "type": "code.run",
+            "x": 572,
+            "y": 680,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reveal all",
+            "params": {
+              "language": "python",
+              "code": "import os\nd=[x for x in os.environ.get('INPUT','').split(',') if ':' in x]\nif not d:\n    print('No game in progress. !wolf start to deal roles.')\nelse:\n    out=[]\n    for x in d:\n        n,r=x.split(':')\n        tag=dict(wolf='🐺 wolf', seer='🔮 seer', villager='🧑 villager').get(r,r)\n        out.append(n+' = '+tag)\n    print('🔦 Roles revealed — '+' · '.join(out))",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "vRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 606,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "sw",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "sw",
+            "toPin": 1
+          },
+          {
+            "from": "sw",
+            "fromPin": 4,
+            "to": "usage",
+            "toPin": 0
+          },
+          {
+            "from": "sw",
+            "fromPin": 0,
+            "to": "jcode",
+            "toPin": 0
+          },
+          {
+            "from": "jGet",
+            "fromPin": 0,
+            "to": "jcode",
+            "toPin": 1
+          },
+          {
+            "from": "jcode",
+            "fromPin": 0,
+            "to": "jregex",
+            "toPin": 0
+          },
+          {
+            "from": "jcode",
+            "fromPin": 1,
+            "to": "jregex",
+            "toPin": 1
+          },
+          {
+            "from": "jregex",
+            "fromPin": 0,
+            "to": "jSet",
+            "toPin": 0
+          },
+          {
+            "from": "jSet",
+            "fromPin": 0,
+            "to": "jRep",
+            "toPin": 0
+          },
+          {
+            "from": "jregex",
+            "fromPin": 2,
+            "to": "jSet",
+            "toPin": 1
+          },
+          {
+            "from": "jregex",
+            "fromPin": 3,
+            "to": "jRep",
+            "toPin": 1
+          },
+          {
+            "from": "sw",
+            "fromPin": 1,
+            "to": "scode",
+            "toPin": 0
+          },
+          {
+            "from": "pGet",
+            "fromPin": 0,
+            "to": "scode",
+            "toPin": 1
+          },
+          {
+            "from": "scode",
+            "fromPin": 0,
+            "to": "sregex",
+            "toPin": 0
+          },
+          {
+            "from": "scode",
+            "fromPin": 1,
+            "to": "sregex",
+            "toPin": 1
+          },
+          {
+            "from": "sregex",
+            "fromPin": 0,
+            "to": "aSet",
+            "toPin": 0
+          },
+          {
+            "from": "aSet",
+            "fromPin": 0,
+            "to": "aRep",
+            "toPin": 0
+          },
+          {
+            "from": "sregex",
+            "fromPin": 2,
+            "to": "aSet",
+            "toPin": 1
+          },
+          {
+            "from": "sregex",
+            "fromPin": 3,
+            "to": "aRep",
+            "toPin": 1
+          },
+          {
+            "from": "sw",
+            "fromPin": 2,
+            "to": "rcode",
+            "toPin": 0
+          },
+          {
+            "from": "aGet",
+            "fromPin": 0,
+            "to": "rcode",
+            "toPin": 1
+          },
+          {
+            "from": "rcode",
+            "fromPin": 0,
+            "to": "rRep",
+            "toPin": 0
+          },
+          {
+            "from": "rcode",
+            "fromPin": 1,
+            "to": "rRep",
+            "toPin": 1
+          },
+          {
+            "from": "sw",
+            "fromPin": 3,
+            "to": "vcode",
+            "toPin": 0
+          },
+          {
+            "from": "vGet",
+            "fromPin": 0,
+            "to": "vcode",
+            "toPin": 1
+          },
+          {
+            "from": "vcode",
+            "fromPin": 0,
+            "to": "vRep",
+            "toPin": 0
+          },
+          {
+            "from": "vcode",
+            "fromPin": 1,
+            "to": "vRep",
+            "toPin": 1
+          }
+        ]
+      }
+    }
+  ]
+}

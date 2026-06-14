@@ -1,0 +1,255 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Hangman",
+  "description": "Play hangman in your channel. Guess letters to reveal the word before the tries run out.",
+  "author": "ircuitry",
+  "tags": [
+    "game",
+    "word",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "hmCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "start",
+      "params": {
+        "prefix": "!",
+        "command": "hangman",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "hcode",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "new word",
+      "params": {
+        "language": "python",
+        "code": "import random\nwords=['banana','python','wizard','guitar','rocket','puzzle','dragon','coffee','jungle','planet','diamond','volcano']\nw=random.choice(words)\nprint(w+'||0@@@🪢 Hangman! '+str(len(w))+' letters: '+' '.join('_' for _ in w)+'  — !guess <letter>')",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "hregex",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split",
+      "params": {
+        "pattern": "^(.*?)@@@(.*)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "hSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save state",
+      "params": {
+        "table": "hangman_state",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "hRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "gCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess",
+      "params": {
+        "prefix": "!",
+        "command": "guess",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "gcode",
+      "type": "code.run",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "play letter",
+      "params": {
+        "language": "python",
+        "code": "import os\nst=os.environ.get('INPUT','').strip()\ng=os.environ.get('ARGS','').strip().lower()\nnick=os.environ.get('NICK','someone')\nL=6\ndef out(s):\n    print(s)\n    raise SystemExit\ndef show(gd):\n    return ' '.join(c if c in gd else '_' for c in word)\nif not st: out('@@@No game running — !hangman to start. 🪢')\np=st.split('|')\nword=p[0]\nguessed=p[1] if len(p)>1 else ''\nwrong=int(p[2]) if len(p)>2 and p[2] else 0\nif not g: out(st+'@@@'+show(guessed)+'  ('+str(L-wrong)+' lives) — !guess a letter')\nif len(g)>1:\n    if g==word: out('@@@🎉 '+nick+' guessed the word: '+word.upper()+'! 🪢')\n    wrong+=1\n    if wrong>=L: out('@@@💀 Out of lives! The word was '+word.upper()+'. !hangman to play again.')\n    out(word+'|'+guessed+'|'+str(wrong)+'@@@Nope, not '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nif not g.isalpha(): out(st+'@@@Letters only, '+nick+'. '+show(guessed))\nif g in guessed: out(st+'@@@Already tried '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nguessed=guessed+g\nif g in word:\n    if all(c in guessed for c in word): out('@@@🎉 '+nick+' solved it: '+word.upper()+'! 🪢')\n    out(word+'|'+guessed+'|'+str(wrong)+'@@@Yes! '+g+' is in. '+show(guessed)+'  ('+str(L-wrong)+' lives)')\nwrong+=1\nif wrong>=L: out('@@@💀 Out of lives! The word was '+word.upper()+'. !hangman to play again.')\nout(word+'|'+guessed+'|'+str(wrong)+'@@@No '+g+'. '+show(guessed)+'  ('+str(L-wrong)+' lives)')",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "gregex",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split",
+      "params": {
+        "pattern": "^(.*?)@@@(.*)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "gSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save state",
+      "params": {
+        "table": "hangman_state",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "gRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "stGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 436,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "load state",
+      "params": {
+        "table": "hangman_state",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "hmCmd",
+      "fromPin": 0,
+      "to": "hcode",
+      "toPin": 0
+    },
+    {
+      "from": "hcode",
+      "fromPin": 0,
+      "to": "hregex",
+      "toPin": 0
+    },
+    {
+      "from": "hcode",
+      "fromPin": 1,
+      "to": "hregex",
+      "toPin": 1
+    },
+    {
+      "from": "hregex",
+      "fromPin": 0,
+      "to": "hSet",
+      "toPin": 0
+    },
+    {
+      "from": "hSet",
+      "fromPin": 0,
+      "to": "hRep",
+      "toPin": 0
+    },
+    {
+      "from": "hregex",
+      "fromPin": 2,
+      "to": "hSet",
+      "toPin": 1
+    },
+    {
+      "from": "hregex",
+      "fromPin": 3,
+      "to": "hRep",
+      "toPin": 1
+    },
+    {
+      "from": "gCmd",
+      "fromPin": 0,
+      "to": "gcode",
+      "toPin": 0
+    },
+    {
+      "from": "stGet",
+      "fromPin": 0,
+      "to": "gcode",
+      "toPin": 1
+    },
+    {
+      "from": "gcode",
+      "fromPin": 0,
+      "to": "gregex",
+      "toPin": 0
+    },
+    {
+      "from": "gcode",
+      "fromPin": 1,
+      "to": "gregex",
+      "toPin": 1
+    },
+    {
+      "from": "gregex",
+      "fromPin": 0,
+      "to": "gSet",
+      "toPin": 0
+    },
+    {
+      "from": "gSet",
+      "fromPin": 0,
+      "to": "gRep",
+      "toPin": 0
+    },
+    {
+      "from": "gregex",
+      "fromPin": 2,
+      "to": "gSet",
+      "toPin": 1
+    },
+    {
+      "from": "gregex",
+      "fromPin": 3,
+      "to": "gRep",
+      "toPin": 1
+    }
+  ]
+}

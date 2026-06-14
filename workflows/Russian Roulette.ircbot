@@ -1,0 +1,188 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Russian Roulette",
+  "description": "A game of !roulette. Pull the trigger and hope the chamber is empty.",
+  "author": "ircuitry",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "roulette",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "chance",
+      "type": "logic.chance",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "1 in 6",
+      "params": {
+        "percent": "17"
+      }
+    },
+    {
+      "id": "hrep",
+      "type": "irc.action",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "text": "spins the cylinder and pulls the trigger on {nick}… 🔫 *BANG* — {nick} is dead. ☠️ rip"
+      }
+    },
+    {
+      "id": "hset",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reset streak",
+      "params": {
+        "table": "roulette",
+        "key": "{nick}",
+        "value": "0"
+      }
+    },
+    {
+      "id": "mrep",
+      "type": "irc.action",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "text": ""
+      }
+    },
+    {
+      "id": "sset",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save streak",
+      "params": {
+        "table": "roulette",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "sget",
+      "type": "db.get",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "table": "roulette",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "inc",
+      "type": "data.math",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "streak+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "mfmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "template": "spins the cylinder and pulls the trigger on {nick}… *click* — survived! 😅 ({a} in a row)"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "chance",
+      "toPin": 0
+    },
+    {
+      "from": "chance",
+      "fromPin": 0,
+      "to": "hrep",
+      "toPin": 0
+    },
+    {
+      "from": "hrep",
+      "fromPin": 0,
+      "to": "hset",
+      "toPin": 0
+    },
+    {
+      "from": "chance",
+      "fromPin": 1,
+      "to": "mrep",
+      "toPin": 0
+    },
+    {
+      "from": "mrep",
+      "fromPin": 0,
+      "to": "sset",
+      "toPin": 0
+    },
+    {
+      "from": "sget",
+      "fromPin": 0,
+      "to": "inc",
+      "toPin": 0
+    },
+    {
+      "from": "inc",
+      "fromPin": 0,
+      "to": "mfmt",
+      "toPin": 0
+    },
+    {
+      "from": "inc",
+      "fromPin": 0,
+      "to": "sset",
+      "toPin": 1
+    },
+    {
+      "from": "mfmt",
+      "fromPin": 0,
+      "to": "mrep",
+      "toPin": 1
+    }
+  ]
+}

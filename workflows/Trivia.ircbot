@@ -1,0 +1,400 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Trivia",
+  "description": "A trivia quiz that asks questions, tracks scores, and crowns a winner.",
+  "author": "ircuitry",
+  "tags": [
+    "game",
+    "quiz",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "triviaCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "trivia",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick question",
+      "params": {
+        "language": "python",
+        "code": "import random\nqs=[['What is the capital of France?','paris'],['How many legs does a spider have?','8'],['What gas do plants take in for photosynthesis?','carbon dioxide'],['Chemical symbol for gold?','au'],['Who wrote Romeo and Juliet?','shakespeare'],['Which planet is the Red Planet?','mars'],['How many continents are there?','7'],['What is 9 times 7?','63'],['Largest ocean on Earth?','pacific'],['Year WW2 ended in Europe?','1945']]\nq,a=random.choice(qs)\nprint(q+'@@@'+a)",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "ansSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store answer",
+      "params": {
+        "table": "trivia_answer",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "qRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ask",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "answerCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "answer",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ansGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 436,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stored answer",
+      "params": {
+        "table": "trivia_answer",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "ansIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "right?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "ansClear",
+      "type": "db.set",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "consume answer",
+      "params": {
+        "table": "trivia_answer",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "cScoreGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 606,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "my score",
+      "params": {
+        "table": "trivia_score",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "cInc",
+      "type": "data.math",
+      "x": 286,
+      "y": 364,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "cFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 558,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "template": "✅ Correct, {nick}! +1 — you're on {a} points."
+      }
+    },
+    {
+      "id": "cRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "cSave",
+      "type": "db.set",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save score",
+      "params": {
+        "table": "trivia_score",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "wRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wrong",
+      "params": {
+        "message": "❌ Not quite, {nick}. !trivia for a fresh one."
+      }
+    },
+    {
+      "id": "tsCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 776,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "prefix": "!",
+        "command": "triviascore",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "tsGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 994,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "table": "trivia_score",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "tsFmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 534,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "template": "{nick} — 🧠 {a} trivia points."
+      }
+    },
+    {
+      "id": "tsRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 698,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split q@@@a",
+      "params": {
+        "pattern": "^(.*)@@@(.*)$",
+        "ci": "false"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "triviaCmd",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "ansSet",
+      "toPin": 0
+    },
+    {
+      "from": "ansSet",
+      "fromPin": 0,
+      "to": "qRep",
+      "toPin": 0
+    },
+    {
+      "from": "regex",
+      "fromPin": 3,
+      "to": "ansSet",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 2,
+      "to": "qRep",
+      "toPin": 1
+    },
+    {
+      "from": "answerCmd",
+      "fromPin": 0,
+      "to": "ansIf",
+      "toPin": 0
+    },
+    {
+      "from": "answerCmd",
+      "fromPin": 1,
+      "to": "ansIf",
+      "toPin": 1
+    },
+    {
+      "from": "ansGet",
+      "fromPin": 0,
+      "to": "ansIf",
+      "toPin": 2
+    },
+    {
+      "from": "ansIf",
+      "fromPin": 0,
+      "to": "ansClear",
+      "toPin": 0
+    },
+    {
+      "from": "ansClear",
+      "fromPin": 0,
+      "to": "cRep",
+      "toPin": 0
+    },
+    {
+      "from": "cRep",
+      "fromPin": 0,
+      "to": "cSave",
+      "toPin": 0
+    },
+    {
+      "from": "cScoreGet",
+      "fromPin": 0,
+      "to": "cInc",
+      "toPin": 0
+    },
+    {
+      "from": "cInc",
+      "fromPin": 0,
+      "to": "cFmt",
+      "toPin": 0
+    },
+    {
+      "from": "cInc",
+      "fromPin": 0,
+      "to": "cSave",
+      "toPin": 1
+    },
+    {
+      "from": "cFmt",
+      "fromPin": 0,
+      "to": "cRep",
+      "toPin": 1
+    },
+    {
+      "from": "ansIf",
+      "fromPin": 1,
+      "to": "wRep",
+      "toPin": 0
+    },
+    {
+      "from": "tsCmd",
+      "fromPin": 0,
+      "to": "tsRep",
+      "toPin": 0
+    },
+    {
+      "from": "tsGet",
+      "fromPin": 0,
+      "to": "tsFmt",
+      "toPin": 0
+    },
+    {
+      "from": "tsFmt",
+      "fromPin": 0,
+      "to": "tsRep",
+      "toPin": 1
+    }
+  ]
+}
