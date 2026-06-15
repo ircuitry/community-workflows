@@ -171,6 +171,12 @@
     {
       "from": "run",
       "fromPin": 0,
+      "to": "board",
+      "toPin": 0
+    },
+    {
+      "from": "board",
+      "fromPin": 0,
       "to": "set",
       "toPin": 0
     },

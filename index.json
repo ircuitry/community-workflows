@@ -12407,7 +12407,7 @@
         "db"
       ],
       "nodeCount": 9,
-      "connectionCount": 13,
+      "connectionCount": 14,
       "nodeTypes": [
         "action.multiline",
         "code.run",
@@ -12590,6 +12590,12 @@
           },
           {
             "from": "run",
+            "fromPin": 0,
+            "to": "board",
+            "toPin": 0
+          },
+          {
+            "from": "board",
             "fromPin": 0,
             "to": "set",
             "toPin": 0
