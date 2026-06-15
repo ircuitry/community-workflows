@@ -1,5 +1,5 @@
 {
-  "count": 226,
+  "count": 227,
   "workflows": [
     {
       "name": "Random Advice",
@@ -28915,6 +28915,109 @@
             "from": "fmt",
             "fromPin": 0,
             "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Self-Editing Bot",
+      "description": "An !evolve command that lets the bot rewrite its own workflow on request - add a command, tweak a reply, wire a node - using the built-in Workflow Editor (inward MCP) tools.",
+      "author": "ircuitry",
+      "category": "AI",
+      "tags": [
+        "ai",
+        "meta",
+        "self-editing"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "ai.editor",
+        "ai.reply",
+        "event.command"
+      ],
+      "file": "workflows/SelfEditingBot.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Self-Editing Bot",
+        "description": "An !evolve command that lets the bot rewrite its own workflow on request - add a command, tweak a reply, wire a node - using the built-in Workflow Editor (inward MCP) tools.",
+        "author": "ircuitry",
+        "category": "AI",
+        "tags": [
+          "ai",
+          "meta",
+          "self-editing"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 40,
+            "y": 140,
+            "title": "!evolve",
+            "params": {
+              "command": "evolve"
+            }
+          },
+          {
+            "id": "editor",
+            "type": "ai.editor",
+            "x": 40,
+            "y": 340,
+            "title": "Workflow Editor (this bot)",
+            "params": {
+              "bot": "",
+              "mode": "edit"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 380,
+            "y": 140,
+            "title": "Ask AI to self-edit",
+            "params": {
+              "system": "You are this IRC bot's self-editing assistant. You can inspect and modify the bot workflows in this workspace with your tools. To make a change: first call get_graph to read the current workflow, and list_node_types / describe_node to learn the exact node typeIds and their 0-based pin indices; then apply the change with add_node, connect, disconnect, set_param, remove_node or set_graph. Pin indices are 0-based in pin order; wire Exec->Exec and data->data. Always finish by calling validate_graph and fix any errors it reports. Edits are saved to the workspace and take effect the next time the bot is started. Then reply to the user with ONE short sentence describing what you changed (or why you could not).",
+              "prompt": "{nick} asked you to change this bot: \"{args}\". Make that change to this bot's workflow using your tools, then confirm in one short sentence.",
+              "maxTokens": "1024"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.reply",
+            "x": 760,
+            "y": 140,
+            "title": "Tell them what changed",
+            "params": {
+              "message": "on it!"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "editor",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 2
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "say",
             "toPin": 1
           }
         ]
