@@ -1,0 +1,72 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Bill Pay Nudge",
+  "description": "Nudges #money each day, and on the 25th reminds everyone that utility and card bills are due so payments get scheduled on time.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "bills",
+    "finance"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 18:00",
+      "params": {
+        "mode": "daily",
+        "time": "18:00"
+      }
+    },
+    {
+      "id": "isday25",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is it the 25th?",
+      "params": {
+        "op": "ends with",
+        "b": "-25"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Nudge #money",
+      "params": {
+        "channel": "#money",
+        "message": "Utility and card bills are due around now. Schedule payments."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "isday25",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 2,
+      "to": "isday25",
+      "toPin": 1
+    },
+    {
+      "from": "isday25",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

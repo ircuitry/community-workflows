@@ -1,0 +1,174 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Introduce the Bot (!introduce-bot)",
+  "description": "Self-describing welcome and command tour that greets newcomers on join and answers !botinfo with a friendly blurb.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "onboarding",
+    "help",
+    "intro"
+  ],
+  "nodes": [
+    {
+      "id": "infoCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!botinfo",
+      "params": {
+        "prefix": "!",
+        "command": "botinfo",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "blurb",
+      "type": "data.random",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick a blurb",
+      "params": {
+        "options": "Hi! I'm the community bot. I keep onboarding cozy. Try !intro, !faq, !links, !term to get started.\nHowdy! I'm your friendly community bot. New here? Try !intro, !faq, !links, !term any time.\nHello hello! I'm the community bot, here to help you settle in. Try !intro, !faq, !links, !term.\nWelcome aboard! I'm the community bot. Type !intro, !faq, !links, or !term whenever you need a hand."
+      }
+    },
+    {
+      "id": "infoReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send blurb",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "someone joins",
+      "params": {}
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "skip bots",
+      "params": {}
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "once per hour per user",
+      "params": {
+        "seconds": "3600",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "greet",
+      "type": "data.format",
+      "x": 858,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build welcome",
+      "params": {
+        "template": "Hi {a}! Welcome to {b}. I'm the community bot. Try !intro, !faq, !links, !term. Type !botinfo to learn more."
+      }
+    },
+    {
+      "id": "welcome",
+      "type": "action.say",
+      "x": 1144,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome newcomer",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "infoCmd",
+      "fromPin": 0,
+      "to": "infoReply",
+      "toPin": 0
+    },
+    {
+      "from": "blurb",
+      "fromPin": 0,
+      "to": "infoReply",
+      "toPin": 1
+    },
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "welcome",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "greet",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "greet",
+      "toPin": 1
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "welcome",
+      "toPin": 1
+    },
+    {
+      "from": "greet",
+      "fromPin": 0,
+      "to": "welcome",
+      "toPin": 2
+    }
+  ]
+}

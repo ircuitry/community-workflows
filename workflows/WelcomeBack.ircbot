@@ -1,0 +1,236 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Welcome Back Streak (join)",
+  "description": "Greets returning members on join with a running visit streak, welcoming first-timers and counting repeat visits in the db.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "streak",
+    "join",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On join",
+      "params": {}
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Real person?",
+      "params": {}
+    },
+    {
+      "id": "lastJoinGet",
+      "type": "db.get",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Seen before?",
+      "params": {
+        "table": "lastjoin",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "ifFirst",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "First time?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "sayFirst",
+      "type": "action.say",
+      "x": 1144,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Welcome newcomer",
+      "params": {
+        "channel": "",
+        "message": "Welcome, {nick}! First time here.",
+        "server": ""
+      }
+    },
+    {
+      "id": "visitMath",
+      "type": "data.math",
+      "x": 1144,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Count +1",
+      "params": {
+        "op": "+",
+        "a": "{lastjoinGet.count}",
+        "b": "1"
+      }
+    },
+    {
+      "id": "visitsSet",
+      "type": "db.set",
+      "x": 1430,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Save visit count",
+      "params": {
+        "table": "visits",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "lastJoinSet",
+      "type": "db.set",
+      "x": 1716,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Stamp last join",
+      "params": {
+        "table": "lastjoin",
+        "key": "{nick}",
+        "value": "{date}"
+      }
+    },
+    {
+      "id": "visitsGet",
+      "type": "db.get",
+      "x": 2002,
+      "y": 380,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Read visit count",
+      "params": {
+        "table": "visits",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "1",
+        "find": ""
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 2002,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build greeting",
+      "params": {
+        "template": "Welcome back {nick}! Visit #{a}"
+      }
+    },
+    {
+      "id": "sayBack",
+      "type": "action.say",
+      "x": 2288,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Welcome returner",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "lastJoinGet",
+      "fromPin": 0,
+      "to": "ifFirst",
+      "toPin": 1
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "ifFirst",
+      "toPin": 0
+    },
+    {
+      "from": "ifFirst",
+      "fromPin": 0,
+      "to": "sayFirst",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "sayFirst",
+      "toPin": 1
+    },
+    {
+      "from": "ifFirst",
+      "fromPin": 1,
+      "to": "visitsSet",
+      "toPin": 0
+    },
+    {
+      "from": "visitMath",
+      "fromPin": 0,
+      "to": "visitsSet",
+      "toPin": 1
+    },
+    {
+      "from": "visitsSet",
+      "fromPin": 0,
+      "to": "lastJoinSet",
+      "toPin": 0
+    },
+    {
+      "from": "lastJoinSet",
+      "fromPin": 0,
+      "to": "sayBack",
+      "toPin": 0
+    },
+    {
+      "from": "visitsGet",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "sayBack",
+      "toPin": 2
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "sayBack",
+      "toPin": 1
+    }
+  ]
+}

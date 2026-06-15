@@ -1,0 +1,140 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Timezone Clock (worldtimeapi)",
+  "description": "Tells the current local time for any IANA timezone with !now <zone>, fetched live from the free worldtimeapi.org API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "time",
+    "timezone"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!now <zone>",
+      "params": {
+        "prefix": "!",
+        "command": "now",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build API url",
+      "params": {
+        "template": "https://worldtimeapi.org/api/timezone/{a}"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch time",
+      "params": {
+        "method": "GET",
+        "url": "https://worldtimeapi.org/api/timezone/Europe/London",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "datetime field",
+      "params": {
+        "path": "datetime"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "🕒 Time in {a}: {b}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send time",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

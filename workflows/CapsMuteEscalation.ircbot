@@ -1,0 +1,199 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Caps Mute Escalation",
+  "description": "Counts sustained all-caps shouting per nick in a database and escalates from a polite warning to a channel mute (+q) on the third strike.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "caps",
+    "mute",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "caps",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Sustained shouting?",
+      "params": {
+        "pattern": "[A-Z ]{12,}",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "getStrikes",
+      "type": "db.get",
+      "x": 572,
+      "y": -180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current strikes",
+      "params": {
+        "table": "capsstrikes",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "addStrike",
+      "type": "data.math",
+      "x": 858,
+      "y": -180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1 strike",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "setStrikes",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save strike count",
+      "params": {
+        "table": "capsstrikes",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "thirdStrike",
+      "type": "logic.if",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "3rd strike?",
+      "params": {
+        "op": ">",
+        "b": "2",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "mute",
+      "type": "irc.mode",
+      "x": 1716,
+      "y": -180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mute the shouter",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 2002,
+      "y": -180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the mute",
+      "params": {
+        "text": "caps-mute {nick}"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1716,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "polite warning",
+      "params": {
+        "message": "Easy on the caps, {nick} (strike {result}).",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "caps",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "caps",
+      "toPin": 1
+    },
+    {
+      "from": "caps",
+      "fromPin": 0,
+      "to": "setStrikes",
+      "toPin": 0
+    },
+    {
+      "from": "getStrikes",
+      "fromPin": 0,
+      "to": "addStrike",
+      "toPin": 0
+    },
+    {
+      "from": "addStrike",
+      "fromPin": 0,
+      "to": "setStrikes",
+      "toPin": 1
+    },
+    {
+      "from": "setStrikes",
+      "fromPin": 0,
+      "to": "thirdStrike",
+      "toPin": 0
+    },
+    {
+      "from": "addStrike",
+      "fromPin": 0,
+      "to": "thirdStrike",
+      "toPin": 1
+    },
+    {
+      "from": "thirdStrike",
+      "fromPin": 0,
+      "to": "mute",
+      "toPin": 0
+    },
+    {
+      "from": "mute",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "thirdStrike",
+      "fromPin": 1,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

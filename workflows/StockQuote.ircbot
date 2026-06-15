@@ -1,0 +1,140 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Stock Quote",
+  "description": "Fetch the latest stock price for any ticker with !stock <symbol>, pulled live from Yahoo Finance.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "stock",
+    "finance"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!stock <symbol>",
+      "params": {
+        "prefix": "!",
+        "command": "stock",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build API url",
+      "params": {
+        "template": "https://query1.finance.yahoo.com/v8/finance/chart/{a}?interval=1d"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch quote",
+      "params": {
+        "method": "GET",
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "market price",
+      "params": {
+        "path": "chart.result.0.meta.regularMarketPrice"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "📈 {a} = ${b}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send quote",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

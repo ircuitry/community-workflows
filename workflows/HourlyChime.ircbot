@@ -1,0 +1,72 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Hourly Chime",
+  "description": "Announces the current hour in #lobby every hour using the schedule's own time output.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "time",
+    "interval"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every hour",
+      "params": {
+        "mode": "interval",
+        "every": 1,
+        "unit": "hours"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build chime",
+      "params": {
+        "template": "The time is now {a}. Ding."
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "chime in #lobby",
+      "params": {
+        "channel": "#lobby",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Streak Keeper",
+  "description": "Every night at 21:30 it posts your current habit streak to #habits and nudges you to keep the chain unbroken.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "habits",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 21:30",
+      "params": {
+        "mode": "daily",
+        "time": "21:30"
+      }
+    },
+    {
+      "id": "streak",
+      "type": "db.get",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "read streak",
+      "params": {
+        "table": "habits",
+        "mode": "value",
+        "key": "streak",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build nudge",
+      "params": {
+        "template": "Don't break the chain. Current streak: {a} days. Did you do it today?"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post to #habits",
+      "params": {
+        "channel": "#habits",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "streak",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

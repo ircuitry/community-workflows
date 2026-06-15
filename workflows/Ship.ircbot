@@ -1,0 +1,175 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Ship Two Nicks (!ship)",
+  "description": "Playfully ships two nicks with !ship nick1 nick2, returning a deterministic 0-100 compatibility score and a merged ship-name.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "fun",
+    "social",
+    "random"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ship <nick1> <nick2>",
+      "params": {
+        "prefix": "!",
+        "command": "ship",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "parse",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "two nicks?",
+      "params": {
+        "pattern": "(\\S+)\\s+(\\S+)",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "pair",
+      "type": "data.format",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "combine names",
+      "params": {
+        "template": "{a} {b}"
+      }
+    },
+    {
+      "id": "ship",
+      "type": "code.run",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "deterministic score + ship-name",
+      "params": {
+        "language": "javascript",
+        "timeout": "5",
+        "code": "const parts = (INPUT || '').trim().split(/\\s+/);\nconst a = (parts[0] || '').trim();\nconst b = (parts[1] || '').trim();\n// order-independent deterministic hash so ship(a,b) == ship(b,a)\nconst pair = [a.toLowerCase(), b.toLowerCase()].sort().join('\\u0000');\nlet h = 2166136261;\nfor (let i = 0; i < pair.length; i++) {\n  h ^= pair.charCodeAt(i);\n  h = (h * 16777619) >>> 0;\n}\nconst score = h % 101; // 0..100, always the same for the same pair\n// merged ship-name: first half of a + second half of b\nconst left = a.slice(0, Math.max(1, Math.ceil(a.length / 2)));\nconst right = b.slice(Math.floor(b.length / 2));\nconst shipName = (left + right) || (a + b);\nlet verdict;\nif (score >= 90) verdict = 'soulmates! \\uD83D\\uDC95';\nelse if (score >= 70) verdict = 'a strong match \\uD83D\\uDC96';\nelse if (score >= 50) verdict = 'pretty cute together \\uD83D\\uDE0A';\nelse if (score >= 30) verdict = 'it could work \\uD83E\\uDD1E';\nelse verdict = 'just friends \\uD83E\\uDD1D';\nprint('\\uD83D\\uDC98 ' + a + ' + ' + b + ' = ' + shipName + ' \\u2014 ' + score + '% ' + verdict);"
+      }
+    },
+    {
+      "id": "cache",
+      "type": "db.set",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "cache result",
+      "params": {
+        "table": "ships",
+        "key": "{args}",
+        "value": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "usage",
+      "type": "action.reply",
+      "x": 572,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "usage hint",
+      "params": {
+        "message": "Usage: !ship nick1 nick2",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "parse",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "ship",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 2,
+      "to": "pair",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 3,
+      "to": "pair",
+      "toPin": 1
+    },
+    {
+      "from": "pair",
+      "fromPin": 0,
+      "to": "ship",
+      "toPin": 1
+    },
+    {
+      "from": "ship",
+      "fromPin": 0,
+      "to": "cache",
+      "toPin": 0
+    },
+    {
+      "from": "ship",
+      "fromPin": 1,
+      "to": "cache",
+      "toPin": 1
+    },
+    {
+      "from": "cache",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ship",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 1,
+      "to": "usage",
+      "toPin": 0
+    }
+  ]
+}

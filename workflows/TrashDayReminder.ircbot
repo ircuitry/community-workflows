@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Trash Day Reminder",
+  "description": "Pings #household every Monday at 20:00 reminding everyone to take the trash out for the morning pickup.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "chores",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Mondays 20:00",
+      "params": {
+        "mode": "weekly",
+        "time": "20:00",
+        "days": "Mon"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remind the house",
+      "params": {
+        "channel": "#household",
+        "message": "Take the trash out tonight. Pickup is tomorrow morning."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

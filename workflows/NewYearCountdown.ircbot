@@ -1,0 +1,97 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "New Year Countdown",
+  "description": "Each evening at 20:00 it announces how many days remain until January 1st of next year, nudging #general to make the rest of the year count.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "countdown",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 20:00",
+      "params": {
+        "mode": "daily",
+        "time": "20:00"
+      }
+    },
+    {
+      "id": "calc",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Days until New Year",
+      "params": {
+        "language": "javascript",
+        "code": "const now = new Date();\nconst nextYear = now.getFullYear() + 1;\nconst newYear = new Date(nextYear, 0, 1);\nconst msPerDay = 1000 * 60 * 60 * 24;\nconst start = new Date(now.getFullYear(), now.getMonth(), now.getDate());\nreturn Math.round((newYear - start) / msPerDay);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build message",
+      "params": {
+        "template": "{a} days left in the year. Make them count."
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce to #general",
+      "params": {
+        "channel": "#general",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "calc",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 2,
+      "to": "calc",
+      "toPin": 1
+    },
+    {
+      "from": "calc",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "calc",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

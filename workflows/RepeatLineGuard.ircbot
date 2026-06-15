@@ -1,0 +1,267 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Repeat Line Guard",
+  "description": "Watches each user's last line and mutes anyone who repeats the same message three times in a row, warning them on earlier repeats.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "spam",
+    "repeat"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "lastLine",
+      "type": "db.get",
+      "x": 286,
+      "y": -180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "user's previous line",
+      "params": {
+        "table": "lastline",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "same",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "same as last line?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "countGet",
+      "type": "db.get",
+      "x": 858,
+      "y": -360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current repeat count",
+      "params": {
+        "table": "repeatct",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "countInc",
+      "type": "data.math",
+      "x": 1144,
+      "y": -360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "countSet",
+      "type": "db.set",
+      "x": 858,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save repeat count",
+      "params": {
+        "table": "repeatct",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "threshold",
+      "type": "logic.if",
+      "x": 1144,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "repeated > 2 times?",
+      "params": {
+        "op": ">",
+        "b": "2",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "mute",
+      "type": "irc.mode",
+      "x": 1430,
+      "y": -240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mute the repeater",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1716,
+      "y": -240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the mute",
+      "params": {
+        "text": "muted {nick} for repeating: {message}"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn the repeater",
+      "params": {
+        "message": "please stop repeating yourself, {nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "resetCount",
+      "type": "db.set",
+      "x": 858,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reset repeat count",
+      "params": {
+        "table": "repeatct",
+        "key": "{nick}",
+        "value": "0"
+      }
+    },
+    {
+      "id": "storeLine",
+      "type": "db.set",
+      "x": 1144,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store new line",
+      "params": {
+        "table": "lastline",
+        "key": "{nick}",
+        "value": "{message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "same",
+      "toPin": 0
+    },
+    {
+      "from": "lastLine",
+      "fromPin": 0,
+      "to": "same",
+      "toPin": 1
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "same",
+      "toPin": 2
+    },
+    {
+      "from": "same",
+      "fromPin": 0,
+      "to": "countSet",
+      "toPin": 0
+    },
+    {
+      "from": "countGet",
+      "fromPin": 0,
+      "to": "countInc",
+      "toPin": 0
+    },
+    {
+      "from": "countInc",
+      "fromPin": 0,
+      "to": "countSet",
+      "toPin": 1
+    },
+    {
+      "from": "countSet",
+      "fromPin": 0,
+      "to": "threshold",
+      "toPin": 0
+    },
+    {
+      "from": "countInc",
+      "fromPin": 0,
+      "to": "threshold",
+      "toPin": 1
+    },
+    {
+      "from": "threshold",
+      "fromPin": 0,
+      "to": "mute",
+      "toPin": 0
+    },
+    {
+      "from": "mute",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "threshold",
+      "fromPin": 1,
+      "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "same",
+      "fromPin": 1,
+      "to": "resetCount",
+      "toPin": 0
+    },
+    {
+      "from": "resetCount",
+      "fromPin": 0,
+      "to": "storeLine",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "storeLine",
+      "toPin": 1
+    }
+  ]
+}

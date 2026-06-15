@@ -1,0 +1,190 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Pin This (!pin / !pinned)",
+  "description": "Pin one channel message for quick recall with !pin <text>, fetch it with !pinned, and clear it with !unpin.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "pin",
+    "db",
+    "message"
+  ],
+  "nodes": [
+    {
+      "id": "pinCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!pin <text>",
+      "params": {
+        "prefix": "!",
+        "command": "pin",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pinSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save pin",
+      "params": {
+        "table": "pins",
+        "key": "{channel}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "pinReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm pin",
+      "params": {
+        "message": "Pinned: {args}",
+        "server": ""
+      }
+    },
+    {
+      "id": "pinnedCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!pinned",
+      "params": {
+        "prefix": "!",
+        "command": "pinned",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pinnedGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "read pin",
+      "params": {
+        "table": "pins",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "Nothing pinned. Pin with !pin <text>",
+        "find": ""
+      }
+    },
+    {
+      "id": "pinnedSay",
+      "type": "action.say",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "show pin",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "unpinCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!unpin",
+      "params": {
+        "prefix": "!",
+        "command": "unpin",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "unpinSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear pin",
+      "params": {
+        "table": "pins",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "unpinReact",
+      "type": "action.react",
+      "x": 572,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react x",
+      "params": {
+        "emoji": "x",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "pinCmd",
+      "fromPin": 0,
+      "to": "pinSet",
+      "toPin": 0
+    },
+    {
+      "from": "pinCmd",
+      "fromPin": 1,
+      "to": "pinSet",
+      "toPin": 1
+    },
+    {
+      "from": "pinSet",
+      "fromPin": 0,
+      "to": "pinReply",
+      "toPin": 0
+    },
+    {
+      "from": "pinnedCmd",
+      "fromPin": 0,
+      "to": "pinnedSay",
+      "toPin": 0
+    },
+    {
+      "from": "pinnedCmd",
+      "fromPin": 3,
+      "to": "pinnedSay",
+      "toPin": 1
+    },
+    {
+      "from": "pinnedGet",
+      "fromPin": 0,
+      "to": "pinnedSay",
+      "toPin": 2
+    },
+    {
+      "from": "unpinCmd",
+      "fromPin": 0,
+      "to": "unpinSet",
+      "toPin": 0
+    },
+    {
+      "from": "unpinSet",
+      "fromPin": 0,
+      "to": "unpinReact",
+      "toPin": 0
+    }
+  ]
+}

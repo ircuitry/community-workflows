@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Morning Standup Ping",
+  "description": "Pings #team every weekday at 09:15 to remind everyone that standup starts in 15 minutes.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "standup",
+    "team"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Weekdays 09:15",
+      "params": {
+        "mode": "weekly",
+        "time": "09:15",
+        "days": "Mon,Tue,Wed,Thu,Fri"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ping the team",
+      "params": {
+        "channel": "#team",
+        "message": "Standup in 15 minutes. Drop your yesterday/today/blockers."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

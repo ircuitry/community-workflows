@@ -1,0 +1,84 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Weekend Kickoff",
+  "description": "Every Friday at 17:00 it drops a random celebratory line in #lounge to officially kick off the weekend.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "fun",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fridays 17:00",
+      "params": {
+        "mode": "weekly",
+        "time": "17:00",
+        "days": "Fri"
+      }
+    },
+    {
+      "id": "rand",
+      "type": "data.random",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick a line",
+      "params": {
+        "options": "Time to log off and log on to fun.\nThe weekend has entered the chat.\nClocking out, vibing in.\nWeekend protocol initiated."
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "Weekend mode engaged. {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce in #lounge",
+      "params": {
+        "channel": "#lounge",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "rand",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

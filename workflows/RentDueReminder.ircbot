@@ -1,0 +1,73 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Rent Due Reminder",
+  "description": "Posts a rent-due reminder to #household every month on the 1st, checking the schedule date suffix for monthly cadence.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "bills",
+    "monthly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 09:00",
+      "params": {
+        "mode": "daily",
+        "time": "09:00"
+      }
+    },
+    {
+      "id": "first",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is it the 1st?",
+      "params": {
+        "op": "ends with",
+        "b": "-01",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remind household",
+      "params": {
+        "channel": "#household",
+        "message": "Rent is due today. Remember to pay before midnight."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "first",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 2,
+      "to": "first",
+      "toPin": 1
+    },
+    {
+      "from": "first",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

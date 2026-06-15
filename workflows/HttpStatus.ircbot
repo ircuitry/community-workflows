@@ -1,0 +1,80 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "HTTP Status Code Meaning",
+  "description": "Look up the meaning of a common HTTP status code locally with !status <code>, e.g. !status 404.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "http",
+    "reference"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!status <code>",
+      "params": {
+        "prefix": "!",
+        "command": "status",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "HTTP code -> meaning",
+      "params": {
+        "language": "javascript",
+        "code": "const codes = {\n  '200': 'OK',\n  '201': 'Created',\n  '204': 'No Content',\n  '301': 'Moved Permanently',\n  '302': 'Found',\n  '304': 'Not Modified',\n  '400': 'Bad Request',\n  '401': 'Unauthorized',\n  '403': 'Forbidden',\n  '404': 'Not Found',\n  '405': 'Method Not Allowed',\n  '418': \"I'm a teapot\",\n  '429': 'Too Many Requests',\n  '500': 'Internal Server Error',\n  '502': 'Bad Gateway',\n  '503': 'Service Unavailable',\n  '504': 'Gateway Timeout'\n};\nconst n = (input || '').trim().match(/\\d{3}/);\nif (!n) return 'Usage: !status <code> (e.g. !status 404)';\nconst code = n[0];\nconst meaning = codes[code];\nreturn meaning ? code + ': ' + meaning : code + ': Unknown or uncommon HTTP status code';",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send meaning",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "lookup",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "lookup",
+      "toPin": 1
+    },
+    {
+      "from": "lookup",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

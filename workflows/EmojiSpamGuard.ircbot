@@ -1,0 +1,117 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Emoji Spam Guard",
+  "description": "Kicks repeat offenders who flood the channel with six or more emoji in a row, with a short per-user cooldown so first-timers are spared.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "spam",
+    "emoji",
+    "kick"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "emojiRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "6+ emoji in a row?",
+      "params": {
+        "pattern": "([\\x{1F300}-\\x{1FAFF}\\x{2600}-\\x{27BF}]\\s*){6,}",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "cooldown",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "repeat offender?",
+      "params": {
+        "seconds": "20",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 858,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick flooder",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "Emoji flood",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log the flood",
+      "params": {
+        "text": "emoji-spam {nick} in {channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "emojiRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "emojiRegex",
+      "toPin": 1
+    },
+    {
+      "from": "emojiRegex",
+      "fromPin": 0,
+      "to": "cooldown",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cooldown",
+      "toPin": 1
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

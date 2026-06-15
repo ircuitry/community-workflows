@@ -1,0 +1,138 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Color Code Strip Warn",
+  "description": "Warns users (with a per-user cooldown) when their message contains mIRC color or formatting control codes that can break some clients.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "color",
+    "warn"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "re",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Has color/format codes?",
+      "params": {
+        "pattern": "[\\x03\\x02\\x1f\\x16\\x1d]",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "cd",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Per-user 60s cooldown",
+      "params": {
+        "seconds": "60",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build warning",
+      "params": {
+        "template": "Please avoid color/formatting codes, {a} - they break some clients."
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Warn the user",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1144,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log the warning",
+      "params": {
+        "text": "colorcode-warn {nick}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "re",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "re",
+      "toPin": 1
+    },
+    {
+      "from": "re",
+      "fromPin": 0,
+      "to": "cd",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cd",
+      "toPin": 1
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "cd",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

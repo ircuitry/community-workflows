@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Quote of the Day",
+  "description": "Posts a fresh, randomly chosen famous quote into #general every morning at 08:30.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "daily",
+    "quotes"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 08:30",
+      "params": {
+        "mode": "daily",
+        "time": "08:30"
+      }
+    },
+    {
+      "id": "rand",
+      "type": "data.random",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick a quote",
+      "params": {
+        "options": "The only way to do great work is to love what you do. - Steve Jobs\nIn the middle of difficulty lies opportunity. - Albert Einstein\nThe future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt\nIt always seems impossible until it is done. - Nelson Mandela\nSuccess is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill\nWhatever you are, be a good one. - Abraham Lincoln"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "Quote of the day: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post to #general",
+      "params": {
+        "channel": "#general",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "rand",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

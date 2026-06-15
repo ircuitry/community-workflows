@@ -1,0 +1,224 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Repeated Flood Redact",
+  "description": "Detects users posting faster than every 3 seconds, counts their rapid lines, and once they cross a threshold redacts the message, quiets them, and logs the flood.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "flood",
+    "redact"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "cooldown",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Faster than 3s?",
+      "params": {
+        "seconds": "3",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "getCount",
+      "type": "db.get",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current flood count",
+      "params": {
+        "table": "floodct",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "addOne",
+      "type": "data.math",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "saveCount",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save flood count",
+      "params": {
+        "table": "floodct",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "ifFlood",
+      "type": "logic.if",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count > 4?",
+      "params": {
+        "op": ">",
+        "b": "4",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "msgid",
+      "type": "data.gettag",
+      "x": 1430,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "this msg id",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 1716,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "redact flood line",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "flood",
+        "server": ""
+      }
+    },
+    {
+      "id": "quiet",
+      "type": "irc.mode",
+      "x": 2002,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+q the flooder",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 2288,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the flood",
+      "params": {
+        "text": "flood-redact {nick}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "cooldown",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cooldown",
+      "toPin": 1
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 1,
+      "to": "saveCount",
+      "toPin": 0
+    },
+    {
+      "from": "getCount",
+      "fromPin": 0,
+      "to": "addOne",
+      "toPin": 0
+    },
+    {
+      "from": "addOne",
+      "fromPin": 0,
+      "to": "saveCount",
+      "toPin": 1
+    },
+    {
+      "from": "saveCount",
+      "fromPin": 0,
+      "to": "ifFlood",
+      "toPin": 0
+    },
+    {
+      "from": "addOne",
+      "fromPin": 0,
+      "to": "ifFlood",
+      "toPin": 1
+    },
+    {
+      "from": "ifFlood",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 3,
+      "to": "redact",
+      "toPin": 1
+    },
+    {
+      "from": "msgid",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "quiet",
+      "toPin": 0
+    },
+    {
+      "from": "quiet",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Sunrise and Sunset",
+  "description": "Posts today's sunrise and sunset times to #nature every morning at 06:00, fetched live from the free sunrise-sunset.org API.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "nature",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 06:00",
+      "params": {
+        "mode": "daily",
+        "time": "06:00"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch sun times",
+      "params": {
+        "method": "GET",
+        "url": "https://api.sunrise-sunset.org/json?lat=51.5&lng=-0.12&formatted=0",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick sunrise",
+      "params": {
+        "path": "results.sunrise"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "Sunrise/sunset times for today: {a} UTC"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post to #nature",
+      "params": {
+        "channel": "#nature",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

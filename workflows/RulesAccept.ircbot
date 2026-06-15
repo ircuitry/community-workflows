@@ -1,0 +1,181 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Rules Accept (!agree)",
+  "description": "Greets joiners with the rules and lets them type !agree to record their acceptance and get voiced, with !agreed? to look anyone up.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "rules",
+    "db",
+    "onboarding"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On join",
+      "params": {}
+    },
+    {
+      "id": "greet",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Greet joiner",
+      "params": {
+        "channel": "",
+        "message": "{nick}: please read the rules and type !agree to get voiced.",
+        "server": ""
+      }
+    },
+    {
+      "id": "agreeCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!agree",
+      "params": {
+        "prefix": "!",
+        "command": "agree",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "saveAgree",
+      "type": "db.set",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Record acceptance",
+      "params": {
+        "table": "agreed",
+        "key": "{nick}",
+        "value": "{date}"
+      }
+    },
+    {
+      "id": "voice",
+      "type": "irc.mode",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Give voice",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+v",
+        "target": "{nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "thanks",
+      "type": "action.reply",
+      "x": 858,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Confirm",
+      "params": {
+        "message": "Thanks {nick}, you're all set!",
+        "server": ""
+      }
+    },
+    {
+      "id": "checkCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!agreed? <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "agreed?",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 286,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Look up acceptance",
+      "params": {
+        "table": "agreed",
+        "mode": "value",
+        "key": "{args}",
+        "default": "Not yet accepted",
+        "find": ""
+      }
+    },
+    {
+      "id": "checkReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Report status",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "greet",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "greet",
+      "toPin": 1
+    },
+    {
+      "from": "agreeCmd",
+      "fromPin": 0,
+      "to": "saveAgree",
+      "toPin": 0
+    },
+    {
+      "from": "saveAgree",
+      "fromPin": 0,
+      "to": "voice",
+      "toPin": 0
+    },
+    {
+      "from": "voice",
+      "fromPin": 0,
+      "to": "thanks",
+      "toPin": 0
+    },
+    {
+      "from": "checkCmd",
+      "fromPin": 0,
+      "to": "checkReply",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "checkReply",
+      "toPin": 1
+    }
+  ]
+}

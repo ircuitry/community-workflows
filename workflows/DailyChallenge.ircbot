@@ -1,0 +1,84 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Daily Challenge",
+  "description": "Posts a random mini-challenge to #challenges every day at 10:00 to keep the channel motivated.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "challenge",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 10:00",
+      "params": {
+        "mode": "daily",
+        "time": "10:00"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a challenge",
+      "params": {
+        "options": "Refactor one function today.\nDM someone a thank-you.\nWrite a test for untested code.\nDelete some dead code.\nLearn one new keyboard shortcut.\nDocument a tricky bit of code."
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build message",
+      "params": {
+        "template": "Today's challenge: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post to #challenges",
+      "params": {
+        "channel": "#challenges",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

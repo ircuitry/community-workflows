@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Market Close Bell",
+  "description": "Announces in #markets at 16:00 every weekday that the markets have closed for the day.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "finance",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Weekdays 16:00",
+      "params": {
+        "mode": "weekly",
+        "time": "16:00",
+        "days": "Mon-Fri"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ring the close bell",
+      "params": {
+        "channel": "#markets",
+        "message": "Closing bell. Markets are closed for the day."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Blacklist Nick On Join",
+  "description": "When someone joins, matches their nick against a throwaway/spam pattern and kicks them, bans the mask so they cannot rejoin, and logs the action.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "nick",
+    "join",
+    "regex"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On join",
+      "params": {}
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Blacklisted nick?",
+      "params": {
+        "pattern": "(?i)^(guest|spam|sex|bot|free)\\d{2,}",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick offender",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "Blacklisted nick pattern",
+        "server": ""
+      }
+    },
+    {
+      "id": "mask",
+      "type": "data.format",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build ban mask",
+      "params": {
+        "template": "{a}!*@*"
+      }
+    },
+    {
+      "id": "ban",
+      "type": "irc.mode",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ban mask",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+b",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 572,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log blacklist",
+      "params": {
+        "text": "blacklist-nick {nick} joined {channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "ban",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "mask",
+      "toPin": 0
+    },
+    {
+      "from": "mask",
+      "fromPin": 0,
+      "to": "ban",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

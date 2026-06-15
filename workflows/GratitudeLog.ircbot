@@ -1,0 +1,164 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Gratitude Log (!grateful)",
+  "description": "Log daily gratitude entries with !grateful and resurface a random past one with !blessing.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "gratitude",
+    "db",
+    "wellbeing"
+  ],
+  "nodes": [
+    {
+      "id": "gratCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!grateful <thing>",
+      "params": {
+        "prefix": "!",
+        "command": "grateful",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "insert",
+      "type": "db.sql",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save gratitude",
+      "params": {
+        "file": "community.db",
+        "sql": "INSERT INTO gratitude(nick,txt,d) VALUES('{nick}','{args}',date('now'))"
+      }
+    },
+    {
+      "id": "react",
+      "type": "action.react",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react heart",
+      "params": {
+        "emoji": "heart",
+        "server": ""
+      }
+    },
+    {
+      "id": "ack",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm",
+      "params": {
+        "message": "Logged your gratitude, {nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "blessCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!blessing",
+      "params": {
+        "prefix": "!",
+        "command": "blessing",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "db.sql",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "random past entry",
+      "params": {
+        "file": "community.db",
+        "sql": "SELECT txt, nick FROM gratitude ORDER BY RANDOM() LIMIT 1"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build line",
+      "params": {
+        "template": "Someone was grateful for: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "share blessing",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "gratCmd",
+      "fromPin": 0,
+      "to": "insert",
+      "toPin": 0
+    },
+    {
+      "from": "insert",
+      "fromPin": 0,
+      "to": "react",
+      "toPin": 0
+    },
+    {
+      "from": "react",
+      "fromPin": 0,
+      "to": "ack",
+      "toPin": 0
+    },
+    {
+      "from": "blessCmd",
+      "fromPin": 0,
+      "to": "pick",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Water Break",
+  "description": "Posts a randomized hydration nudge to #health every hour so the channel remembers to take a water break.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "health",
+    "interval"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every 60 minutes",
+      "params": {
+        "mode": "interval",
+        "every": "60",
+        "unit": "minutes"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a nudge",
+      "params": {
+        "options": "Sip some water.\nHydrate now.\nGrab a glass of water."
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Nudge #health",
+      "params": {
+        "channel": "#health",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

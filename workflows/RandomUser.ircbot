@@ -1,0 +1,134 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Random User Generator",
+  "description": "Type !randuser to fetch a random person's name and email live from the free randomuser.me API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "random",
+    "data"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!randuser",
+      "params": {
+        "prefix": "!",
+        "command": "randuser",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch random user",
+      "params": {
+        "method": "GET",
+        "url": "https://randomuser.me/api/",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "first",
+      "type": "data.json",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first name",
+      "params": {
+        "path": "results.0.name.first"
+      }
+    },
+    {
+      "id": "email",
+      "type": "data.json",
+      "x": 572,
+      "y": 310,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "email",
+      "params": {
+        "path": "results.0.email"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{a} <{b}>"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send random user",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "first",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "email",
+      "toPin": 0
+    },
+    {
+      "from": "first",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "email",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

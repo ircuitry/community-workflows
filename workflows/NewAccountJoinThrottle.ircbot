@@ -1,0 +1,185 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "New Account Join Throttle",
+  "description": "Mutes first-time joiners for 60 seconds with a friendly welcome, then unmutes them and remembers them so returning members are never throttled again.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "join",
+    "throttle",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On join",
+      "params": {}
+    },
+    {
+      "id": "seen",
+      "type": "db.get",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "have we seen this nick?",
+      "params": {
+        "table": "seenacct",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "NEW",
+        "find": ""
+      }
+    },
+    {
+      "id": "isnew",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first time here?",
+      "params": {
+        "op": "=",
+        "b": "NEW",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "mute",
+      "type": "irc.mode",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mute new joiner (+q)",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "welcome",
+      "type": "action.reply",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome message",
+      "params": {
+        "message": "Welcome {nick}! New joiners are read-only for 60s.",
+        "server": ""
+      }
+    },
+    {
+      "id": "wait",
+      "type": "flow.delay",
+      "x": 1430,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wait 60s",
+      "params": {
+        "seconds": "60"
+      }
+    },
+    {
+      "id": "unmute",
+      "type": "irc.mode",
+      "x": 1716,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "unmute (-q)",
+      "params": {
+        "channel": "{channel}",
+        "modes": "-q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "remember",
+      "type": "db.set",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mark nick as seen",
+      "params": {
+        "table": "seenacct",
+        "key": "{nick}",
+        "value": "SEEN"
+      }
+    },
+    {
+      "id": "returning",
+      "type": "action.log",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log returning member",
+      "params": {
+        "text": "returning {nick}, no throttle"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isnew",
+      "toPin": 0
+    },
+    {
+      "from": "seen",
+      "fromPin": 0,
+      "to": "isnew",
+      "toPin": 1
+    },
+    {
+      "from": "isnew",
+      "fromPin": 0,
+      "to": "mute",
+      "toPin": 0
+    },
+    {
+      "from": "mute",
+      "fromPin": 0,
+      "to": "welcome",
+      "toPin": 0
+    },
+    {
+      "from": "welcome",
+      "fromPin": 0,
+      "to": "wait",
+      "toPin": 0
+    },
+    {
+      "from": "wait",
+      "fromPin": 0,
+      "to": "unmute",
+      "toPin": 0
+    },
+    {
+      "from": "isnew",
+      "fromPin": 0,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "isnew",
+      "fromPin": 1,
+      "to": "returning",
+      "toPin": 0
+    }
+  ]
+}

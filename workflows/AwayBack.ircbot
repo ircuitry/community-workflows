@@ -1,0 +1,226 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Away / Back (!away !back)",
+  "description": "Set a personal away status with !away <reason>, clear it with !back, and auto-notify anyone who @mentions an away user that they are gone.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "presence",
+    "db",
+    "status"
+  ],
+  "nodes": [
+    {
+      "id": "awayCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!away <reason>",
+      "params": {
+        "prefix": "!",
+        "command": "away",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "awaySet",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save away status",
+      "params": {
+        "table": "away",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "awayReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm away",
+      "params": {
+        "message": "Marked away: {args}",
+        "server": ""
+      }
+    },
+    {
+      "id": "backCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!back",
+      "params": {
+        "prefix": "!",
+        "command": "back",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "backSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear away status",
+      "params": {
+        "table": "away",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "backReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome back",
+      "params": {
+        "message": "Welcome back, {nick}!",
+        "server": ""
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "mention",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "find @mention",
+      "params": {
+        "pattern": "@(\\w+)",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 572,
+      "y": 740,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up away status",
+      "params": {
+        "table": "away",
+        "mode": "value",
+        "key": "{$1}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "isAway",
+      "type": "logic.if",
+      "x": 858,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is there a status?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "notify",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "notify mentioner",
+      "params": {
+        "message": "{$1} is away: {value}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "awayCmd",
+      "fromPin": 0,
+      "to": "awaySet",
+      "toPin": 0
+    },
+    {
+      "from": "awayCmd",
+      "fromPin": 1,
+      "to": "awaySet",
+      "toPin": 1
+    },
+    {
+      "from": "awaySet",
+      "fromPin": 0,
+      "to": "awayReply",
+      "toPin": 0
+    },
+    {
+      "from": "backCmd",
+      "fromPin": 0,
+      "to": "backSet",
+      "toPin": 0
+    },
+    {
+      "from": "backSet",
+      "fromPin": 0,
+      "to": "backReply",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "mention",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "mention",
+      "toPin": 1
+    },
+    {
+      "from": "mention",
+      "fromPin": 0,
+      "to": "isAway",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "isAway",
+      "toPin": 1
+    },
+    {
+      "from": "isAway",
+      "fromPin": 1,
+      "to": "notify",
+      "toPin": 0
+    }
+  ]
+}

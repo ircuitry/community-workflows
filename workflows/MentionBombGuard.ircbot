@@ -1,0 +1,135 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Mention Bomb Guard",
+  "description": "Detects mass-ping messages that highlight five or more nicks at once, then mutes the sender, warns them, and logs the incident.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "mention",
+    "spam"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "bomb",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "5+ nick: prefixes?",
+      "params": {
+        "pattern": "((?:[A-Za-z0-9_\\-\\[\\]\\\\^{}|`]+[,:]\\s+){5,})",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "throttle per user",
+      "params": {
+        "seconds": "15",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "mute",
+      "type": "irc.mode",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mute offender (+q)",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}!*@*",
+        "server": ""
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn offender",
+      "params": {
+        "message": "Mass-pinging is not allowed, {nick}.",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log incident",
+      "params": {
+        "text": "mention-bomb {nick}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "bomb",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "bomb",
+      "toPin": 1
+    },
+    {
+      "from": "bomb",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "mute",
+      "toPin": 0
+    },
+    {
+      "from": "mute",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "warn",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Cake Day Cheer (!cakeday)",
+  "description": "Records the date each member first joined and cheers their channel anniversary every morning, with !cakeday <nick> to look up when someone joined.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "celebrate",
+    "db",
+    "join"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on member join",
+      "params": {}
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "skip bots",
+      "params": {}
+    },
+    {
+      "id": "joinedGet",
+      "type": "db.get",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "already recorded?",
+      "params": {
+        "table": "joined",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "ifNew",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first time seen?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "joinedSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save join date",
+      "params": {
+        "table": "joined",
+        "key": "{nick}",
+        "value": "{date}"
+      }
+    },
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!cakeday <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "cakeday",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookupGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up join date",
+      "params": {
+        "table": "joined",
+        "mode": "value",
+        "key": "{args}",
+        "default": "Unknown",
+        "find": ""
+      }
+    },
+    {
+      "id": "lookupFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{a} joined on {b} - happy cake day if it's today!"
+      }
+    },
+    {
+      "id": "lookupReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 920,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "daily 10:00",
+      "params": {
+        "mode": "daily",
+        "time": "10:00",
+        "days": ""
+      }
+    },
+    {
+      "id": "sql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 920,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "today's cake days",
+      "params": {
+        "file": "",
+        "sql": "SELECT GROUP_CONCAT(key, ', ') FROM joined WHERE strftime('%m-%d', value) = strftime('%m-%d', 'now')"
+      }
+    },
+    {
+      "id": "cheerFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 920,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build cheer",
+      "params": {
+        "template": "Happy cake day to {a}! Thanks for being part of the channel."
+      }
+    },
+    {
+      "id": "cheerSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 920,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "cheer the channel",
+      "params": {
+        "channel": "#general",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "ifNew",
+      "toPin": 0
+    },
+    {
+      "from": "joinedGet",
+      "fromPin": 0,
+      "to": "ifNew",
+      "toPin": 1
+    },
+    {
+      "from": "ifNew",
+      "fromPin": 0,
+      "to": "joinedSet",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "lookupReply",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "lookupFmt",
+      "toPin": 0
+    },
+    {
+      "from": "lookupGet",
+      "fromPin": 0,
+      "to": "lookupFmt",
+      "toPin": 1
+    },
+    {
+      "from": "lookupFmt",
+      "fromPin": 0,
+      "to": "lookupReply",
+      "toPin": 1
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "sql",
+      "toPin": 0
+    },
+    {
+      "from": "sql",
+      "fromPin": 0,
+      "to": "cheerSay",
+      "toPin": 0
+    },
+    {
+      "from": "sql",
+      "fromPin": 1,
+      "to": "cheerFmt",
+      "toPin": 0
+    },
+    {
+      "from": "cheerFmt",
+      "fromPin": 0,
+      "to": "cheerSay",
+      "toPin": 2
+    }
+  ]
+}

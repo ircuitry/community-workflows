@@ -1,0 +1,247 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Link Board (!savelink / !links)",
+  "description": "Crowd-shared link wall: save URLs to a per-channel board with !savelink, then count or recall the latest with !links and !lastlink.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "links",
+    "db",
+    "share"
+  ],
+  "nodes": [
+    {
+      "id": "saveCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!savelink <url>",
+      "params": {
+        "prefix": "!",
+        "command": "savelink",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "urlRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "find a URL",
+      "params": {
+        "pattern": "(https?://\\S+)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "saveDb",
+      "type": "db.set",
+      "x": 572,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save link",
+      "params": {
+        "table": "links:{channel}",
+        "key": "{time}-{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "react",
+      "type": "action.react",
+      "x": 858,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react",
+      "params": {
+        "emoji": "link",
+        "server": ""
+      }
+    },
+    {
+      "id": "noUrl",
+      "type": "action.reply",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ask for a URL",
+      "params": {
+        "message": "Give me a URL: !savelink https://...",
+        "server": ""
+      }
+    },
+    {
+      "id": "linksCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!links",
+      "params": {
+        "prefix": "!",
+        "command": "links",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "countDb",
+      "type": "db.get",
+      "x": 286,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count links",
+      "params": {
+        "table": "links:{channel}",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "countFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{a} links saved. Browse: !lastlink"
+      }
+    },
+    {
+      "id": "countReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply with count",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "lastCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 820,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!lastlink",
+      "params": {
+        "prefix": "!",
+        "command": "lastlink",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lastDb",
+      "type": "db.get",
+      "x": 286,
+      "y": 980,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "newest link",
+      "params": {
+        "table": "links:{channel}",
+        "mode": "value",
+        "key": "",
+        "default": "No links saved yet. Add one with !savelink",
+        "find": ""
+      }
+    },
+    {
+      "id": "lastReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 820,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply with link",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "saveCmd",
+      "fromPin": 0,
+      "to": "urlRegex",
+      "toPin": 0
+    },
+    {
+      "from": "saveCmd",
+      "fromPin": 1,
+      "to": "urlRegex",
+      "toPin": 1
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 0,
+      "to": "saveDb",
+      "toPin": 0
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 2,
+      "to": "saveDb",
+      "toPin": 1
+    },
+    {
+      "from": "saveDb",
+      "fromPin": 0,
+      "to": "react",
+      "toPin": 0
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 1,
+      "to": "noUrl",
+      "toPin": 0
+    },
+    {
+      "from": "linksCmd",
+      "fromPin": 0,
+      "to": "countReply",
+      "toPin": 0
+    },
+    {
+      "from": "countDb",
+      "fromPin": 1,
+      "to": "countFmt",
+      "toPin": 0
+    },
+    {
+      "from": "countFmt",
+      "fromPin": 0,
+      "to": "countReply",
+      "toPin": 1
+    },
+    {
+      "from": "lastCmd",
+      "fromPin": 0,
+      "to": "lastReply",
+      "toPin": 0
+    },
+    {
+      "from": "lastDb",
+      "fromPin": 0,
+      "to": "lastReply",
+      "toPin": 1
+    }
+  ]
+}

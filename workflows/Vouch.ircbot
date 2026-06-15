@@ -1,0 +1,161 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Vouch (!vouch)",
+  "description": "Members build a whitelist of trust by vouching for each other with !vouch <nick>, tallying distinct vouchers per target and replying with the running count (one vouch per voucher per day).",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "trust",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!vouch <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "vouch",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "once per day per voucher",
+      "params": {
+        "seconds": "86400",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "insert",
+      "type": "db.sql",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record vouch",
+      "params": {
+        "file": "community.db",
+        "sql": "CREATE TABLE IF NOT EXISTS vouches(target TEXT, voucher TEXT, UNIQUE(target,voucher)); INSERT OR IGNORE INTO vouches(target,voucher) VALUES('{args}','{nick}')"
+      }
+    },
+    {
+      "id": "count",
+      "type": "db.sql",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "tally vouches",
+      "params": {
+        "file": "community.db",
+        "sql": "SELECT COUNT(*) FROM vouches WHERE target='{args}'"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{b} now has {a} vouches."
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce count",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "wait",
+      "type": "action.reply",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "cooldown notice",
+      "params": {
+        "message": "You can vouch once per day.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "insert",
+      "toPin": 0
+    },
+    {
+      "from": "insert",
+      "fromPin": 0,
+      "to": "count",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 2,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 1,
+      "to": "wait",
+      "toPin": 0
+    }
+  ]
+}

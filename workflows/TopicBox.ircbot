@@ -1,0 +1,196 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Topic Suggestion Box (!topicbox)",
+  "description": "Collect discussion topics into a database with !topicbox <idea>, then draw a random one with !nexttopic.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "topics",
+    "db",
+    "queue"
+  ],
+  "nodes": [
+    {
+      "id": "addCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!topicbox <idea>",
+      "params": {
+        "prefix": "!",
+        "command": "topicbox",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "addSql",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build INSERT",
+      "params": {
+        "template": "CREATE TABLE IF NOT EXISTS topics(ch TEXT, nick TEXT, topic TEXT); INSERT INTO topics(ch,nick,topic) VALUES('{channel}','{nick}','{a}')"
+      }
+    },
+    {
+      "id": "addDb",
+      "type": "db.sql",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save topic",
+      "params": {
+        "file": "community.db",
+        "sql": ""
+      }
+    },
+    {
+      "id": "addReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm",
+      "params": {
+        "message": "Added to the topic box, {nick}!",
+        "server": ""
+      }
+    },
+    {
+      "id": "drawCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!nexttopic",
+      "params": {
+        "prefix": "!",
+        "command": "nexttopic",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "drawDb",
+      "type": "db.sql",
+      "x": 286,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "draw random topic",
+      "params": {
+        "file": "community.db",
+        "sql": "SELECT topic FROM topics ORDER BY RANDOM() LIMIT 1"
+      }
+    },
+    {
+      "id": "drawIf",
+      "type": "logic.if",
+      "x": 572,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "box empty?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "drawSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 660,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce topic",
+      "params": {
+        "channel": "{channel}",
+        "message": "Today's topic: {result}",
+        "server": ""
+      }
+    },
+    {
+      "id": "emptyReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "box empty",
+      "params": {
+        "message": "The topic box is empty - add one with !topicbox <idea>",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "addCmd",
+      "fromPin": 0,
+      "to": "addDb",
+      "toPin": 0
+    },
+    {
+      "from": "addCmd",
+      "fromPin": 1,
+      "to": "addSql",
+      "toPin": 0
+    },
+    {
+      "from": "addSql",
+      "fromPin": 0,
+      "to": "addDb",
+      "toPin": 1
+    },
+    {
+      "from": "addDb",
+      "fromPin": 0,
+      "to": "addReply",
+      "toPin": 0
+    },
+    {
+      "from": "drawCmd",
+      "fromPin": 0,
+      "to": "drawDb",
+      "toPin": 0
+    },
+    {
+      "from": "drawDb",
+      "fromPin": 0,
+      "to": "drawIf",
+      "toPin": 0
+    },
+    {
+      "from": "drawDb",
+      "fromPin": 1,
+      "to": "drawIf",
+      "toPin": 1
+    },
+    {
+      "from": "drawDb",
+      "fromPin": 1,
+      "to": "drawSay",
+      "toPin": 2
+    },
+    {
+      "from": "drawIf",
+      "fromPin": 0,
+      "to": "emptyReply",
+      "toPin": 0
+    },
+    {
+      "from": "drawIf",
+      "fromPin": 1,
+      "to": "drawSay",
+      "toPin": 0
+    }
+  ]
+}

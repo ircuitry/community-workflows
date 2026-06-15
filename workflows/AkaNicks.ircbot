@@ -1,0 +1,221 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AKA / Nicknames (!aka)",
+  "description": "Remember a member's alternate nicks: !aka <names> stores your aliases, bare !aka recalls them, and !whois2 <nick> looks up someone else's.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "nicknames",
+    "db",
+    "identity"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!aka [names]",
+      "params": {
+        "prefix": "!",
+        "command": "aka",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "chk",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "args empty?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "getOwn",
+      "type": "db.get",
+      "x": 572,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up my aka",
+      "params": {
+        "table": "aka",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "No alias on file",
+        "find": ""
+      }
+    },
+    {
+      "id": "getReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "show my aka",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "setAka",
+      "type": "db.set",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save my aka",
+      "params": {
+        "table": "aka",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "setReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm save",
+      "params": {
+        "message": "Got it, {nick} also known as {args}",
+        "server": ""
+      }
+    },
+    {
+      "id": "whoCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whois2 <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "whois2",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "whoGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 760,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up their aka",
+      "params": {
+        "table": "aka",
+        "mode": "value",
+        "key": "{args}",
+        "default": "No alias on file",
+        "find": ""
+      }
+    },
+    {
+      "id": "whoFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{b} is also known as: {a}"
+      }
+    },
+    {
+      "id": "whoReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "show their aka",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "chk",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "chk",
+      "toPin": 1
+    },
+    {
+      "from": "chk",
+      "fromPin": 0,
+      "to": "getReply",
+      "toPin": 0
+    },
+    {
+      "from": "getOwn",
+      "fromPin": 0,
+      "to": "getReply",
+      "toPin": 1
+    },
+    {
+      "from": "chk",
+      "fromPin": 1,
+      "to": "setAka",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "setAka",
+      "toPin": 1
+    },
+    {
+      "from": "setAka",
+      "fromPin": 0,
+      "to": "setReply",
+      "toPin": 0
+    },
+    {
+      "from": "whoCmd",
+      "fromPin": 0,
+      "to": "whoReply",
+      "toPin": 0
+    },
+    {
+      "from": "whoCmd",
+      "fromPin": 1,
+      "to": "whoFmt",
+      "toPin": 1
+    },
+    {
+      "from": "whoGet",
+      "fromPin": 0,
+      "to": "whoFmt",
+      "toPin": 0
+    },
+    {
+      "from": "whoFmt",
+      "fromPin": 0,
+      "to": "whoReply",
+      "toPin": 1
+    }
+  ]
+}

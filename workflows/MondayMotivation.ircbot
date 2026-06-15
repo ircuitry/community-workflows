@@ -1,0 +1,85 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Monday Motivation",
+  "description": "Posts a random motivational quote to #lounge every Monday at 08:00 to kick off the week.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "motivation",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Mondays 08:00",
+      "params": {
+        "mode": "weekly",
+        "time": "08:00",
+        "days": "Mon"
+      }
+    },
+    {
+      "id": "quote",
+      "type": "data.random",
+      "x": 286,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a quote",
+      "params": {
+        "options": "The secret of getting ahead is getting started.\nLittle by little, one travels far.\nDo the hard things first.\nProgress, not perfection.\nA fresh week is a fresh chance."
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build message",
+      "params": {
+        "template": "Monday motivation: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post to #lounge",
+      "params": {
+        "channel": "#lounge",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "quote",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

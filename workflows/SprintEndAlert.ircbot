@@ -1,0 +1,47 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Sprint End Alert",
+  "description": "Fires once at the configured sprint end datetime to remind the dev channel to close out tickets and update statuses.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "sprint",
+    "agile"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Sprint end (once)",
+      "params": {
+        "mode": "once",
+        "datetime": "2026-06-26 17:00"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Alert #dev",
+      "params": {
+        "channel": "#dev",
+        "message": "Sprint ends today. Close out tickets and update statuses."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

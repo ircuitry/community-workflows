@@ -1,0 +1,72 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "End of Day Wrap",
+  "description": "Posts a friendly end-of-day wrap-up prompt to #team every weekday at 17:30 using the schedule's own time output.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "team",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Weekdays 17:30",
+      "params": {
+        "mode": "weekly",
+        "time": "17:30",
+        "days": "Mon-Fri"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build wrap-up message",
+      "params": {
+        "template": "Wrapping up at {a}. Post your end-of-day update and log off well."
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ping the team",
+      "params": {
+        "channel": "#team",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

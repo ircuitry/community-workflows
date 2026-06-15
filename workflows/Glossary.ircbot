@@ -1,0 +1,179 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Our Glossary (!term)",
+  "description": "A community-defined jargon dictionary: teach the bot words with !defterm <word> <meaning> and recall them with !term <word>.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "glossary",
+    "db",
+    "lookup"
+  ],
+  "nodes": [
+    {
+      "id": "defCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!defterm <word> <meaning>",
+      "params": {
+        "prefix": "!",
+        "command": "defterm",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "defRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split word + meaning",
+      "params": {
+        "pattern": "^(\\S+)\\s+(.+)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "defSet",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save term",
+      "params": {
+        "table": "glossary",
+        "key": "{1}",
+        "value": ""
+      }
+    },
+    {
+      "id": "defFmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build confirmation",
+      "params": {
+        "template": "✅ Added term {a}"
+      }
+    },
+    {
+      "id": "defReply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "termCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!term <word>",
+      "params": {
+        "prefix": "!",
+        "command": "term",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "termGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 650,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up term",
+      "params": {
+        "table": "glossary",
+        "mode": "value",
+        "key": "{args}",
+        "default": "No such term. Add one with !defterm <word> <meaning>",
+        "find": ""
+      }
+    },
+    {
+      "id": "termReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send definition",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "defCmd",
+      "fromPin": 0,
+      "to": "defRegex",
+      "toPin": 0
+    },
+    {
+      "from": "defCmd",
+      "fromPin": 1,
+      "to": "defRegex",
+      "toPin": 1
+    },
+    {
+      "from": "defRegex",
+      "fromPin": 0,
+      "to": "defSet",
+      "toPin": 0
+    },
+    {
+      "from": "defRegex",
+      "fromPin": 3,
+      "to": "defSet",
+      "toPin": 1
+    },
+    {
+      "from": "defSet",
+      "fromPin": 0,
+      "to": "defReply",
+      "toPin": 0
+    },
+    {
+      "from": "defRegex",
+      "fromPin": 2,
+      "to": "defFmt",
+      "toPin": 0
+    },
+    {
+      "from": "defFmt",
+      "fromPin": 0,
+      "to": "defReply",
+      "toPin": 1
+    },
+    {
+      "from": "termCmd",
+      "fromPin": 0,
+      "to": "termReply",
+      "toPin": 0
+    },
+    {
+      "from": "termGet",
+      "fromPin": 0,
+      "to": "termReply",
+      "toPin": 1
+    }
+  ]
+}

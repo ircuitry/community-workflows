@@ -1,0 +1,122 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ASCII Art Flood Guard",
+  "description": "Detects long runs of box-drawing or block art characters in a message and kicks the spammer on a per-user cooldown to stop figlet and ASCII-art dumps from scrolling the channel.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "flood",
+    "ascii"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "art",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "15+ art chars?",
+      "params": {
+        "pattern": "[\\x{2500}-\\x{259F}\\x{2580}-\\x{25FF}#@*=_|/\\\\]{15,}",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "per-user 30s",
+      "params": {
+        "seconds": "30",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 858,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick art flooder",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "ASCII art flood",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log repeat offender",
+      "params": {
+        "text": "asciiart-repeat {nick}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "art",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "art",
+      "toPin": 1
+    },
+    {
+      "from": "art",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 1,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "UUID Generator",
+  "description": "Generate a fresh RFC4122 version 4 UUID on demand with !uuid.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "uuid",
+    "id"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!uuid",
+      "params": {
+        "prefix": "!",
+        "command": "uuid",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "gen",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "generate v4 uuid",
+      "params": {
+        "language": "javascript",
+        "code": "var h = '';\nfor (var i = 0; i < 32; i++) { h += Math.floor(Math.random() * 16).toString(16); }\nvar bytes = h.split('');\nbytes[12] = '4';\nbytes[16] = (parseInt(bytes[16], 16) & 0x3 | 0x8).toString(16);\nvar u = bytes.slice(0,8).join('') + '-' + bytes.slice(8,12).join('') + '-' + bytes.slice(12,16).join('') + '-' + bytes.slice(16,20).join('') + '-' + bytes.slice(20,32).join('');\nreturn u;",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send uuid",
+      "params": {
+        "message": "Your UUID: {message}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "gen",
+      "toPin": 0
+    },
+    {
+      "from": "gen",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "gen",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Member Counter (join milestones)",
+  "description": "Counts unique members as they join and shouts a welcome whenever the channel hits a round 50-member milestone.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "counter",
+    "join",
+    "milestone"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On join",
+      "params": {}
+    },
+    {
+      "id": "isHuman",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Skip bots",
+      "params": {}
+    },
+    {
+      "id": "remember",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Record member (de-dupe by nick)",
+      "params": {
+        "table": "members",
+        "key": "{nick}",
+        "value": "1"
+      }
+    },
+    {
+      "id": "total",
+      "type": "db.get",
+      "x": 572,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Count members",
+      "params": {
+        "table": "members",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "mod",
+      "type": "data.math",
+      "x": 858,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count % 50",
+      "params": {
+        "op": "%",
+        "a": "0",
+        "b": "50"
+      }
+    },
+    {
+      "id": "isMilestone",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Round milestone?",
+      "params": {
+        "op": "=",
+        "b": "0",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "welcome",
+      "type": "data.format",
+      "x": 1144,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build celebration",
+      "params": {
+        "template": "We just hit {a} members! Welcome {b}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Celebrate in channel",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isHuman",
+      "toPin": 0
+    },
+    {
+      "from": "isHuman",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 1
+    },
+    {
+      "from": "remember",
+      "fromPin": 0,
+      "to": "isMilestone",
+      "toPin": 0
+    },
+    {
+      "from": "total",
+      "fromPin": 1,
+      "to": "mod",
+      "toPin": 0
+    },
+    {
+      "from": "mod",
+      "fromPin": 0,
+      "to": "isMilestone",
+      "toPin": 1
+    },
+    {
+      "from": "isMilestone",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "total",
+      "fromPin": 1,
+      "to": "welcome",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "welcome",
+      "toPin": 1
+    },
+    {
+      "from": "welcome",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "say",
+      "toPin": 1
+    }
+  ]
+}

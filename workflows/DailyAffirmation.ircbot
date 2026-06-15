@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Daily Affirmation",
+  "description": "Posts a randomly chosen motivational affirmation to #wellness every morning at 07:30.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "motivation",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 07:30",
+      "params": {
+        "mode": "daily",
+        "time": "07:30"
+      }
+    },
+    {
+      "id": "rand",
+      "type": "data.random",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick affirmation",
+      "params": {
+        "options": "You are capable.\nProgress over perfection.\nYou have everything you need today.\nOne step at a time is still moving forward.\nYou are enough, exactly as you are."
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "Affirmation: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post to #wellness",
+      "params": {
+        "channel": "#wellness",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "rand",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

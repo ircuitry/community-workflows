@@ -1,0 +1,210 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Raid Auto Plus-M",
+  "description": "Counts channel joins in a rolling one-minute window and auto-sets the channel +m when a join flood (raid) is detected, alerting mods.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "raid",
+    "join",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On someone joining",
+      "params": {}
+    },
+    {
+      "id": "winGet",
+      "type": "db.get",
+      "x": 286,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "joins this window",
+      "params": {
+        "table": "raidwin",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "winMath",
+      "type": "data.math",
+      "x": 572,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1 join",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "winSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save join count",
+      "params": {
+        "table": "raidwin",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "ifRaid",
+      "type": "logic.if",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "8+ joins?",
+      "params": {
+        "op": ">",
+        "b": "8",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "mode",
+      "type": "irc.mode",
+      "x": 1430,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "set channel +m",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+m",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1716,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "alert mods",
+      "params": {
+        "channel": "{channel}",
+        "message": "Raid detected - channel set +m. Mods, review.",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 2002,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the raid",
+      "params": {
+        "text": "Raid auto-moderation triggered in {channel}"
+      }
+    },
+    {
+      "id": "reset",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "every minute",
+      "params": {
+        "mode": "interval",
+        "every": "1",
+        "unit": "minutes",
+        "time": "",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "resetSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear join window",
+      "params": {
+        "table": "raidwin",
+        "key": "{channel}",
+        "value": "0"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "winSet",
+      "toPin": 0
+    },
+    {
+      "from": "winGet",
+      "fromPin": 0,
+      "to": "winMath",
+      "toPin": 0
+    },
+    {
+      "from": "winMath",
+      "fromPin": 0,
+      "to": "winSet",
+      "toPin": 1
+    },
+    {
+      "from": "winSet",
+      "fromPin": 0,
+      "to": "ifRaid",
+      "toPin": 0
+    },
+    {
+      "from": "winMath",
+      "fromPin": 0,
+      "to": "ifRaid",
+      "toPin": 1
+    },
+    {
+      "from": "ifRaid",
+      "fromPin": 0,
+      "to": "mode",
+      "toPin": 0
+    },
+    {
+      "from": "mode",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "say",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "reset",
+      "fromPin": 0,
+      "to": "resetSet",
+      "toPin": 0
+    }
+  ]
+}

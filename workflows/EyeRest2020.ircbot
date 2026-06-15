@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Eye Rest 20-20-20",
+  "description": "Every 20 minutes it nudges #focus to follow the 20-20-20 rule and rest your eyes from screen strain.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "health",
+    "interval"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every 20 minutes",
+      "params": {
+        "mode": "interval",
+        "every": 20,
+        "unit": "minutes"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remind #focus",
+      "params": {
+        "channel": "#focus",
+        "message": "20-20-20: look at something 20 feet away for 20 seconds."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

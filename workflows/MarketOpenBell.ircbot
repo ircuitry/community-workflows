@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Market Open Bell",
+  "description": "Announces in #markets every weekday at 09:30 that the US markets have opened.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "finance",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Weekdays 09:30",
+      "params": {
+        "mode": "weekly",
+        "time": "09:30",
+        "days": "Mon,Tue,Wed,Thu,Fri"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ring the bell",
+      "params": {
+        "channel": "#markets",
+        "message": "Opening bell. US markets are now open."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

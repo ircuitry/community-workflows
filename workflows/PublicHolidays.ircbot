@@ -1,0 +1,158 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Public Holidays Lookup",
+  "description": "Look up the next public holiday for any country with !holidays <countryCode>, fetched live from the free Nager.Date API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "holidays",
+    "date"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!holidays <country>",
+      "params": {
+        "prefix": "!",
+        "command": "holidays",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build API url",
+      "params": {
+        "template": "https://date.nager.at/api/v3/NextPublicHolidays/{a}"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch holidays",
+      "params": {
+        "method": "GET",
+        "url": "https://date.nager.at/api/v3/NextPublicHolidays/US",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "jname",
+      "type": "data.json",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "holiday name",
+      "params": {
+        "path": "0.name"
+      }
+    },
+    {
+      "id": "jdate",
+      "type": "data.json",
+      "x": 858,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "holiday date",
+      "params": {
+        "path": "0.date"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "Next: {a} on {b}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send holiday",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "jname",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "jdate",
+      "toPin": 0
+    },
+    {
+      "from": "jname",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "jdate",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

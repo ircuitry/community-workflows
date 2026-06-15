@@ -1,0 +1,110 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Fact of the Day",
+  "description": "Posts a random interesting fact to your channel every day at noon, fetched live from the uselessfacts API.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "daily",
+    "facts"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 12:00",
+      "params": {
+        "mode": "daily",
+        "time": "12:00"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch random fact",
+      "params": {
+        "method": "GET",
+        "url": "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "extract fact text",
+      "params": {
+        "path": "text"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "Did you know? {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post the fact",
+      "params": {
+        "channel": "#general",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

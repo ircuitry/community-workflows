@@ -1,0 +1,90 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Payday Celebration",
+  "description": "Every day at 08:00 it checks the date and, on the 15th of the month, drops a random hype line in #general to celebrate payday.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "payday",
+    "monthly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 08:00",
+      "params": {
+        "mode": "daily",
+        "time": "08:00"
+      }
+    },
+    {
+      "id": "isPayday",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is it the 15th?",
+      "params": {
+        "op": "ends with",
+        "b": "-15"
+      }
+    },
+    {
+      "id": "hype",
+      "type": "data.random",
+      "x": 572,
+      "y": 140,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Random hype line",
+      "params": {
+        "options": "💸 Payday is here, treat yourself!\n🤑 Cha-ching! The eagle has landed.\n🎉 Happy payday everyone, go enjoy it!\n💰 Direct deposit dropped, let's celebrate!"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce in #general",
+      "params": {
+        "channel": "#general",
+        "message": "{rand}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "isPayday",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 2,
+      "to": "isPayday",
+      "toPin": 1
+    },
+    {
+      "from": "isPayday",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "hype",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

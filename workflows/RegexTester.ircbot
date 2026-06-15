@@ -1,0 +1,80 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Regex Tester",
+  "description": "Test a regular expression against text with !regex /pattern/flags <text> and see the matched groups or 'no match'.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "regex",
+    "text"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!regex /pat/ <text>",
+      "params": {
+        "prefix": "!",
+        "command": "regex",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "run",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Run regex",
+      "params": {
+        "language": "javascript",
+        "code": "const raw = (input || '').trim();\nconst m = raw.match(/^\\/((?:\\\\.|[^\\\\\\/])*)\\/([a-z]*)\\s+([\\s\\S]+)$/);\nif (!m) { return 'usage: !regex /pattern/flags <text>'; }\nconst [, pattern, flags, subject] = m;\nlet re;\ntry { re = new RegExp(pattern, flags); } catch (e) { return 'bad pattern: ' + e.message; }\nconst res = re.exec(subject);\nif (!res) { return 'no match'; }\nif (res.length > 1) { return 'match: groups = ' + res.slice(1).map((g, i) => '$' + (i + 1) + '=' + (g === undefined ? '' : g)).join(', '); }\nreturn 'match: ' + res[0];",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "run",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "run",
+      "toPin": 1
+    },
+    {
+      "from": "run",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "run",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

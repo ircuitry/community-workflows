@@ -1,0 +1,250 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Group Decide (!decide-poll)",
+  "description": "Run a quick yes/no group decision: !decide <question> opens a vote, members reply !yes or !no, and !result tallies the totals.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "decision",
+    "db",
+    "vote"
+  ],
+  "nodes": [
+    {
+      "id": "decideCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!decide <question>",
+      "params": {
+        "prefix": "!",
+        "command": "decide",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "saveQ",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store question",
+      "params": {
+        "table": "decide",
+        "key": "{channel}:q",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "resetVotes",
+      "type": "db.sql",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear old votes",
+      "params": {
+        "file": "decide.db",
+        "sql": "DELETE FROM votes WHERE ch=?"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce vote",
+      "params": {
+        "channel": "{channel}",
+        "message": "Vote on: {args} -> !yes / !no (then !result)",
+        "server": ""
+      }
+    },
+    {
+      "id": "yesCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!yes",
+      "params": {
+        "prefix": "!",
+        "command": "yes",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "yesSql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record yes",
+      "params": {
+        "file": "decide.db",
+        "sql": "INSERT OR REPLACE INTO votes(ch,nick,v) VALUES(?,?,1)"
+      }
+    },
+    {
+      "id": "noCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!no",
+      "params": {
+        "prefix": "!",
+        "command": "no",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "noSql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record no",
+      "params": {
+        "file": "decide.db",
+        "sql": "INSERT OR REPLACE INTO votes(ch,nick,v) VALUES(?,?,0)"
+      }
+    },
+    {
+      "id": "resultCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!result",
+      "params": {
+        "prefix": "!",
+        "command": "result",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "tallySql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "tally votes",
+      "params": {
+        "file": "decide.db",
+        "sql": "SELECT SUM(v) || ' vs ' || (COUNT(*)-SUM(v)) FROM votes WHERE ch=?"
+      }
+    },
+    {
+      "id": "resultFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 780,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build tally line",
+      "params": {
+        "template": "Yes vs No -> {a}"
+      }
+    },
+    {
+      "id": "resultSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce result",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "decideCmd",
+      "fromPin": 0,
+      "to": "saveQ",
+      "toPin": 0
+    },
+    {
+      "from": "decideCmd",
+      "fromPin": 1,
+      "to": "saveQ",
+      "toPin": 1
+    },
+    {
+      "from": "saveQ",
+      "fromPin": 0,
+      "to": "resetVotes",
+      "toPin": 0
+    },
+    {
+      "from": "resetVotes",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "decideCmd",
+      "fromPin": 3,
+      "to": "announce",
+      "toPin": 1
+    },
+    {
+      "from": "yesCmd",
+      "fromPin": 0,
+      "to": "yesSql",
+      "toPin": 0
+    },
+    {
+      "from": "noCmd",
+      "fromPin": 0,
+      "to": "noSql",
+      "toPin": 0
+    },
+    {
+      "from": "resultCmd",
+      "fromPin": 0,
+      "to": "tallySql",
+      "toPin": 0
+    },
+    {
+      "from": "tallySql",
+      "fromPin": 0,
+      "to": "resultSay",
+      "toPin": 0
+    },
+    {
+      "from": "tallySql",
+      "fromPin": 1,
+      "to": "resultFmt",
+      "toPin": 0
+    },
+    {
+      "from": "resultCmd",
+      "fromPin": 3,
+      "to": "resultSay",
+      "toPin": 1
+    },
+    {
+      "from": "resultFmt",
+      "fromPin": 0,
+      "to": "resultSay",
+      "toPin": 2
+    }
+  ]
+}

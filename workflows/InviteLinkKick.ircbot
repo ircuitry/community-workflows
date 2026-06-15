@@ -1,0 +1,97 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Invite Link Kick",
+  "description": "Kicks anyone who posts a Discord, Telegram, WhatsApp, or Skype invite link in the channel and logs each removal.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "invite",
+    "kick"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "linkRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Has invite link?",
+      "params": {
+        "pattern": "(discord\\.gg|t\\.me|telegram\\.me|chat\\.whatsapp\\.com|join\\.skype)/",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick spammer",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "No invite links",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log the kick",
+      "params": {
+        "text": "invite-link {nick}: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "linkRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "linkRegex",
+      "toPin": 1
+    },
+    {
+      "from": "linkRegex",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "linkRegex",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

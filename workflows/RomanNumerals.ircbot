@@ -1,0 +1,80 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Roman Numeral Converter",
+  "description": "Convert between numbers and Roman numerals with !roman 2024 or !roman MMXXIV, handled locally with no external services.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "roman",
+    "convert"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!roman <value>",
+      "params": {
+        "prefix": "!",
+        "command": "roman",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "convert",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "convert roman <-> int",
+      "params": {
+        "language": "javascript",
+        "code": "var raw = (INPUT || ARGS || '').trim();\nvar table = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];\nvar out;\nif (/^[0-9]+$/.test(raw)) {\n  var n = parseInt(raw, 10);\n  if (n < 1 || n > 3999) {\n    out = 'Number must be between 1 and 3999.';\n  } else {\n    var r = '';\n    for (var i = 0; i < table.length; i++) {\n      while (n >= table[i][0]) { r += table[i][1]; n -= table[i][0]; }\n    }\n    out = raw + ' = ' + r;\n  }\n} else if (/^[MDCLXVI]+$/i.test(raw)) {\n  var s = raw.toUpperCase();\n  var total = 0, idx = 0;\n  for (var j = 0; j < table.length; j++) {\n    while (s.substr(idx, table[j][1].length) === table[j][1]) { total += table[j][0]; idx += table[j][1].length; }\n  }\n  out = idx === s.length ? (s + ' = ' + total) : ('Invalid Roman numeral: ' + raw);\n} else {\n  out = 'Usage: !roman 2024  or  !roman MMXXIV';\n}\nprint(out);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": "{message}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "convert",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "convert",
+      "toPin": 1
+    },
+    {
+      "from": "convert",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "convert",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

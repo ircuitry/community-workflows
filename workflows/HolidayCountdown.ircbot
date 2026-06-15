@@ -1,0 +1,97 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Holiday Countdown",
+  "description": "Every morning at 09:00 it posts how many days remain until a fixed holiday in #general.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "countdown",
+    "daily"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 09:00",
+      "params": {
+        "mode": "daily",
+        "time": "09:00"
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Days until holiday",
+      "params": {
+        "language": "javascript",
+        "code": "const today = input ? new Date(input) : new Date();\nlet holiday = new Date(today.getFullYear(), 11, 25);\nif (holiday < today) holiday = new Date(today.getFullYear() + 1, 11, 25);\nconst days = Math.ceil((holiday - today) / (1000 * 60 * 60 * 24));\nreturn String(days);",
+        "timeout": 5000
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build message",
+      "params": {
+        "template": "Only {a} days until the holiday!"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce in #general",
+      "params": {
+        "channel": "#general",
+        "message": "Only {a} days until the holiday!"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 2,
+      "to": "code",
+      "toPin": 1
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

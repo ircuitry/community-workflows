@@ -1,0 +1,79 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Lorem Ipsum Generator",
+  "description": "Generates N sentences of placeholder lorem ipsum text on demand with !lorem <count>.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "text",
+    "placeholder"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!lorem <count>",
+      "params": {
+        "prefix": "!",
+        "command": "lorem",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "gen",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build lorem text",
+      "params": {
+        "language": "javascript",
+        "code": "const bank = [\"lorem\",\"ipsum\",\"dolor\",\"sit\",\"amet\",\"consectetur\",\"adipiscing\",\"elit\",\"sed\",\"do\",\"eiusmod\",\"tempor\",\"incididunt\",\"ut\",\"labore\",\"et\",\"dolore\",\"magna\",\"aliqua\",\"enim\",\"ad\",\"minim\",\"veniam\",\"quis\",\"nostrud\",\"exercitation\",\"ullamco\",\"laboris\",\"nisi\",\"aliquip\",\"ex\",\"ea\",\"commodo\",\"consequat\"];\nlet n = parseInt((input || \"\").trim(), 10);\nif (isNaN(n) || n < 1) n = 1;\nif (n > 5) n = 5;\nfunction sentence() {\n  const len = 6 + Math.floor(Math.random() * 7);\n  const words = [];\n  for (let i = 0; i < len; i++) words.push(bank[Math.floor(Math.random() * bank.length)]);\n  let s = words.join(\" \");\n  return s.charAt(0).toUpperCase() + s.slice(1) + \".\";\n}\nconst out = [];\nfor (let i = 0; i < n; i++) out.push(sentence());\nlet text = out.join(\" \");\nif (text.length > 400) text = text.slice(0, 397) + \"...\";\nreturn text;",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send lorem ipsum",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "gen",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "gen",
+      "toPin": 1
+    },
+    {
+      "from": "gen",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "gen",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

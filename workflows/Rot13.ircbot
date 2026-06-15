@@ -1,0 +1,79 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ROT13 Cipher",
+  "description": "Encodes or decodes text with the self-inverse ROT13 letter cipher using !rot13 <text>.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "cipher",
+    "text"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!rot13 <text>",
+      "params": {
+        "prefix": "!",
+        "command": "rot13",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rot",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "apply ROT13",
+      "params": {
+        "language": "javascript",
+        "code": "return input.replace(/[a-zA-Z]/g, function(c) {\n  var base = c <= 'Z' ? 65 : 97;\n  return String.fromCharCode((c.charCodeAt(0) - base + 13) % 26 + base);\n});",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "rot",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "rot",
+      "toPin": 1
+    },
+    {
+      "from": "rot",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "rot",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

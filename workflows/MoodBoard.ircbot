@@ -1,0 +1,225 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Mood Board (!mood)",
+  "description": "Members set their current mood with !mood <emoji/word> and check the channel vibe with !vibe to see the top moods right now.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "mood",
+    "db",
+    "vibe"
+  ],
+  "nodes": [
+    {
+      "id": "moodCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!mood <emoji/word>",
+      "params": {
+        "prefix": "!",
+        "command": "mood",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "isEmpty",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "no mood given?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "saveMood",
+      "type": "db.set",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save mood",
+      "params": {
+        "table": "moods:{channel}",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "react",
+      "type": "action.react",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "thumbs up",
+      "params": {
+        "emoji": "thumbsup",
+        "server": ""
+      }
+    },
+    {
+      "id": "getMood",
+      "type": "db.get",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up my mood",
+      "params": {
+        "table": "moods:{channel}",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "no mood set",
+        "find": ""
+      }
+    },
+    {
+      "id": "moodReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply with mood",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "vibeCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!vibe",
+      "params": {
+        "prefix": "!",
+        "command": "vibe",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "vibeSql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "top moods",
+      "params": {
+        "file": "community.db",
+        "sql": "SELECT value, COUNT(*) FROM kv WHERE table=''moods:''||? GROUP BY value ORDER BY 2 DESC LIMIT 3"
+      }
+    },
+    {
+      "id": "vibeFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 700,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build vibe line",
+      "params": {
+        "template": "Channel vibe: {a}"
+      }
+    },
+    {
+      "id": "vibeSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce vibe",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "moodCmd",
+      "fromPin": 0,
+      "to": "isEmpty",
+      "toPin": 0
+    },
+    {
+      "from": "moodCmd",
+      "fromPin": 1,
+      "to": "isEmpty",
+      "toPin": 1
+    },
+    {
+      "from": "isEmpty",
+      "fromPin": 1,
+      "to": "saveMood",
+      "toPin": 0
+    },
+    {
+      "from": "moodCmd",
+      "fromPin": 1,
+      "to": "saveMood",
+      "toPin": 1
+    },
+    {
+      "from": "saveMood",
+      "fromPin": 0,
+      "to": "react",
+      "toPin": 0
+    },
+    {
+      "from": "isEmpty",
+      "fromPin": 0,
+      "to": "moodReply",
+      "toPin": 0
+    },
+    {
+      "from": "getMood",
+      "fromPin": 0,
+      "to": "moodReply",
+      "toPin": 1
+    },
+    {
+      "from": "vibeCmd",
+      "fromPin": 0,
+      "to": "vibeSql",
+      "toPin": 0
+    },
+    {
+      "from": "vibeCmd",
+      "fromPin": 1,
+      "to": "vibeSql",
+      "toPin": 1
+    },
+    {
+      "from": "vibeSql",
+      "fromPin": 1,
+      "to": "vibeFmt",
+      "toPin": 0
+    },
+    {
+      "from": "vibeSql",
+      "fromPin": 0,
+      "to": "vibeSay",
+      "toPin": 0
+    },
+    {
+      "from": "vibeFmt",
+      "fromPin": 0,
+      "to": "vibeSay",
+      "toPin": 2
+    }
+  ]
+}

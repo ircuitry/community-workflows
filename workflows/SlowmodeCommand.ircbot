@@ -1,0 +1,210 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Slowmode Toggle Command",
+  "description": "Lets channel ops flip slowmode on or off with !slowmode on|off, applying the matching channel mode and logging who toggled it.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "slowmode",
+    "command"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!slowmode on|off",
+      "params": {
+        "prefix": "!",
+        "command": "slowmode",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "switch",
+      "type": "logic.switch",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on / off / usage",
+      "params": {
+        "case1": "on",
+        "case2": "off",
+        "case3": "",
+        "case4": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "modeOn",
+      "type": "irc.mode",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "enable slowmode",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+R",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "replyOn",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say enabled",
+      "params": {
+        "message": "Slowmode enabled.",
+        "server": ""
+      }
+    },
+    {
+      "id": "modeOff",
+      "type": "irc.mode",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "disable slowmode",
+      "params": {
+        "channel": "{channel}",
+        "modes": "-R",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "replyOff",
+      "type": "action.reply",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say disabled",
+      "params": {
+        "message": "Slowmode disabled.",
+        "server": ""
+      }
+    },
+    {
+      "id": "usage",
+      "type": "action.reply",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "usage hint",
+      "params": {
+        "message": "Usage: !slowmode on|off",
+        "server": ""
+      }
+    },
+    {
+      "id": "logFmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build log line",
+      "params": {
+        "template": "slowmode {a} by {b}"
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record toggle",
+      "params": {
+        "text": "slowmode toggled"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "switch",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "switch",
+      "toPin": 1
+    },
+    {
+      "from": "switch",
+      "fromPin": 0,
+      "to": "modeOn",
+      "toPin": 0
+    },
+    {
+      "from": "modeOn",
+      "fromPin": 0,
+      "to": "replyOn",
+      "toPin": 0
+    },
+    {
+      "from": "replyOn",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "switch",
+      "fromPin": 1,
+      "to": "modeOff",
+      "toPin": 0
+    },
+    {
+      "from": "modeOff",
+      "fromPin": 0,
+      "to": "replyOff",
+      "toPin": 0
+    },
+    {
+      "from": "replyOff",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "switch",
+      "fromPin": 4,
+      "to": "usage",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "logFmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "logFmt",
+      "toPin": 1
+    },
+    {
+      "from": "logFmt",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 1
+    }
+  ]
+}

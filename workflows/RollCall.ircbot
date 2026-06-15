@@ -1,0 +1,180 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Roll Call (!here)",
+  "description": "Lightweight presence check-in: members type !here to mark attendance, !whoshere shows today's count, and the roster auto-resets at midnight.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "attendance",
+    "db",
+    "session"
+  ],
+  "nodes": [
+    {
+      "id": "hereCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!here",
+      "params": {
+        "prefix": "!",
+        "command": "here",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "hereSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mark present",
+      "params": {
+        "table": "rollcall:{channel}",
+        "key": "{nick}",
+        "value": "{date} {time}"
+      }
+    },
+    {
+      "id": "hereReact",
+      "type": "action.react",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wave back",
+      "params": {
+        "emoji": "wave",
+        "server": ""
+      }
+    },
+    {
+      "id": "whoCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whoshere",
+      "params": {
+        "prefix": "!",
+        "command": "whoshere",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "whoGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count check-ins",
+      "params": {
+        "table": "rollcall:{channel}",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "whoFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{a} people checked in today"
+      }
+    },
+    {
+      "id": "whoReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "report count",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "resetSched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 720,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "midnight reset",
+      "params": {
+        "mode": "daily",
+        "time": "00:00"
+      }
+    },
+    {
+      "id": "resetSql",
+      "type": "db.sql",
+      "x": 286,
+      "y": 720,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear roster",
+      "params": {
+        "file": "community.db",
+        "sql": "DELETE FROM kv WHERE table LIKE 'rollcall:%'"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "hereCmd",
+      "fromPin": 0,
+      "to": "hereSet",
+      "toPin": 0
+    },
+    {
+      "from": "hereCmd",
+      "fromPin": 2,
+      "to": "hereSet",
+      "toPin": 1
+    },
+    {
+      "from": "hereSet",
+      "fromPin": 0,
+      "to": "hereReact",
+      "toPin": 0
+    },
+    {
+      "from": "whoCmd",
+      "fromPin": 0,
+      "to": "whoReply",
+      "toPin": 0
+    },
+    {
+      "from": "whoGet",
+      "fromPin": 1,
+      "to": "whoFmt",
+      "toPin": 0
+    },
+    {
+      "from": "whoFmt",
+      "fromPin": 0,
+      "to": "whoReply",
+      "toPin": 1
+    },
+    {
+      "from": "resetSched",
+      "fromPin": 0,
+      "to": "resetSql",
+      "toPin": 0
+    }
+  ]
+}

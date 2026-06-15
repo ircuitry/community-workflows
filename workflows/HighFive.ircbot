@@ -1,0 +1,157 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "High Five (!highfive)",
+  "description": "Trade high-fives with !highfive <nick> and keep a running per-channel total of every slap.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "fun",
+    "db",
+    "counter"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!highfive <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "highfive",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "empty",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "no target?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "slap",
+      "type": "irc.action",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "high-five them",
+      "params": {
+        "text": "high-fives {args}! *SLAP*",
+        "server": ""
+      }
+    },
+    {
+      "id": "count",
+      "type": "db.sql",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "bump + read total",
+      "params": {
+        "file": "",
+        "sql": "INSERT INTO counters(k,n) VALUES('hf',1) ON CONFLICT(k) DO UPDATE SET n=n+1 ; SELECT n FROM counters WHERE k='hf'"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build total line",
+      "params": {
+        "template": "That's {a} high-fives in here!"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce total",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "ask",
+      "type": "action.reply",
+      "x": 572,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "who?",
+      "params": {
+        "message": "Who? Try !highfive <nick>",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "empty",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "empty",
+      "toPin": 1
+    },
+    {
+      "from": "empty",
+      "fromPin": 1,
+      "to": "slap",
+      "toPin": 0
+    },
+    {
+      "from": "slap",
+      "fromPin": 0,
+      "to": "count",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "count",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "empty",
+      "fromPin": 0,
+      "to": "ask",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,189 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Shoutout of the Week",
+  "description": "Members nominate each other with !nominate, then every Monday at 09:00 the most-nominated member is announced as shoutout of the week.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "recognition",
+    "db",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "nomCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!nominate <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "nominate",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "one per week",
+      "params": {
+        "seconds": "604800",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "insert",
+      "type": "db.sql",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record nomination",
+      "params": {
+        "file": "shoutout",
+        "sql": "CREATE TABLE IF NOT EXISTS noms(nominee TEXT, wk TEXT); INSERT INTO noms(nominee, wk) VALUES('{args}', strftime('%W','now'))"
+      }
+    },
+    {
+      "id": "star",
+      "type": "action.react",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react star",
+      "params": {
+        "emoji": "star",
+        "server": ""
+      }
+    },
+    {
+      "id": "tooSoon",
+      "type": "action.reply",
+      "x": 572,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "rate limit",
+      "params": {
+        "message": "One nomination per week, please!",
+        "server": ""
+      }
+    },
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Mondays 09:00",
+      "params": {
+        "mode": "weekly",
+        "days": "Mon",
+        "time": "09:00"
+      }
+    },
+    {
+      "id": "winner",
+      "type": "db.sql",
+      "x": 286,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "top nominee",
+      "params": {
+        "file": "shoutout",
+        "sql": "SELECT nominee FROM noms GROUP BY nominee ORDER BY COUNT(*) DESC LIMIT 1"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build announcement",
+      "params": {
+        "template": "🌟 Shoutout of the week goes to {a}!"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 858,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce winner",
+      "params": {
+        "channel": "#general",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "nomCmd",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "nomCmd",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "insert",
+      "toPin": 0
+    },
+    {
+      "from": "insert",
+      "fromPin": 0,
+      "to": "star",
+      "toPin": 0
+    },
+    {
+      "from": "cool",
+      "fromPin": 1,
+      "to": "tooSoon",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "winner",
+      "toPin": 0
+    },
+    {
+      "from": "winner",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "winner",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 2
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Currency Converter",
+  "description": "Convert between currencies live with !convert <amount> <from> <to> using the free Frankfurter exchange-rate API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "currency",
+    "convert"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!convert <amount> <from> <to>",
+      "params": {
+        "prefix": "!",
+        "command": "convert",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch rate",
+      "params": {
+        "method": "GET",
+        "url": "https://api.frankfurter.app/latest?amount={arg1}&from={arg2}&to={arg3}",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "converted amount",
+      "params": {
+        "path": "rates.{arg3}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": "{arg1} {arg2} = {message} {arg3}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

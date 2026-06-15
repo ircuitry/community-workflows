@@ -1,0 +1,79 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Base64 Encode/Decode",
+  "description": "Encode or decode Base64 text in chat with !b64 enc <text> or !b64 dec <text>.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "encoding",
+    "text"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!b64 enc|dec <text>",
+      "params": {
+        "prefix": "!",
+        "command": "b64",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "encode/decode Base64",
+      "params": {
+        "language": "javascript",
+        "code": "const raw = (input || '').trim();\nconst sp = raw.indexOf(' ');\nconst mode = (sp === -1 ? raw : raw.slice(0, sp)).toLowerCase();\nconst rest = sp === -1 ? '' : raw.slice(sp + 1);\nfunction enc(s) { return (typeof btoa === 'function') ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s, 'utf8').toString('base64'); }\nfunction dec(s) { return (typeof atob === 'function') ? decodeURIComponent(escape(atob(s))) : Buffer.from(s, 'base64').toString('utf8'); }\nif (mode === 'enc') { return enc(rest); }\nif (mode === 'dec') { try { return dec(rest); } catch (e) { return 'invalid base64'; } }\nreturn 'usage: !b64 enc <text>  |  !b64 dec <text>';",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "code",
+      "toPin": 1
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

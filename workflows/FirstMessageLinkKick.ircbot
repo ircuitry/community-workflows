@@ -1,0 +1,186 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "First Message Link Kick",
+  "description": "Kicks a user who posts a link in their very first channel message, while letting established members share links freely.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "link",
+    "newbie",
+    "kick"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "getCount",
+      "type": "db.get",
+      "x": 286,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "messages so far",
+      "params": {
+        "table": "msgcount",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "addOne",
+      "type": "data.math",
+      "x": 572,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count + 1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "saveCount",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save new count",
+      "params": {
+        "table": "msgcount",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "isFirst",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first message?",
+      "params": {
+        "op": "=",
+        "b": "1",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "hasLink",
+      "type": "logic.regex",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "contains a link?",
+      "params": {
+        "pattern": "https?://",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "kick newbie",
+      "params": {
+        "channel": "{channel}",
+        "nick": "",
+        "reason": "No links on first message",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the kick",
+      "params": {
+        "text": "kicked {nick} for a link in their first message"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "getCount",
+      "fromPin": 0,
+      "to": "addOne",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "saveCount",
+      "toPin": 0
+    },
+    {
+      "from": "addOne",
+      "fromPin": 0,
+      "to": "saveCount",
+      "toPin": 1
+    },
+    {
+      "from": "saveCount",
+      "fromPin": 0,
+      "to": "isFirst",
+      "toPin": 0
+    },
+    {
+      "from": "addOne",
+      "fromPin": 0,
+      "to": "isFirst",
+      "toPin": 1
+    },
+    {
+      "from": "isFirst",
+      "fromPin": 0,
+      "to": "hasLink",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "hasLink",
+      "toPin": 1
+    },
+    {
+      "from": "hasLink",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "kick",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

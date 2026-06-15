@@ -1,0 +1,80 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Epoch <-> Date Converter",
+  "description": "Convert between Unix epoch seconds and ISO dates with !epoch <seconds|date> or !epoch now, computed locally with no network access.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "epoch",
+    "date"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!epoch <value|now>",
+      "params": {
+        "prefix": "!",
+        "command": "epoch",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "conv",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "convert epoch/date",
+      "params": {
+        "language": "javascript",
+        "code": "const arg = (input || '').trim();\nlet out;\nif (arg === '' || arg.toLowerCase() === 'now') {\n  out = String(Math.floor(Date.now() / 1000));\n} else if (/^-?\\d+$/.test(arg)) {\n  out = new Date(parseInt(arg, 10) * 1000).toISOString();\n} else {\n  const ms = Date.parse(arg);\n  out = isNaN(ms) ? 'Could not parse: ' + arg : String(Math.floor(ms / 1000));\n}\nout;",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "conv",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "conv",
+      "toPin": 1
+    },
+    {
+      "from": "conv",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "conv",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Backup Reminder",
+  "description": "Pings #ops every Sunday at 23:00 to verify the latest backup snapshot and rotate offsite copies.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "devops",
+    "weekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Sundays 23:00",
+      "params": {
+        "mode": "weekly",
+        "time": "23:00",
+        "days": "Sun"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ping #ops",
+      "params": {
+        "channel": "#ops",
+        "message": "Weekly backup time. Verify last snapshot and rotate offsites."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

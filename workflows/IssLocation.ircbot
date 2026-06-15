@@ -1,0 +1,134 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ISS Current Location",
+  "description": "Reply with the International Space Station's current latitude and longitude when someone types !iss, fetched live from the open-notify API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "space",
+    "iss"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!iss",
+      "params": {
+        "prefix": "!",
+        "command": "iss",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch ISS position",
+      "params": {
+        "method": "GET",
+        "url": "http://api.open-notify.org/iss-now.json",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "lat",
+      "type": "data.json",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "latitude",
+      "params": {
+        "path": "iss_position.latitude"
+      }
+    },
+    {
+      "id": "lng",
+      "type": "data.json",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "longitude",
+      "params": {
+        "path": "iss_position.longitude"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "🛰️ ISS is at {a}, {b}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send location",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "lat",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "lng",
+      "toPin": 0
+    },
+    {
+      "from": "lat",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "lng",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

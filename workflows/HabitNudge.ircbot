@@ -1,0 +1,65 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Habit Nudge",
+  "description": "Posts a randomized afternoon habit prompt to #habits every day at 14:00 to keep your routine on track.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "habits",
+    "interval"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 14:00",
+      "params": {
+        "mode": "daily",
+        "time": "14:00"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick a habit",
+      "params": {
+        "options": "Read 10 pages.\nMeditate 5 min.\nNo-phone walk."
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "nudge #habits",
+      "params": {
+        "channel": "#habits",
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

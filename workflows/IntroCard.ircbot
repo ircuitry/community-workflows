@@ -1,0 +1,197 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Intro Card (!intro)",
+  "description": "Store a personal self-intro with !intro <text> and recall yours or someone else's with !intro or !whois <nick>.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "profile",
+    "onboarding",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "introCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!intro [text]",
+      "params": {
+        "prefix": "!",
+        "command": "intro",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "isEmpty",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "no text given?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "saveSet",
+      "type": "db.set",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save intro",
+      "params": {
+        "table": "intros",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "savedReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm save",
+      "params": {
+        "message": "Saved your intro, {nick}!",
+        "server": ""
+      }
+    },
+    {
+      "id": "recallGet",
+      "type": "db.get",
+      "x": 572,
+      "y": -200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "my intro",
+      "params": {
+        "table": "intros",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "No intro yet - try !intro <text>",
+        "find": ""
+      }
+    },
+    {
+      "id": "recallReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": -40,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send my intro",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "whoisCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whois <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "whois",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "whoisGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 660,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "their intro",
+      "params": {
+        "table": "intros",
+        "mode": "value",
+        "key": "{args}",
+        "default": "I don't know them yet.",
+        "find": ""
+      }
+    },
+    {
+      "id": "whoisReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send their intro",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "introCmd",
+      "fromPin": 0,
+      "to": "isEmpty",
+      "toPin": 0
+    },
+    {
+      "from": "introCmd",
+      "fromPin": 1,
+      "to": "isEmpty",
+      "toPin": 1
+    },
+    {
+      "from": "isEmpty",
+      "fromPin": 1,
+      "to": "saveSet",
+      "toPin": 0
+    },
+    {
+      "from": "introCmd",
+      "fromPin": 1,
+      "to": "saveSet",
+      "toPin": 1
+    },
+    {
+      "from": "saveSet",
+      "fromPin": 0,
+      "to": "savedReply",
+      "toPin": 0
+    },
+    {
+      "from": "isEmpty",
+      "fromPin": 0,
+      "to": "recallReply",
+      "toPin": 0
+    },
+    {
+      "from": "recallGet",
+      "fromPin": 0,
+      "to": "recallReply",
+      "toPin": 1
+    },
+    {
+      "from": "whoisCmd",
+      "fromPin": 0,
+      "to": "whoisReply",
+      "toPin": 0
+    },
+    {
+      "from": "whoisGet",
+      "fromPin": 0,
+      "to": "whoisReply",
+      "toPin": 1
+    }
+  ]
+}

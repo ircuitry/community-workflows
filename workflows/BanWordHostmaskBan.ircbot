@@ -1,0 +1,131 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Ban Word Hostmask Ban",
+  "description": "Watches channel chat for a banned slur and, on a match, sets a +b hostmask ban on the offender, kicks them, and logs the removal.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "banword",
+    "ban"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "filt",
+      "type": "filter.contains",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Has banned word?",
+      "params": {
+        "needle": "slurtoken",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "mask",
+      "type": "data.format",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build hostmask",
+      "params": {
+        "template": "{nick}!*@*",
+        "a": "{nick}"
+      }
+    },
+    {
+      "id": "ban",
+      "type": "irc.mode",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+b hostmask",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+b",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick offender",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "Banned term",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 858,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log the ban",
+      "params": {
+        "text": "banword+b {nick}: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "filt",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "filt",
+      "toPin": 1
+    },
+    {
+      "from": "filt",
+      "fromPin": 0,
+      "to": "ban",
+      "toPin": 0
+    },
+    {
+      "from": "mask",
+      "fromPin": 0,
+      "to": "ban",
+      "toPin": 1
+    },
+    {
+      "from": "ban",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "filt",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

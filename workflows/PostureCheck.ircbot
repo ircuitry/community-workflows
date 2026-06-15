@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Posture Check",
+  "description": "Reminds #focus every 45 minutes to fix their posture: shoulders back, screen at eye level, feet flat.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "health",
+    "interval"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every 45 minutes",
+      "params": {
+        "mode": "interval",
+        "every": "45",
+        "unit": "minutes"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Posture reminder",
+      "params": {
+        "channel": "#focus",
+        "message": "Posture check: shoulders back, screen at eye level, feet flat."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

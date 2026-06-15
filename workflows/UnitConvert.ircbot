@@ -1,0 +1,80 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Unit Converter",
+  "description": "Convert between common length, weight and temperature units with !unit <n> <from> <to>, for example !unit 10 km mi.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "units",
+    "convert"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!unit <n> <from> <to>",
+      "params": {
+        "prefix": "!",
+        "command": "unit",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "calc",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "convert units",
+      "params": {
+        "language": "javascript",
+        "code": "const parts = String(input || '').trim().split(/\\s+/);\nif (parts.length < 3) { return 'Usage: !unit <number> <from> <to> (e.g. !unit 10 km mi)'; }\nconst n = parseFloat(parts[0]);\nif (isNaN(n)) { return 'First argument must be a number, e.g. !unit 10 km mi'; }\nconst from = parts[1].toLowerCase();\nconst to = parts[2].toLowerCase();\n\n// length in metres, weight in grams\nconst length = { mm: 0.001, cm: 0.01, m: 1, km: 1000, in: 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344 };\nconst weight = { mg: 0.001, g: 1, kg: 1000, t: 1000000, oz: 28.349523125, lb: 453.59237, st: 6350.29318 };\nconst tempAliases = { c: 'c', celsius: 'c', f: 'f', fahrenheit: 'f', k: 'k', kelvin: 'k' };\n\nfunction round(x) { return Math.round(x * 10000) / 10000; }\n\nlet result;\nif (from in length && to in length) {\n  result = round(n * length[from] / length[to]);\n} else if (from in weight && to in weight) {\n  result = round(n * weight[from] / weight[to]);\n} else if (from in tempAliases && to in tempAliases) {\n  const f = tempAliases[from], t = tempAliases[to];\n  let celsius;\n  if (f === 'c') celsius = n;\n  else if (f === 'f') celsius = (n - 32) * 5 / 9;\n  else celsius = n - 273.15;\n  if (t === 'c') result = round(celsius);\n  else if (t === 'f') result = round(celsius * 9 / 5 + 32);\n  else result = round(celsius + 273.15);\n} else {\n  return 'Cannot convert ' + from + ' to ' + to + '. Try length (km, mi, m, ft), weight (kg, lb, g, oz) or temperature (c, f, k).';\n}\nreturn n + ' ' + from + ' = ' + result + ' ' + to;",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "calc",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "calc",
+      "toPin": 1
+    },
+    {
+      "from": "calc",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "calc",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Recycling Day Reminder",
+  "description": "Reminds #household on Thursday evenings to put the recycling out, with a 50% chance gate to roughly emulate the alternating fortnightly bin week.",
+  "author": "ircuitry",
+  "category": "Reminders",
+  "tags": [
+    "chores",
+    "biweekly"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Thursdays 20:00",
+      "params": {
+        "mode": "weekly",
+        "time": "20:00",
+        "days": "Thu"
+      }
+    },
+    {
+      "id": "chance",
+      "type": "logic.chance",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Alternating weeks (50%)",
+      "params": {
+        "percent": "50"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remind household",
+      "params": {
+        "channel": "#household",
+        "message": "Recycling goes out tonight (bin week)."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "chance",
+      "toPin": 0
+    },
+    {
+      "from": "chance",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}
