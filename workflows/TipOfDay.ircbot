@@ -1,0 +1,102 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Tip of the Day",
+  "description": "Every day at 10:00 it reads tips.txt and posts one random tip line to #general.",
+  "author": "ircuitry",
+  "tags": [
+    "fun",
+    "schedule",
+    "file"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily at 10:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "10:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "read",
+      "type": "file.read",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Read tips.txt",
+      "params": {
+        "path": "tips.txt"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "code.run",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a random tip",
+      "params": {
+        "language": "javascript",
+        "code": "const lines=(process.env.INPUT||'').split('\\n').map(l=>l.trim()).filter(l=>l.length>0);\nif(lines.length===0){console.log('No tips found in tips.txt yet.');}else{console.log('\\uD83D\\uDCA1 Tip of the day: '+lines[Math.floor(Math.random()*lines.length)]);}",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post to #general",
+      "params": {
+        "channel": "#general",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "read",
+      "toPin": 0
+    },
+    {
+      "from": "read",
+      "fromPin": 0,
+      "to": "pick",
+      "toPin": 0
+    },
+    {
+      "from": "read",
+      "fromPin": 2,
+      "to": "pick",
+      "toPin": 1
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

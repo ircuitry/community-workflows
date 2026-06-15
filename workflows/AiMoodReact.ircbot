@@ -1,0 +1,81 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Mood Reactions",
+  "description": "Reads every channel message, asks an AI for a single emoji matching its mood, and reacts to the message with that emoji using IRCv3 reactions.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "ircv3",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a mood emoji",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Reply with ONE emoji that matches the mood of the message, nothing else.",
+        "prompt": "",
+        "maxTokens": "8"
+      }
+    },
+    {
+      "id": "react",
+      "type": "action.react",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "React with the emoji",
+      "params": {
+        "emoji": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "react",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "react",
+      "toPin": 1
+    }
+  ]
+}

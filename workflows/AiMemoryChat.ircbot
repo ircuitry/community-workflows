@@ -1,0 +1,185 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Chat with Memory",
+  "description": "!chat <message> talks to an AI that remembers the conversation per channel, recalling prior turns for context and storing each new exchange.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "chat",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!chat <message>",
+      "params": {
+        "prefix": "!",
+        "command": "chat",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "recall",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recall channel history",
+      "params": {
+        "session": "{channel}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "12"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "history + new message",
+      "params": {
+        "template": "Conversation so far:\n{a}\n\nUser: {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "generate reply",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a friendly, concise IRC chat assistant. Use the conversation history for context and answer the user's latest message in one or two short sentences.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "remUser",
+      "type": "ai.memory",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember user message",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "user",
+        "text": "",
+        "max": "12"
+      }
+    },
+    {
+      "id": "remAi",
+      "type": "ai.memory",
+      "x": 1716,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember assistant reply",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "assistant",
+        "text": "",
+        "max": "12"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "recall",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "recall",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "say",
+      "fromPin": 0,
+      "to": "remUser",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "remUser",
+      "toPin": 1
+    },
+    {
+      "from": "remUser",
+      "fromPin": 0,
+      "to": "remAi",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "remAi",
+      "toPin": 1
+    }
+  ]
+}

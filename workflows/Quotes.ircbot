@@ -1,0 +1,197 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Quote Book",
+  "description": "A shared quote book: type !quote add <text> to save a memorable line, or just !quote to read one back.",
+  "author": "ircuitry",
+  "tags": [
+    "fun",
+    "db",
+    "game"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!quote",
+      "params": {
+        "prefix": "!",
+        "command": "quote",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "emptyIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "no args?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "countGet",
+      "type": "db.get",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "how many quotes",
+      "params": {
+        "table": "quotes",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "quoteGet",
+      "type": "db.get",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch a quote",
+      "params": {
+        "table": "quotes",
+        "mode": "value",
+        "key": "1",
+        "default": "The quote book is empty — add one with !quote add <text>",
+        "find": ""
+      }
+    },
+    {
+      "id": "readFmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build read reply",
+      "params": {
+        "template": "📖 “{a}”  ({b} quote(s) on file)"
+      }
+    },
+    {
+      "id": "readRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "show quote",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "saveSet",
+      "type": "db.set",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store quote",
+      "params": {
+        "table": "quotes",
+        "key": "{time}",
+        "value": ""
+      }
+    },
+    {
+      "id": "saveFmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build saved reply",
+      "params": {
+        "template": "✅ Saved, {nick}! Read it back any time with !quote"
+      }
+    },
+    {
+      "id": "saveRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm save",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "emptyIf",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "emptyIf",
+      "toPin": 1
+    },
+    {
+      "from": "emptyIf",
+      "fromPin": 0,
+      "to": "readRep",
+      "toPin": 0
+    },
+    {
+      "from": "quoteGet",
+      "fromPin": 0,
+      "to": "readFmt",
+      "toPin": 0
+    },
+    {
+      "from": "countGet",
+      "fromPin": 1,
+      "to": "readFmt",
+      "toPin": 1
+    },
+    {
+      "from": "readFmt",
+      "fromPin": 0,
+      "to": "readRep",
+      "toPin": 1
+    },
+    {
+      "from": "emptyIf",
+      "fromPin": 1,
+      "to": "saveSet",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "saveSet",
+      "toPin": 1
+    },
+    {
+      "from": "saveSet",
+      "fromPin": 0,
+      "to": "saveRep",
+      "toPin": 0
+    },
+    {
+      "from": "saveFmt",
+      "fromPin": 0,
+      "to": "saveRep",
+      "toPin": 1
+    }
+  ]
+}

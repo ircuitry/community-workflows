@@ -1,0 +1,134 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Crypto Price",
+  "description": "Use !price <coin> to fetch a cryptocurrency's current USD price from the CoinGecko API (the example reply parses bitcoin.usd; CoinGecko coin ids like ethereum or dogecoin also work).",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "web",
+    "finance"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!price <coin>",
+      "params": {
+        "prefix": "!",
+        "command": "price",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "urlFmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build CoinGecko URL",
+      "params": {
+        "template": "https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=usd"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "GET simple price",
+      "params": {
+        "method": "GET",
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+        "headers": "Accept: application/json",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "bitcoin.usd",
+      "params": {
+        "path": "bitcoin.usd"
+      }
+    },
+    {
+      "id": "msgFmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "💰 BTC is currently ${a} USD (via CoinGecko)."
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send price",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "urlFmt",
+      "toPin": 0
+    },
+    {
+      "from": "urlFmt",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "msgFmt",
+      "toPin": 0
+    },
+    {
+      "from": "msgFmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

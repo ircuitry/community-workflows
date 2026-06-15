@@ -1,0 +1,231 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Poll",
+  "description": "Run a simple channel poll: !vote <option> tallies a vote into a per-option counter and !results lists every option with its current vote count.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "db",
+    "community"
+  ],
+  "nodes": [
+    {
+      "id": "voteCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!vote <option>",
+      "params": {
+        "prefix": "!",
+        "command": "vote",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "optLower",
+      "type": "data.transform",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "normalize option",
+      "params": {
+        "op": "lower",
+        "find": "",
+        "replace": ""
+      }
+    },
+    {
+      "id": "voteGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current tally",
+      "params": {
+        "table": "poll_votes",
+        "mode": "value",
+        "key": "{args}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "voteInc",
+      "type": "data.math",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "tally + 1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "voteSet",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save tally",
+      "params": {
+        "table": "poll_votes",
+        "key": "{args}",
+        "value": ""
+      }
+    },
+    {
+      "id": "voteFmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirmation",
+      "params": {
+        "template": "🗳️ Counted! \"{a}\" now has {b} vote(s). Use !results to see the standings."
+      }
+    },
+    {
+      "id": "voteRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "resCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!results",
+      "params": {
+        "prefix": "!",
+        "command": "results",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "resGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "all tallies",
+      "params": {
+        "table": "poll_votes",
+        "mode": "find",
+        "key": "",
+        "default": "No votes yet. Cast one with !vote <option>",
+        "find": ""
+      }
+    },
+    {
+      "id": "resFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "results line",
+      "params": {
+        "template": "📊 Poll results: {a}"
+      }
+    },
+    {
+      "id": "resRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "voteCmd",
+      "fromPin": 0,
+      "to": "voteSet",
+      "toPin": 0
+    },
+    {
+      "from": "voteCmd",
+      "fromPin": 1,
+      "to": "optLower",
+      "toPin": 0
+    },
+    {
+      "from": "voteGet",
+      "fromPin": 0,
+      "to": "voteInc",
+      "toPin": 0
+    },
+    {
+      "from": "voteInc",
+      "fromPin": 0,
+      "to": "voteSet",
+      "toPin": 1
+    },
+    {
+      "from": "voteSet",
+      "fromPin": 0,
+      "to": "voteRep",
+      "toPin": 0
+    },
+    {
+      "from": "optLower",
+      "fromPin": 0,
+      "to": "voteFmt",
+      "toPin": 0
+    },
+    {
+      "from": "voteInc",
+      "fromPin": 0,
+      "to": "voteFmt",
+      "toPin": 1
+    },
+    {
+      "from": "voteFmt",
+      "fromPin": 0,
+      "to": "voteRep",
+      "toPin": 1
+    },
+    {
+      "from": "resCmd",
+      "fromPin": 0,
+      "to": "resRep",
+      "toPin": 0
+    },
+    {
+      "from": "resGet",
+      "fromPin": 0,
+      "to": "resFmt",
+      "toPin": 0
+    },
+    {
+      "from": "resFmt",
+      "fromPin": 0,
+      "to": "resRep",
+      "toPin": 1
+    }
+  ]
+}

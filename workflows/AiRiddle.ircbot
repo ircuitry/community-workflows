@@ -1,0 +1,76 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Hourly Riddle",
+  "description": "Every hour an AI poses a short riddle (with no answer) to #general for everyone to puzzle over.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "fun",
+    "timer"
+  ],
+  "nodes": [
+    {
+      "id": "timer",
+      "type": "event.timer",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "every hour",
+      "params": {
+        "seconds": "3600"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pose a riddle",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a riddle master. Pose a single short riddle. Do not reveal or hint at the answer. Output only the riddle, in one or two lines.",
+        "prompt": "Give me a fresh, clever riddle now.",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce",
+      "params": {
+        "channel": "#general",
+        "message": "🧩 Riddle of the hour:",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "timer",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

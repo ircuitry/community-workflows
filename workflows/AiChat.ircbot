@@ -1,0 +1,118 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Chat",
+  "description": "A friendly AI Q&A bot: ask it anything with !ask <question> and it replies with a witty answer while showing a typing indicator as it thinks.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "chat",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ask <question>",
+      "params": {
+        "prefix": "!",
+        "command": "ask",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "typeStart",
+      "type": "irc.typing.start",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "thinking…",
+      "params": {
+        "target": "{channel}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ask the AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a witty, concise IRC bot. Answer the user's question helpfully in one or two short lines of plain text, with a bit of humor. No markdown.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "typeStop",
+      "type": "irc.typing.stop",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "done",
+      "params": {
+        "target": "{channel}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send answer",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "typeStart",
+      "toPin": 0
+    },
+    {
+      "from": "typeStart",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "typeStop",
+      "toPin": 0
+    },
+    {
+      "from": "typeStop",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI TL;DR",
+  "description": "Type !tldr followed by a wall of text and the bot replies with a single-sentence AI summary.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "summary",
+    "utility"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !tldr",
+      "params": {
+        "prefix": "!",
+        "command": "tldr",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize in one short sentence.",
+        "prompt": "",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send the TL;DR",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

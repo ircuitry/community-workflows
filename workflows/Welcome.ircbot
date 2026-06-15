@@ -1,0 +1,127 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Welcome + Rules",
+  "description": "Greets everyone who joins the channel and shows the channel rules from a rules.txt file (or a friendly note if none is set).",
+  "author": "ircuitry",
+  "tags": [
+    "community",
+    "onboarding",
+    "file"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone joined",
+      "params": {}
+    },
+    {
+      "id": "greet",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Greet the joiner",
+      "params": {
+        "channel": "",
+        "message": "welcome {nick}! 🎉",
+        "server": ""
+      }
+    },
+    {
+      "id": "rules",
+      "type": "file.read",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Read rules.txt",
+      "params": {
+        "path": "rules.txt"
+      }
+    },
+    {
+      "id": "sayRules",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post the rules",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "noRules",
+      "type": "action.say",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "No rules file",
+      "params": {
+        "channel": "",
+        "message": "(no rules file set)",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "greet",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "greet",
+      "toPin": 1
+    },
+    {
+      "from": "greet",
+      "fromPin": 0,
+      "to": "rules",
+      "toPin": 0
+    },
+    {
+      "from": "rules",
+      "fromPin": 0,
+      "to": "sayRules",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "sayRules",
+      "toPin": 1
+    },
+    {
+      "from": "rules",
+      "fromPin": 2,
+      "to": "sayRules",
+      "toPin": 2
+    },
+    {
+      "from": "rules",
+      "fromPin": 1,
+      "to": "noRules",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "noRules",
+      "toPin": 1
+    }
+  ]
+}

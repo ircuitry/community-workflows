@@ -1,0 +1,142 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI FAQ (from file)",
+  "description": "Answers !faq <question> by reading a local knowledge file and asking an AI to respond using only that content.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "support",
+    "file"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!faq <question>",
+      "params": {
+        "prefix": "!",
+        "command": "faq",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "read",
+      "type": "file.read",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Read knowledge file",
+      "params": {
+        "path": "faq.txt"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build prompt",
+      "params": {
+        "template": "Knowledge:\n{a}\n\nQuestion: {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer from knowledge",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a helpful support assistant. Answer the user's question using only the provided knowledge. If the answer is not in the knowledge, say you don't know.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send answer",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "missReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "No file yet",
+      "params": {
+        "message": "No FAQ file yet."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "read",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "read",
+      "fromPin": 2,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "read",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "read",
+      "fromPin": 1,
+      "to": "missReply",
+      "toPin": 0
+    }
+  ]
+}

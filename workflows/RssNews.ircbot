@@ -1,0 +1,104 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "RSS Headlines",
+  "description": "Every 30 minutes it fetches an RSS feed, extracts the latest headline title, and posts it to #news.",
+  "author": "ircuitry",
+  "tags": [
+    "news",
+    "web",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "every 30 min",
+      "params": {
+        "mode": "interval",
+        "every": "30",
+        "unit": "minutes",
+        "time": "",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch RSS",
+      "params": {
+        "method": "GET",
+        "url": "https://hnrss.org/frontpage",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "extract <title>",
+      "params": {
+        "pattern": "<item>[\\s\\S]*?<title>(.*?)</title>",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post headline",
+      "params": {
+        "channel": "#news",
+        "message": "📰 {1}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "regex",
+      "fromPin": 2,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

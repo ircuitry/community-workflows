@@ -1,0 +1,118 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Broadcast (signal)",
+  "description": "Lets an admin run !broadcast <msg> to fan a single message out to several channels at once using an internal signal.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "signal",
+    "admin"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!broadcast <msg>",
+      "params": {
+        "prefix": "!",
+        "command": "broadcast",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "sig",
+      "type": "action.signal",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fire broadcast",
+      "params": {
+        "signal": "broadcast",
+        "data": ""
+      }
+    },
+    {
+      "id": "evsig",
+      "type": "event.signal",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on broadcast",
+      "params": {
+        "signal": "broadcast"
+      }
+    },
+    {
+      "id": "say1",
+      "type": "action.say",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "to #general",
+      "params": {
+        "channel": "#general",
+        "message": "📢 Broadcast: {1}",
+        "server": ""
+      }
+    },
+    {
+      "id": "say2",
+      "type": "action.say",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "to #random",
+      "params": {
+        "channel": "#random",
+        "message": "📢 Broadcast: {1}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "sig",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "sig",
+      "toPin": 1
+    },
+    {
+      "from": "evsig",
+      "fromPin": 0,
+      "to": "say1",
+      "toPin": 0
+    },
+    {
+      "from": "evsig",
+      "fromPin": 1,
+      "to": "say1",
+      "toPin": 2
+    },
+    {
+      "from": "say1",
+      "fromPin": 0,
+      "to": "say2",
+      "toPin": 0
+    },
+    {
+      "from": "evsig",
+      "fromPin": 1,
+      "to": "say2",
+      "toPin": 2
+    }
+  ]
+}

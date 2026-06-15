@@ -1,0 +1,179 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Text Adventure",
+  "description": "Play a continuing text adventure with !go <action>; an AI dungeon master remembers your story per channel using ai.memory so it persists across turns.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "game",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "goCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!go <action>",
+      "params": {
+        "prefix": "!",
+        "command": "go",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "recall",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recall story",
+      "params": {
+        "session": "{channel}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "20"
+      }
+    },
+    {
+      "id": "prompt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build prompt",
+      "params": {
+        "template": "Story so far:\n{a}\n\nThe player's next action: {b}\n\nContinue the adventure."
+      }
+    },
+    {
+      "id": "dm",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "dungeon master",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a dungeon master running an interactive text adventure. Keep your replies to 2 sentences. Always continue the story from where it left off and end with a hook or choice for the player.",
+        "prompt": "",
+        "maxTokens": "180"
+      }
+    },
+    {
+      "id": "tell",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "tell the player",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "rememberAction",
+      "type": "ai.memory",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember player turn",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "user",
+        "text": "{args}",
+        "max": "20"
+      }
+    },
+    {
+      "id": "rememberStory",
+      "type": "ai.memory",
+      "x": 1716,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember DM reply",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "assistant",
+        "text": "",
+        "max": "20"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "goCmd",
+      "fromPin": 0,
+      "to": "recall",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 0,
+      "to": "dm",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 1,
+      "to": "prompt",
+      "toPin": 0
+    },
+    {
+      "from": "goCmd",
+      "fromPin": 1,
+      "to": "prompt",
+      "toPin": 1
+    },
+    {
+      "from": "prompt",
+      "fromPin": 0,
+      "to": "dm",
+      "toPin": 1
+    },
+    {
+      "from": "dm",
+      "fromPin": 0,
+      "to": "tell",
+      "toPin": 0
+    },
+    {
+      "from": "dm",
+      "fromPin": 1,
+      "to": "tell",
+      "toPin": 1
+    },
+    {
+      "from": "tell",
+      "fromPin": 0,
+      "to": "rememberAction",
+      "toPin": 0
+    },
+    {
+      "from": "rememberAction",
+      "fromPin": 0,
+      "to": "rememberStory",
+      "toPin": 0
+    },
+    {
+      "from": "dm",
+      "fromPin": 1,
+      "to": "rememberStory",
+      "toPin": 1
+    }
+  ]
+}

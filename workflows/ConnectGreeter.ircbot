@@ -1,0 +1,65 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Connect Greeter",
+  "description": "On connect, sets the #general topic and announces that the bot is online so users know to type !help.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "startup",
+    "ircv3"
+  ],
+  "nodes": [
+    {
+      "id": "onConnect",
+      "type": "event.connect",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On connect",
+      "params": {}
+    },
+    {
+      "id": "setTopic",
+      "type": "irc.topic",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Set #general topic",
+      "params": {
+        "channel": "#general",
+        "topic": "welcome - powered by ircuitry 🤖",
+        "server": ""
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce online",
+      "params": {
+        "channel": "#general",
+        "message": "ircuitry is online! type !help",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "onConnect",
+      "fromPin": 0,
+      "to": "setTopic",
+      "toPin": 0
+    },
+    {
+      "from": "setTopic",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    }
+  ]
+}

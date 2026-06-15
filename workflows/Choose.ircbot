@@ -1,0 +1,78 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Choose",
+  "description": "Picks one option at random from a pipe-separated list, e.g. !choose pizza | tacos | sushi.",
+  "author": "ircuitry",
+  "tags": [
+    "fun",
+    "utility"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !choose",
+      "params": {
+        "prefix": "!",
+        "command": "choose",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a random option",
+      "params": {
+        "language": "javascript",
+        "code": "const raw=(process.env.INPUT||'').trim();\nconst opts=raw.split('|').map(s=>s.trim()).filter(s=>s.length>0);\nif(opts.length===0){console.log('Give me some options: !choose a | b | c');}else{const i=Math.floor(Math.random()*opts.length);console.log('🎲 I choose: '+opts[i]);}",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce the choice",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "pick",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "pick",
+      "toPin": 1
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

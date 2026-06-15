@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Explain",
+  "description": "Type !explain <thing> and the bot gives a short, plain-English explanation of it.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "help",
+    "dev"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !explain",
+      "params": {
+        "prefix": "!",
+        "command": "explain",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Explain it simply",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a helpful assistant. Explain the thing the user asks about in plain English, simply, in 1-2 sentences. No jargon, no preamble.",
+        "prompt": "",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send the explanation",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

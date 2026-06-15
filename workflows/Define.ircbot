@@ -1,0 +1,140 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Dictionary",
+  "description": "Look up the definition of any word with !define <word>, fetched live from the free dictionaryapi.dev API.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "web",
+    "reference"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!define <word>",
+      "params": {
+        "prefix": "!",
+        "command": "define",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build API url",
+      "params": {
+        "template": "https://api.dictionaryapi.dev/api/v2/entries/en/{a}"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "fetch definition",
+      "params": {
+        "method": "GET",
+        "url": "https://api.dictionaryapi.dev/api/v2/entries/en/word",
+        "headers": "",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 858,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first definition",
+      "params": {
+        "path": "0.meanings.0.definitions.0.definition"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "📖 {a}: {b}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send definition",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

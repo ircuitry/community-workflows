@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Translator",
+  "description": "Type !tr <text> and the bot replies with an English translation of whatever you wrote.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "translate",
+    "utility"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!tr <text>",
+      "params": {
+        "prefix": "!",
+        "command": "tr",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "translate to English",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Translate the user text to English; reply only with the translation.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "rep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send translation",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "rep",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "rep",
+      "toPin": 1
+    }
+  ]
+}

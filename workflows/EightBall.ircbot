@@ -1,0 +1,64 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Magic 8-Ball",
+  "description": "Ask the Magic 8-Ball a yes-or-no question with !8ball <question> and it replies with a random fortune.",
+  "author": "ircuitry",
+  "tags": [
+    "fun",
+    "game"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !8ball",
+      "params": {
+        "prefix": "!",
+        "command": "8ball",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "fortune",
+      "type": "data.random",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a fortune",
+      "params": {
+        "options": "Yes.\nNo.\nMaybe.\nAsk again later.\nDefinitely.\nDoubtful."
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer the question",
+      "params": {
+        "message": "🎱 {nick}: Yes."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fortune",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

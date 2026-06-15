@@ -1,0 +1,126 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Seen",
+  "description": "Tracks the last message every nick said and answers !seen <nick> with their most recent line.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "record",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remember last line",
+      "params": {
+        "table": "seen",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !seen",
+      "params": {
+        "prefix": "!",
+        "command": "seen",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 0,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Last line for nick",
+      "params": {
+        "table": "seen",
+        "mode": "value",
+        "key": "{args}",
+        "default": "I haven't seen them say anything",
+        "find": ""
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build reply",
+      "params": {
+        "template": "last I saw {args}: \"{a}\""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer the user",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "record",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "record",
+      "toPin": 1
+    },
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

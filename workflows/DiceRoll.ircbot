@@ -1,0 +1,79 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Dice Roller",
+  "description": "Roll dice with !roll NdM (e.g. !roll 2d6) and the bot replies with each die and the total.",
+  "author": "ircuitry",
+  "tags": [
+    "game",
+    "fun",
+    "dice"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone typed !roll",
+      "params": {
+        "prefix": "!",
+        "command": "roll",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "roll",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Parse NdM and roll",
+      "params": {
+        "language": "javascript",
+        "code": "const raw = (process.env.ARGS || process.env.INPUT || '').trim();\nconst m = raw.match(/^(\\d*)\\s*[dD]\\s*(\\d+)$/);\nlet n = m ? parseInt(m[1] || '1', 10) : 1;\nlet sides = m ? parseInt(m[2], 10) : 6;\nif (!Number.isFinite(n) || n < 1) n = 1;\nif (n > 100) n = 100;\nif (!Number.isFinite(sides) || sides < 2) sides = 6;\nif (sides > 1000) sides = 1000;\nconst rolls = [];\nlet total = 0;\nfor (let i = 0; i < n; i++) {\n  const r = Math.floor(Math.random() * sides) + 1;\n  rolls.push(r);\n  total += r;\n}\nconsole.log('\\uD83C\\uDFB2 ' + n + 'd' + sides + ': [' + rolls.join(', ') + '] = ' + total);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send the result",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "roll",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "roll",
+      "toPin": 1
+    },
+    {
+      "from": "roll",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "roll",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

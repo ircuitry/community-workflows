@@ -1,0 +1,101 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Auto-Moderator",
+  "description": "Classifies every channel message with an AI model and gently warns the sender when their message is flagged as toxic, without auto-kicking anyone.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "moderation",
+    "safety"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "classify",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Classify toxicity",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Reply with exactly TOXIC or OK for the message.",
+        "prompt": "",
+        "maxTokens": "8"
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is it toxic?",
+      "params": {
+        "op": "contains",
+        "b": "TOXIC",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Warn the sender",
+      "params": {
+        "message": "easy there {nick}, keep it friendly.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "classify",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "classify",
+      "toPin": 1
+    },
+    {
+      "from": "classify",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "classify",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

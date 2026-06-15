@@ -1,0 +1,94 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Auto-Op Trusted",
+  "description": "Automatically grants channel operator (+o) status to users on your trusted list the moment they join the channel.",
+  "author": "ircuitry",
+  "tags": [
+    "moderation",
+    "db",
+    "ircv3"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Someone joined",
+      "params": {}
+    },
+    {
+      "id": "trustGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Is nick trusted?",
+      "params": {
+        "table": "trusted",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "no",
+        "find": ""
+      }
+    },
+    {
+      "id": "trustIf",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "trusted = yes?",
+      "params": {
+        "op": "=",
+        "b": "yes",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "opMode",
+      "type": "irc.mode",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Give +o",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+o",
+        "target": "{nick}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "trustIf",
+      "toPin": 0
+    },
+    {
+      "from": "trustGet",
+      "fromPin": 0,
+      "to": "trustIf",
+      "toPin": 1
+    },
+    {
+      "from": "trustIf",
+      "fromPin": 0,
+      "to": "opMode",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "opMode",
+      "toPin": 1
+    }
+  ]
+}

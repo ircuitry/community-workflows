@@ -1,0 +1,145 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "URL Title",
+  "description": "Watches the channel for links and replies with the page's HTML <title> so people know what was shared.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "web"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "findUrl",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Find a URL",
+      "params": {
+        "pattern": "(https?://\\S+)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "fetch",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch the page",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: ircuitry-urltitle",
+        "body": ""
+      }
+    },
+    {
+      "id": "findTitle",
+      "type": "logic.regex",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Extract <title>",
+      "params": {
+        "pattern": "<title[^>]*>(.*?)</title>",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build reply",
+      "params": {
+        "template": "↳ {a}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce title",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "findUrl",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "findUrl",
+      "toPin": 1
+    },
+    {
+      "from": "findUrl",
+      "fromPin": 0,
+      "to": "fetch",
+      "toPin": 0
+    },
+    {
+      "from": "findUrl",
+      "fromPin": 2,
+      "to": "fetch",
+      "toPin": 1
+    },
+    {
+      "from": "fetch",
+      "fromPin": 0,
+      "to": "findTitle",
+      "toPin": 0
+    },
+    {
+      "from": "fetch",
+      "fromPin": 1,
+      "to": "findTitle",
+      "toPin": 1
+    },
+    {
+      "from": "findTitle",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "findTitle",
+      "fromPin": 2,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Word Filter",
+  "description": "Watches channel messages for a banned word and kicks the offending user with a warning, logging each removal.",
+  "author": "ircuitry",
+  "tags": [
+    "moderation",
+    "safety"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "On any message",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "filter",
+      "type": "filter.contains",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Has banned word?",
+      "params": {
+        "needle": "badword",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Kick offender",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "watch the language",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Log the kick",
+      "params": {
+        "text": "kicked {nick}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "filter",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "filter",
+      "toPin": 1
+    },
+    {
+      "from": "filter",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "kick",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

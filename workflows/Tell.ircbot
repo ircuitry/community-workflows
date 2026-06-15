@@ -1,0 +1,232 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Tell (offline messages)",
+  "description": "Use !tell <nick> <message> to leave an offline note that gets delivered to that person the next time they speak in the channel.",
+  "author": "ircuitry",
+  "tags": [
+    "utility",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "tellCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!tell nick message",
+      "params": {
+        "prefix": "!",
+        "command": "tell",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "parse",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split nick + message",
+      "params": {
+        "pattern": "^(\\S+)\\s+(.*)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save tell",
+      "params": {
+        "table": "tells",
+        "key": "{1}",
+        "value": ""
+      }
+    },
+    {
+      "id": "okRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ack",
+      "params": {
+        "message": "ok, I'll tell them."
+      }
+    },
+    {
+      "id": "usage",
+      "type": "action.reply",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "usage",
+      "params": {
+        "message": "usage: !tell <nick> <message>"
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "anyone speaks",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 0,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pending tell?",
+      "params": {
+        "table": "tells",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "hasTell",
+      "type": "logic.if",
+      "x": 286,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "non-empty?",
+      "params": {
+        "op": "is empty",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "deliverFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build message",
+      "params": {
+        "template": "{nick}, message: {a}"
+      }
+    },
+    {
+      "id": "deliverRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "deliver",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "clear",
+      "type": "db.set",
+      "x": 1144,
+      "y": 420,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear tell",
+      "params": {
+        "table": "tells",
+        "key": "{nick}",
+        "value": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "tellCmd",
+      "fromPin": 0,
+      "to": "parse",
+      "toPin": 0
+    },
+    {
+      "from": "tellCmd",
+      "fromPin": 1,
+      "to": "parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 3,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "okRep",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 1,
+      "to": "usage",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "hasTell",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "hasTell",
+      "toPin": 1
+    },
+    {
+      "from": "hasTell",
+      "fromPin": 1,
+      "to": "deliverRep",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "deliverFmt",
+      "toPin": 0
+    },
+    {
+      "from": "deliverFmt",
+      "fromPin": 0,
+      "to": "deliverRep",
+      "toPin": 1
+    },
+    {
+      "from": "deliverRep",
+      "fromPin": 0,
+      "to": "clear",
+      "toPin": 0
+    }
+  ]
+}

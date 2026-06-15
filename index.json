@@ -1,6 +1,1777 @@
 {
-  "count": 6,
+  "count": 37,
   "workflows": [
+    {
+      "name": "AI Text Adventure",
+      "description": "Play a continuing text adventure with !go <action>; an AI dungeon master remembers your story per channel using ai.memory so it persists across turns.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "game",
+        "memory"
+      ],
+      "nodeCount": 7,
+      "connectionCount": 10,
+      "nodeTypes": [
+        "action.reply",
+        "ai.memory",
+        "ai.reply",
+        "data.format",
+        "event.command"
+      ],
+      "file": "workflows/AiAdventure.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Text Adventure",
+        "description": "Play a continuing text adventure with !go <action>; an AI dungeon master remembers your story per channel using ai.memory so it persists across turns.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "game",
+          "memory"
+        ],
+        "nodes": [
+          {
+            "id": "goCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!go <action>",
+            "params": {
+              "prefix": "!",
+              "command": "go",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "recall",
+            "type": "ai.memory",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "recall story",
+            "params": {
+              "session": "{channel}",
+              "mode": "recall",
+              "role": "user",
+              "text": "",
+              "max": "20"
+            }
+          },
+          {
+            "id": "prompt",
+            "type": "data.format",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build prompt",
+            "params": {
+              "template": "Story so far:\n{a}\n\nThe player's next action: {b}\n\nContinue the adventure."
+            }
+          },
+          {
+            "id": "dm",
+            "type": "ai.reply",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "dungeon master",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a dungeon master running an interactive text adventure. Keep your replies to 2 sentences. Always continue the story from where it left off and end with a hook or choice for the player.",
+              "prompt": "",
+              "maxTokens": "180"
+            }
+          },
+          {
+            "id": "tell",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "tell the player",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "rememberAction",
+            "type": "ai.memory",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "remember player turn",
+            "params": {
+              "session": "{channel}",
+              "mode": "remember",
+              "role": "user",
+              "text": "{args}",
+              "max": "20"
+            }
+          },
+          {
+            "id": "rememberStory",
+            "type": "ai.memory",
+            "x": 1716,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "remember DM reply",
+            "params": {
+              "session": "{channel}",
+              "mode": "remember",
+              "role": "assistant",
+              "text": "",
+              "max": "20"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "goCmd",
+            "fromPin": 0,
+            "to": "recall",
+            "toPin": 0
+          },
+          {
+            "from": "recall",
+            "fromPin": 0,
+            "to": "dm",
+            "toPin": 0
+          },
+          {
+            "from": "recall",
+            "fromPin": 1,
+            "to": "prompt",
+            "toPin": 0
+          },
+          {
+            "from": "goCmd",
+            "fromPin": 1,
+            "to": "prompt",
+            "toPin": 1
+          },
+          {
+            "from": "prompt",
+            "fromPin": 0,
+            "to": "dm",
+            "toPin": 1
+          },
+          {
+            "from": "dm",
+            "fromPin": 0,
+            "to": "tell",
+            "toPin": 0
+          },
+          {
+            "from": "dm",
+            "fromPin": 1,
+            "to": "tell",
+            "toPin": 1
+          },
+          {
+            "from": "tell",
+            "fromPin": 0,
+            "to": "rememberAction",
+            "toPin": 0
+          },
+          {
+            "from": "rememberAction",
+            "fromPin": 0,
+            "to": "rememberStory",
+            "toPin": 0
+          },
+          {
+            "from": "dm",
+            "fromPin": 1,
+            "to": "rememberStory",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Auto-Moderator",
+      "description": "Classifies every channel message with an AI model and gently warns the sender when their message is flagged as toxic, without auto-kicking anyone.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "moderation",
+        "safety"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "event.message",
+        "logic.if"
+      ],
+      "file": "workflows/AiAutoMod.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Auto-Moderator",
+        "description": "Classifies every channel message with an AI model and gently warns the sender when their message is flagged as toxic, without auto-kicking anyone.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "moderation",
+          "safety"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Every message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "classify",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Classify toxicity",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "Reply with exactly TOXIC or OK for the message.",
+              "prompt": "",
+              "maxTokens": "8"
+            }
+          },
+          {
+            "id": "check",
+            "type": "logic.if",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Is it toxic?",
+            "params": {
+              "op": "contains",
+              "b": "TOXIC",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "warn",
+            "type": "action.reply",
+            "x": 858,
+            "y": -160,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Warn the sender",
+            "params": {
+              "message": "easy there {nick}, keep it friendly.",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "classify",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "classify",
+            "toPin": 1
+          },
+          {
+            "from": "classify",
+            "fromPin": 0,
+            "to": "check",
+            "toPin": 0
+          },
+          {
+            "from": "classify",
+            "fromPin": 1,
+            "to": "check",
+            "toPin": 1
+          },
+          {
+            "from": "check",
+            "fromPin": 0,
+            "to": "warn",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Chat",
+      "description": "A friendly AI Q&A bot: ask it anything with !ask <question> and it replies with a witty answer while showing a typing indicator as it thinks.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "chat",
+        "fun"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "event.command",
+        "irc.typing.start",
+        "irc.typing.stop"
+      ],
+      "file": "workflows/AiChat.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Chat",
+        "description": "A friendly AI Q&A bot: ask it anything with !ask <question> and it replies with a witty answer while showing a typing indicator as it thinks.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "chat",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!ask <question>",
+            "params": {
+              "prefix": "!",
+              "command": "ask",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "typeStart",
+            "type": "irc.typing.start",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "thinking…",
+            "params": {
+              "target": "{channel}"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ask the AI",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a witty, concise IRC bot. Answer the user's question helpfully in one or two short lines of plain text, with a bit of humor. No markdown.",
+              "prompt": "",
+              "maxTokens": "300"
+            }
+          },
+          {
+            "id": "typeStop",
+            "type": "irc.typing.stop",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "done",
+            "params": {
+              "target": "{channel}"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send answer",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "typeStart",
+            "toPin": 0
+          },
+          {
+            "from": "typeStart",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "typeStop",
+            "toPin": 0
+          },
+          {
+            "from": "typeStop",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Explain",
+      "description": "Type !explain <thing> and the bot gives a short, plain-English explanation of it.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "help",
+        "dev"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "event.command"
+      ],
+      "file": "workflows/AiExplain.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Explain",
+        "description": "Type !explain <thing> and the bot gives a short, plain-English explanation of it.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "help",
+          "dev"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !explain",
+            "params": {
+              "prefix": "!",
+              "command": "explain",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Explain it simply",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a helpful assistant. Explain the thing the user asks about in plain English, simply, in 1-2 sentences. No jargon, no preamble.",
+              "prompt": "",
+              "maxTokens": "200"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Send the explanation",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI FAQ (from file)",
+      "description": "Answers !faq <question> by reading a local knowledge file and asking an AI to respond using only that content.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "support",
+        "file"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 8,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "data.format",
+        "event.command",
+        "file.read"
+      ],
+      "file": "workflows/AiFaq.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI FAQ (from file)",
+        "description": "Answers !faq <question> by reading a local knowledge file and asking an AI to respond using only that content.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "support",
+          "file"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!faq <question>",
+            "params": {
+              "prefix": "!",
+              "command": "faq",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "read",
+            "type": "file.read",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Read knowledge file",
+            "params": {
+              "path": "faq.txt"
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build prompt",
+            "params": {
+              "template": "Knowledge:\n{a}\n\nQuestion: {b}"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Answer from knowledge",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a helpful support assistant. Answer the user's question using only the provided knowledge. If the answer is not in the knowledge, say you don't know.",
+              "prompt": "",
+              "maxTokens": "300"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Send answer",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "missReply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "No file yet",
+            "params": {
+              "message": "No FAQ file yet."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "read",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "fmt",
+            "toPin": 1
+          },
+          {
+            "from": "read",
+            "fromPin": 2,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "read",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          },
+          {
+            "from": "read",
+            "fromPin": 1,
+            "to": "missReply",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Chat with Memory",
+      "description": "!chat <message> talks to an AI that remembers the conversation per channel, recalling prior turns for context and storing each new exchange.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "chat",
+        "memory"
+      ],
+      "nodeCount": 7,
+      "connectionCount": 11,
+      "nodeTypes": [
+        "action.reply",
+        "ai.memory",
+        "ai.reply",
+        "data.format",
+        "event.command"
+      ],
+      "file": "workflows/AiMemoryChat.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Chat with Memory",
+        "description": "!chat <message> talks to an AI that remembers the conversation per channel, recalling prior turns for context and storing each new exchange.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "chat",
+          "memory"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!chat <message>",
+            "params": {
+              "prefix": "!",
+              "command": "chat",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "recall",
+            "type": "ai.memory",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "recall channel history",
+            "params": {
+              "session": "{channel}",
+              "mode": "recall",
+              "role": "user",
+              "text": "",
+              "max": "12"
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 160,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "history + new message",
+            "params": {
+              "template": "Conversation so far:\n{a}\n\nUser: {b}"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "generate reply",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a friendly, concise IRC chat assistant. Use the conversation history for context and answer the user's latest message in one or two short sentences.",
+              "prompt": "",
+              "maxTokens": "300"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send reply",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "remUser",
+            "type": "ai.memory",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "remember user message",
+            "params": {
+              "session": "{channel}",
+              "mode": "remember",
+              "role": "user",
+              "text": "",
+              "max": "12"
+            }
+          },
+          {
+            "id": "remAi",
+            "type": "ai.memory",
+            "x": 1716,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "remember assistant reply",
+            "params": {
+              "session": "{channel}",
+              "mode": "remember",
+              "role": "assistant",
+              "text": "",
+              "max": "12"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "recall",
+            "toPin": 0
+          },
+          {
+            "from": "recall",
+            "fromPin": 1,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "fmt",
+            "toPin": 1
+          },
+          {
+            "from": "recall",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "say",
+            "toPin": 1
+          },
+          {
+            "from": "say",
+            "fromPin": 0,
+            "to": "remUser",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "remUser",
+            "toPin": 1
+          },
+          {
+            "from": "remUser",
+            "fromPin": 0,
+            "to": "remAi",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "remAi",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Mood Reactions",
+      "description": "Reads every channel message, asks an AI for a single emoji matching its mood, and reacts to the message with that emoji using IRCv3 reactions.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "ircv3",
+        "fun"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.react",
+        "ai.reply",
+        "event.message"
+      ],
+      "file": "workflows/AiMoodReact.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Mood Reactions",
+        "description": "Reads every channel message, asks an AI for a single emoji matching its mood, and reacts to the message with that emoji using IRCv3 reactions.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "ircv3",
+          "fun"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "On any message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Pick a mood emoji",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "Reply with ONE emoji that matches the mood of the message, nothing else.",
+              "prompt": "",
+              "maxTokens": "8"
+            }
+          },
+          {
+            "id": "react",
+            "type": "action.react",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "React with the emoji",
+            "params": {
+              "emoji": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "react",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "react",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Hourly Riddle",
+      "description": "Every hour an AI poses a short riddle (with no answer) to #general for everyone to puzzle over.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "fun",
+        "timer"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.say",
+        "ai.reply",
+        "event.timer"
+      ],
+      "file": "workflows/AiRiddle.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Hourly Riddle",
+        "description": "Every hour an AI poses a short riddle (with no answer) to #general for everyone to puzzle over.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "fun",
+          "timer"
+        ],
+        "nodes": [
+          {
+            "id": "timer",
+            "type": "event.timer",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "every hour",
+            "params": {
+              "seconds": "3600"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "pose a riddle",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a riddle master. Pose a single short riddle. Do not reveal or hint at the answer. Output only the riddle, in one or two lines.",
+              "prompt": "Give me a fresh, clever riddle now.",
+              "maxTokens": "120"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "announce",
+            "params": {
+              "channel": "#general",
+              "message": "🧩 Riddle of the hour:",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "timer",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "say",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Standup Summary",
+      "description": "Every day at 09:30 it pulls today's standup notes from the database, asks an AI to summarize them, and posts the digest to #team.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "team",
+        "schedule"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.say",
+        "ai.reply",
+        "data.format",
+        "db.get",
+        "event.schedule"
+      ],
+      "file": "workflows/AiStandupSummary.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Standup Summary",
+        "description": "Every day at 09:30 it pulls today's standup notes from the database, asks an AI to summarize them, and posts the digest to #team.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "team",
+          "schedule"
+        ],
+        "nodes": [
+          {
+            "id": "sched",
+            "type": "event.schedule",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Daily 09:30",
+            "params": {
+              "mode": "daily",
+              "every": "1",
+              "unit": "days",
+              "time": "09:30",
+              "days": "",
+              "datetime": ""
+            }
+          },
+          {
+            "id": "notes",
+            "type": "db.get",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Today's notes",
+            "params": {
+              "table": "standup",
+              "mode": "value",
+              "key": "today",
+              "default": "(no notes were logged today)",
+              "find": ""
+            }
+          },
+          {
+            "id": "prompt",
+            "type": "data.format",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build prompt",
+            "params": {
+              "template": "Summarize today's standup notes into a short bullet-point digest highlighting progress, blockers, and next steps:\n{a}"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Summarize",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a concise team assistant that turns raw standup notes into a clear daily digest.",
+              "prompt": "",
+              "maxTokens": "400"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Post to #team",
+            "params": {
+              "channel": "#team",
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "sched",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "notes",
+            "fromPin": 0,
+            "to": "prompt",
+            "toPin": 0
+          },
+          {
+            "from": "prompt",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "say",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI TL;DR",
+      "description": "Type !tldr followed by a wall of text and the bot replies with a single-sentence AI summary.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "summary",
+        "utility"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "event.command"
+      ],
+      "file": "workflows/AiTldr.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI TL;DR",
+        "description": "Type !tldr followed by a wall of text and the bot replies with a single-sentence AI summary.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "summary",
+          "utility"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !tldr",
+            "params": {
+              "prefix": "!",
+              "command": "tldr",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Summarize",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "Summarize in one short sentence.",
+              "prompt": "",
+              "maxTokens": "120"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Send the TL;DR",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Translator",
+      "description": "Type !tr <text> and the bot replies with an English translation of whatever you wrote.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "translate",
+        "utility"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "event.command"
+      ],
+      "file": "workflows/AiTranslate.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Translator",
+        "description": "Type !tr <text> and the bot replies with an English translation of whatever you wrote.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "translate",
+          "utility"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!tr <text>",
+            "params": {
+              "prefix": "!",
+              "command": "tr",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "translate to English",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "Translate the user text to English; reply only with the translation.",
+              "prompt": "",
+              "maxTokens": "300"
+            }
+          },
+          {
+            "id": "rep",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send translation",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "rep",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "rep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "AI Weather (tool use)",
+      "description": "Say !weather <city> and an AI assistant calls a get_weather tool that fetches live conditions from wttr.in, then answers in plain language.",
+      "author": "ircuitry",
+      "tags": [
+        "ai",
+        "weather",
+        "tools"
+      ],
+      "nodeCount": 7,
+      "connectionCount": 10,
+      "nodeTypes": [
+        "action.reply",
+        "ai.reply",
+        "ai.tool",
+        "data.format",
+        "event.command",
+        "net.http",
+        "tool.reply"
+      ],
+      "file": "workflows/AiWeather.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "AI Weather (tool use)",
+        "description": "Say !weather <city> and an AI assistant calls a get_weather tool that fetches live conditions from wttr.in, then answers in plain language.",
+        "author": "ircuitry",
+        "tags": [
+          "ai",
+          "weather",
+          "tools"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!weather <city>",
+            "params": {
+              "prefix": "!",
+              "command": "weather",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "ai",
+            "type": "ai.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Weather AI",
+            "params": {
+              "baseUrl": "",
+              "model": "",
+              "apiKey": "",
+              "system": "You are a friendly weather assistant. When asked about the weather, use the get_weather tool to look up the current conditions for the requested city, then answer in one short, natural sentence.",
+              "prompt": "",
+              "maxTokens": "300"
+            }
+          },
+          {
+            "id": "tool",
+            "type": "ai.tool",
+            "x": 286,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "get_weather tool",
+            "params": {
+              "name": "get_weather",
+              "description": "Get the current weather conditions for a given city.",
+              "arg1name": "city",
+              "arg1desc": "The city to look up the weather for, e.g. London or Tokyo.",
+              "arg2name": "",
+              "arg2desc": "",
+              "arg3name": "",
+              "arg3desc": ""
+            }
+          },
+          {
+            "id": "url",
+            "type": "data.format",
+            "x": 572,
+            "y": 388,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build wttr.in URL",
+            "params": {
+              "template": "https://wttr.in/{a}?format=3"
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 858,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Fetch wttr.in",
+            "params": {
+              "method": "GET",
+              "url": "",
+              "headers": "User-Agent: curl/8.0",
+              "body": ""
+            }
+          },
+          {
+            "id": "toolreply",
+            "type": "tool.reply",
+            "x": 1144,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Return result to AI",
+            "params": {
+              "result": ""
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Answer in channel",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "ai",
+            "toPin": 1
+          },
+          {
+            "from": "tool",
+            "fromPin": 0,
+            "to": "ai",
+            "toPin": 2
+          },
+          {
+            "from": "tool",
+            "fromPin": 1,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "tool",
+            "fromPin": 2,
+            "to": "url",
+            "toPin": 0
+          },
+          {
+            "from": "url",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 1
+          },
+          {
+            "from": "http",
+            "fromPin": 0,
+            "to": "toolreply",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "toolreply",
+            "toPin": 1
+          },
+          {
+            "from": "ai",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "ai",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Auto-Op Trusted",
+      "description": "Automatically grants channel operator (+o) status to users on your trusted list the moment they join the channel.",
+      "author": "ircuitry",
+      "tags": [
+        "moderation",
+        "db",
+        "ircv3"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "db.get",
+        "event.join",
+        "irc.mode",
+        "logic.if"
+      ],
+      "file": "workflows/AutoOp.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Auto-Op Trusted",
+        "description": "Automatically grants channel operator (+o) status to users on your trusted list the moment they join the channel.",
+        "author": "ircuitry",
+        "tags": [
+          "moderation",
+          "db",
+          "ircv3"
+        ],
+        "nodes": [
+          {
+            "id": "join",
+            "type": "event.join",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone joined",
+            "params": {}
+          },
+          {
+            "id": "trustGet",
+            "type": "db.get",
+            "x": 286,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Is nick trusted?",
+            "params": {
+              "table": "trusted",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "no",
+              "find": ""
+            }
+          },
+          {
+            "id": "trustIf",
+            "type": "logic.if",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "trusted = yes?",
+            "params": {
+              "op": "=",
+              "b": "yes",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "opMode",
+            "type": "irc.mode",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Give +o",
+            "params": {
+              "channel": "{channel}",
+              "modes": "+o",
+              "target": "{nick}",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "join",
+            "fromPin": 0,
+            "to": "trustIf",
+            "toPin": 0
+          },
+          {
+            "from": "trustGet",
+            "fromPin": 0,
+            "to": "trustIf",
+            "toPin": 1
+          },
+          {
+            "from": "trustIf",
+            "fromPin": 0,
+            "to": "opMode",
+            "toPin": 0
+          },
+          {
+            "from": "join",
+            "fromPin": 1,
+            "to": "opMode",
+            "toPin": 1
+          }
+        ]
+      }
+    },
     {
       "name": "Bottas",
       "description": "Formula 1 race-weekend reminder. Reads an iCal feed and announces each session about an hour before it starts.",
@@ -219,6 +1990,732 @@
             "fromPin": 1,
             "to": "nf1none",
             "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Broadcast (signal)",
+      "description": "Lets an admin run !broadcast <msg> to fan a single message out to several channels at once using an internal signal.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "signal",
+        "admin"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.say",
+        "action.signal",
+        "event.command",
+        "event.signal"
+      ],
+      "file": "workflows/Broadcast.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Broadcast (signal)",
+        "description": "Lets an admin run !broadcast <msg> to fan a single message out to several channels at once using an internal signal.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "signal",
+          "admin"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!broadcast <msg>",
+            "params": {
+              "prefix": "!",
+              "command": "broadcast",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "sig",
+            "type": "action.signal",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "fire broadcast",
+            "params": {
+              "signal": "broadcast",
+              "data": ""
+            }
+          },
+          {
+            "id": "evsig",
+            "type": "event.signal",
+            "x": 0,
+            "y": 218,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on broadcast",
+            "params": {
+              "signal": "broadcast"
+            }
+          },
+          {
+            "id": "say1",
+            "type": "action.say",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "to #general",
+            "params": {
+              "channel": "#general",
+              "message": "📢 Broadcast: {1}",
+              "server": ""
+            }
+          },
+          {
+            "id": "say2",
+            "type": "action.say",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "to #random",
+            "params": {
+              "channel": "#random",
+              "message": "📢 Broadcast: {1}",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "sig",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "sig",
+            "toPin": 1
+          },
+          {
+            "from": "evsig",
+            "fromPin": 0,
+            "to": "say1",
+            "toPin": 0
+          },
+          {
+            "from": "evsig",
+            "fromPin": 1,
+            "to": "say1",
+            "toPin": 2
+          },
+          {
+            "from": "say1",
+            "fromPin": 0,
+            "to": "say2",
+            "toPin": 0
+          },
+          {
+            "from": "evsig",
+            "fromPin": 1,
+            "to": "say2",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "Choose",
+      "description": "Picks one option at random from a pipe-separated list, e.g. !choose pizza | tacos | sushi.",
+      "author": "ircuitry",
+      "tags": [
+        "fun",
+        "utility"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "code.run",
+        "event.command"
+      ],
+      "file": "workflows/Choose.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Choose",
+        "description": "Picks one option at random from a pipe-separated list, e.g. !choose pizza | tacos | sushi.",
+        "author": "ircuitry",
+        "tags": [
+          "fun",
+          "utility"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !choose",
+            "params": {
+              "prefix": "!",
+              "command": "choose",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "pick",
+            "type": "code.run",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Pick a random option",
+            "params": {
+              "language": "javascript",
+              "code": "const raw=(process.env.INPUT||'').trim();\nconst opts=raw.split('|').map(s=>s.trim()).filter(s=>s.length>0);\nif(opts.length===0){console.log('Give me some options: !choose a | b | c');}else{const i=Math.floor(Math.random()*opts.length);console.log('🎲 I choose: '+opts[i]);}",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Announce the choice",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "pick",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "pick",
+            "toPin": 1
+          },
+          {
+            "from": "pick",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "pick",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Connect Greeter",
+      "description": "On connect, sets the #general topic and announces that the bot is online so users know to type !help.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "startup",
+        "ircv3"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.say",
+        "event.connect",
+        "irc.topic"
+      ],
+      "file": "workflows/ConnectGreeter.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Connect Greeter",
+        "description": "On connect, sets the #general topic and announces that the bot is online so users know to type !help.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "startup",
+          "ircv3"
+        ],
+        "nodes": [
+          {
+            "id": "onConnect",
+            "type": "event.connect",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "On connect",
+            "params": {}
+          },
+          {
+            "id": "setTopic",
+            "type": "irc.topic",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Set #general topic",
+            "params": {
+              "channel": "#general",
+              "topic": "welcome - powered by ircuitry 🤖",
+              "server": ""
+            }
+          },
+          {
+            "id": "announce",
+            "type": "action.say",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Announce online",
+            "params": {
+              "channel": "#general",
+              "message": "ircuitry is online! type !help",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "onConnect",
+            "fromPin": 0,
+            "to": "setTopic",
+            "toPin": 0
+          },
+          {
+            "from": "setTopic",
+            "fromPin": 0,
+            "to": "announce",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Crypto Price",
+      "description": "Use !price <coin> to fetch a cryptocurrency's current USD price from the CoinGecko API (the example reply parses bitcoin.usd; CoinGecko coin ids like ethereum or dogecoin also work).",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "web",
+        "finance"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 7,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.json",
+        "event.command",
+        "net.http"
+      ],
+      "file": "workflows/CryptoPrice.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Crypto Price",
+        "description": "Use !price <coin> to fetch a cryptocurrency's current USD price from the CoinGecko API (the example reply parses bitcoin.usd; CoinGecko coin ids like ethereum or dogecoin also work).",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "web",
+          "finance"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!price <coin>",
+            "params": {
+              "prefix": "!",
+              "command": "price",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "urlFmt",
+            "type": "data.format",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build CoinGecko URL",
+            "params": {
+              "template": "https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=usd"
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "GET simple price",
+            "params": {
+              "method": "GET",
+              "url": "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+              "headers": "Accept: application/json",
+              "body": ""
+            }
+          },
+          {
+            "id": "json",
+            "type": "data.json",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "bitcoin.usd",
+            "params": {
+              "path": "bitcoin.usd"
+            }
+          },
+          {
+            "id": "msgFmt",
+            "type": "data.format",
+            "x": 1144,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build reply",
+            "params": {
+              "template": "💰 BTC is currently ${a} USD (via CoinGecko)."
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send price",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "urlFmt",
+            "toPin": 0
+          },
+          {
+            "from": "urlFmt",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 1
+          },
+          {
+            "from": "http",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "json",
+            "toPin": 0
+          },
+          {
+            "from": "json",
+            "fromPin": 0,
+            "to": "msgFmt",
+            "toPin": 0
+          },
+          {
+            "from": "msgFmt",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dictionary",
+      "description": "Look up the definition of any word with !define <word>, fetched live from the free dictionaryapi.dev API.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "web",
+        "reference"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 8,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.json",
+        "event.command",
+        "net.http"
+      ],
+      "file": "workflows/Define.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Dictionary",
+        "description": "Look up the definition of any word with !define <word>, fetched live from the free dictionaryapi.dev API.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "web",
+          "reference"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!define <word>",
+            "params": {
+              "prefix": "!",
+              "command": "define",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "url",
+            "type": "data.format",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build API url",
+            "params": {
+              "template": "https://api.dictionaryapi.dev/api/v2/entries/en/{a}"
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "fetch definition",
+            "params": {
+              "method": "GET",
+              "url": "https://api.dictionaryapi.dev/api/v2/entries/en/word",
+              "headers": "",
+              "body": ""
+            }
+          },
+          {
+            "id": "json",
+            "type": "data.json",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "first definition",
+            "params": {
+              "path": "0.meanings.0.definitions.0.definition"
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build reply",
+            "params": {
+              "template": "📖 {a}: {b}"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send definition",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "url",
+            "toPin": 0
+          },
+          {
+            "from": "url",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 1
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "json",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "json",
+            "fromPin": 0,
+            "to": "fmt",
+            "toPin": 1
+          },
+          {
+            "from": "http",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dice Roller",
+      "description": "Roll dice with !roll NdM (e.g. !roll 2d6) and the bot replies with each die and the total.",
+      "author": "ircuitry",
+      "tags": [
+        "game",
+        "fun",
+        "dice"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "code.run",
+        "event.command"
+      ],
+      "file": "workflows/DiceRoll.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Dice Roller",
+        "description": "Roll dice with !roll NdM (e.g. !roll 2d6) and the bot replies with each die and the total.",
+        "author": "ircuitry",
+        "tags": [
+          "game",
+          "fun",
+          "dice"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !roll",
+            "params": {
+              "prefix": "!",
+              "command": "roll",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "roll",
+            "type": "code.run",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Parse NdM and roll",
+            "params": {
+              "language": "javascript",
+              "code": "const raw = (process.env.ARGS || process.env.INPUT || '').trim();\nconst m = raw.match(/^(\\d*)\\s*[dD]\\s*(\\d+)$/);\nlet n = m ? parseInt(m[1] || '1', 10) : 1;\nlet sides = m ? parseInt(m[2], 10) : 6;\nif (!Number.isFinite(n) || n < 1) n = 1;\nif (n > 100) n = 100;\nif (!Number.isFinite(sides) || sides < 2) sides = 6;\nif (sides > 1000) sides = 1000;\nconst rolls = [];\nlet total = 0;\nfor (let i = 0; i < n; i++) {\n  const r = Math.floor(Math.random() * sides) + 1;\n  rolls.push(r);\n  total += r;\n}\nconsole.log('\\uD83C\\uDFB2 ' + n + 'd' + sides + ': [' + rolls.join(', ') + '] = ' + total);",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Send the result",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "roll",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "roll",
+            "toPin": 1
+          },
+          {
+            "from": "roll",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "roll",
+            "fromPin": 1,
+            "to": "reply",
+            "toPin": 1
           }
         ]
       }
@@ -676,6 +3173,87 @@
       }
     },
     {
+      "name": "Magic 8-Ball",
+      "description": "Ask the Magic 8-Ball a yes-or-no question with !8ball <question> and it replies with a random fortune.",
+      "author": "ircuitry",
+      "tags": [
+        "fun",
+        "game"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "data.random",
+        "event.command"
+      ],
+      "file": "workflows/EightBall.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Magic 8-Ball",
+        "description": "Ask the Magic 8-Ball a yes-or-no question with !8ball <question> and it replies with a random fortune.",
+        "author": "ircuitry",
+        "tags": [
+          "fun",
+          "game"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !8ball",
+            "params": {
+              "prefix": "!",
+              "command": "8ball",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "fortune",
+            "type": "data.random",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Pick a fortune",
+            "params": {
+              "options": "Yes.\nNo.\nMaybe.\nAsk again later.\nDefinitely.\nDoubtful."
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Answer the question",
+            "params": {
+              "message": "🎱 {nick}: Yes."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "fortune",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
       "name": "Hangman",
       "description": "Play hangman in your channel. Guess letters to reveal the word before the tries run out.",
       "author": "ircuitry",
@@ -952,6 +3530,903 @@
       }
     },
     {
+      "name": "Karma",
+      "description": "Track word karma: say word++ or word-- in chat to adjust a counter, and use !karma <word> to look up its current score.",
+      "author": "ircuitry",
+      "tags": [
+        "fun",
+        "db",
+        "social"
+      ],
+      "nodeCount": 13,
+      "connectionCount": 14,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.math",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.message",
+        "logic.regex"
+      ],
+      "file": "workflows/Karma.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Karma",
+        "description": "Track word karma: say word++ or word-- in chat to adjust a counter, and use !karma <word> to look up its current score.",
+        "author": "ircuitry",
+        "tags": [
+          "fun",
+          "db",
+          "social"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "any chat line",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "incRegex",
+            "type": "logic.regex",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "word++",
+            "params": {
+              "pattern": "(\\w+)\\+\\+",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "incGet",
+            "type": "db.get",
+            "x": 572,
+            "y": -160,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "current karma",
+            "params": {
+              "table": "karma",
+              "mode": "value",
+              "key": "{1}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "incMath",
+            "type": "data.math",
+            "x": 858,
+            "y": -160,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "+1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "incSet",
+            "type": "db.set",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save karma",
+            "params": {
+              "table": "karma",
+              "key": "{1}",
+              "value": ""
+            }
+          },
+          {
+            "id": "decRegex",
+            "type": "logic.regex",
+            "x": 286,
+            "y": 320,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "word--",
+            "params": {
+              "pattern": "(\\w+)--",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "decGet",
+            "type": "db.get",
+            "x": 572,
+            "y": 480,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "current karma",
+            "params": {
+              "table": "karma",
+              "mode": "value",
+              "key": "{1}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "decMath",
+            "type": "data.math",
+            "x": 858,
+            "y": 480,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "-1",
+            "params": {
+              "op": "-",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "decSet",
+            "type": "db.set",
+            "x": 1144,
+            "y": 320,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save karma",
+            "params": {
+              "table": "karma",
+              "key": "{1}",
+              "value": ""
+            }
+          },
+          {
+            "id": "karmaCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 800,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!karma <word>",
+            "params": {
+              "prefix": "!",
+              "command": "karma",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "lookupGet",
+            "type": "db.get",
+            "x": 286,
+            "y": 980,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "look up karma",
+            "params": {
+              "table": "karma",
+              "mode": "value",
+              "key": "{args}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "lookupFmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 800,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build reply",
+            "params": {
+              "template": "{b} has {a} karma."
+            }
+          },
+          {
+            "id": "lookupRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 800,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "incRegex",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "incRegex",
+            "toPin": 1
+          },
+          {
+            "from": "incRegex",
+            "fromPin": 0,
+            "to": "incSet",
+            "toPin": 0
+          },
+          {
+            "from": "incGet",
+            "fromPin": 0,
+            "to": "incMath",
+            "toPin": 0
+          },
+          {
+            "from": "incMath",
+            "fromPin": 0,
+            "to": "incSet",
+            "toPin": 1
+          },
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "decRegex",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "decRegex",
+            "toPin": 1
+          },
+          {
+            "from": "decRegex",
+            "fromPin": 0,
+            "to": "decSet",
+            "toPin": 0
+          },
+          {
+            "from": "decGet",
+            "fromPin": 0,
+            "to": "decMath",
+            "toPin": 0
+          },
+          {
+            "from": "decMath",
+            "fromPin": 0,
+            "to": "decSet",
+            "toPin": 1
+          },
+          {
+            "from": "karmaCmd",
+            "fromPin": 0,
+            "to": "lookupRep",
+            "toPin": 0
+          },
+          {
+            "from": "lookupGet",
+            "fromPin": 0,
+            "to": "lookupFmt",
+            "toPin": 0
+          },
+          {
+            "from": "karmaCmd",
+            "fromPin": 1,
+            "to": "lookupFmt",
+            "toPin": 1
+          },
+          {
+            "from": "lookupFmt",
+            "fromPin": 0,
+            "to": "lookupRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Poll",
+      "description": "Run a simple channel poll: !vote <option> tallies a vote into a per-option counter and !results lists every option with its current vote count.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "db",
+        "community"
+      ],
+      "nodeCount": 11,
+      "connectionCount": 11,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.math",
+        "data.transform",
+        "db.get",
+        "db.set",
+        "event.command"
+      ],
+      "file": "workflows/Poll.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Poll",
+        "description": "Run a simple channel poll: !vote <option> tallies a vote into a per-option counter and !results lists every option with its current vote count.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "db",
+          "community"
+        ],
+        "nodes": [
+          {
+            "id": "voteCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!vote <option>",
+            "params": {
+              "prefix": "!",
+              "command": "vote",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "optLower",
+            "type": "data.transform",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "normalize option",
+            "params": {
+              "op": "lower",
+              "find": "",
+              "replace": ""
+            }
+          },
+          {
+            "id": "voteGet",
+            "type": "db.get",
+            "x": 286,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "current tally",
+            "params": {
+              "table": "poll_votes",
+              "mode": "value",
+              "key": "{args}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "voteInc",
+            "type": "data.math",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "tally + 1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "voteSet",
+            "type": "db.set",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save tally",
+            "params": {
+              "table": "poll_votes",
+              "key": "{args}",
+              "value": ""
+            }
+          },
+          {
+            "id": "voteFmt",
+            "type": "data.format",
+            "x": 858,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "confirmation",
+            "params": {
+              "template": "🗳️ Counted! \"{a}\" now has {b} vote(s). Use !results to see the standings."
+            }
+          },
+          {
+            "id": "voteRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "resCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!results",
+            "params": {
+              "prefix": "!",
+              "command": "results",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "resGet",
+            "type": "db.get",
+            "x": 286,
+            "y": 560,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "all tallies",
+            "params": {
+              "table": "poll_votes",
+              "mode": "find",
+              "key": "",
+              "default": "No votes yet. Cast one with !vote <option>",
+              "find": ""
+            }
+          },
+          {
+            "id": "resFmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "results line",
+            "params": {
+              "template": "📊 Poll results: {a}"
+            }
+          },
+          {
+            "id": "resRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "voteCmd",
+            "fromPin": 0,
+            "to": "voteSet",
+            "toPin": 0
+          },
+          {
+            "from": "voteCmd",
+            "fromPin": 1,
+            "to": "optLower",
+            "toPin": 0
+          },
+          {
+            "from": "voteGet",
+            "fromPin": 0,
+            "to": "voteInc",
+            "toPin": 0
+          },
+          {
+            "from": "voteInc",
+            "fromPin": 0,
+            "to": "voteSet",
+            "toPin": 1
+          },
+          {
+            "from": "voteSet",
+            "fromPin": 0,
+            "to": "voteRep",
+            "toPin": 0
+          },
+          {
+            "from": "optLower",
+            "fromPin": 0,
+            "to": "voteFmt",
+            "toPin": 0
+          },
+          {
+            "from": "voteInc",
+            "fromPin": 0,
+            "to": "voteFmt",
+            "toPin": 1
+          },
+          {
+            "from": "voteFmt",
+            "fromPin": 0,
+            "to": "voteRep",
+            "toPin": 1
+          },
+          {
+            "from": "resCmd",
+            "fromPin": 0,
+            "to": "resRep",
+            "toPin": 0
+          },
+          {
+            "from": "resGet",
+            "fromPin": 0,
+            "to": "resFmt",
+            "toPin": 0
+          },
+          {
+            "from": "resFmt",
+            "fromPin": 0,
+            "to": "resRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Quote Book",
+      "description": "A shared quote book: type !quote add <text> to save a memorable line, or just !quote to read one back.",
+      "author": "ircuitry",
+      "tags": [
+        "fun",
+        "db",
+        "game"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 10,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "db.get",
+        "db.set",
+        "event.command",
+        "logic.if"
+      ],
+      "file": "workflows/Quotes.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Quote Book",
+        "description": "A shared quote book: type !quote add <text> to save a memorable line, or just !quote to read one back.",
+        "author": "ircuitry",
+        "tags": [
+          "fun",
+          "db",
+          "game"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!quote",
+            "params": {
+              "prefix": "!",
+              "command": "quote",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "emptyIf",
+            "type": "logic.if",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "no args?",
+            "params": {
+              "op": "is empty",
+              "b": "",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "countGet",
+            "type": "db.get",
+            "x": 572,
+            "y": -160,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "how many quotes",
+            "params": {
+              "table": "quotes",
+              "mode": "count",
+              "key": "",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "quoteGet",
+            "type": "db.get",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "fetch a quote",
+            "params": {
+              "table": "quotes",
+              "mode": "value",
+              "key": "1",
+              "default": "The quote book is empty — add one with !quote add <text>",
+              "find": ""
+            }
+          },
+          {
+            "id": "readFmt",
+            "type": "data.format",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build read reply",
+            "params": {
+              "template": "📖 “{a}”  ({b} quote(s) on file)"
+            }
+          },
+          {
+            "id": "readRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "show quote",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "saveSet",
+            "type": "db.set",
+            "x": 572,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "store quote",
+            "params": {
+              "table": "quotes",
+              "key": "{time}",
+              "value": ""
+            }
+          },
+          {
+            "id": "saveFmt",
+            "type": "data.format",
+            "x": 858,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build saved reply",
+            "params": {
+              "template": "✅ Saved, {nick}! Read it back any time with !quote"
+            }
+          },
+          {
+            "id": "saveRep",
+            "type": "action.reply",
+            "x": 1144,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "confirm save",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "emptyIf",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "emptyIf",
+            "toPin": 1
+          },
+          {
+            "from": "emptyIf",
+            "fromPin": 0,
+            "to": "readRep",
+            "toPin": 0
+          },
+          {
+            "from": "quoteGet",
+            "fromPin": 0,
+            "to": "readFmt",
+            "toPin": 0
+          },
+          {
+            "from": "countGet",
+            "fromPin": 1,
+            "to": "readFmt",
+            "toPin": 1
+          },
+          {
+            "from": "readFmt",
+            "fromPin": 0,
+            "to": "readRep",
+            "toPin": 1
+          },
+          {
+            "from": "emptyIf",
+            "fromPin": 1,
+            "to": "saveSet",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "saveSet",
+            "toPin": 1
+          },
+          {
+            "from": "saveSet",
+            "fromPin": 0,
+            "to": "saveRep",
+            "toPin": 0
+          },
+          {
+            "from": "saveFmt",
+            "fromPin": 0,
+            "to": "saveRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "RSS Headlines",
+      "description": "Every 30 minutes it fetches an RSS feed, extracts the latest headline title, and posts it to #news.",
+      "author": "ircuitry",
+      "tags": [
+        "news",
+        "web",
+        "schedule"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.say",
+        "event.schedule",
+        "logic.regex",
+        "net.http"
+      ],
+      "file": "workflows/RssNews.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "RSS Headlines",
+        "description": "Every 30 minutes it fetches an RSS feed, extracts the latest headline title, and posts it to #news.",
+        "author": "ircuitry",
+        "tags": [
+          "news",
+          "web",
+          "schedule"
+        ],
+        "nodes": [
+          {
+            "id": "sched",
+            "type": "event.schedule",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "every 30 min",
+            "params": {
+              "mode": "interval",
+              "every": "30",
+              "unit": "minutes",
+              "time": "",
+              "days": "",
+              "datetime": ""
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "fetch RSS",
+            "params": {
+              "method": "GET",
+              "url": "https://hnrss.org/frontpage",
+              "headers": "",
+              "body": ""
+            }
+          },
+          {
+            "id": "regex",
+            "type": "logic.regex",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "extract <title>",
+            "params": {
+              "pattern": "<item>[\\s\\S]*?<title>(.*?)</title>",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "post headline",
+            "params": {
+              "channel": "#news",
+              "message": "📰 {1}",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "sched",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 0,
+            "to": "regex",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "regex",
+            "toPin": 1
+          },
+          {
+            "from": "regex",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "regex",
+            "fromPin": 2,
+            "to": "say",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
       "name": "Russian Roulette",
       "description": "A game of !roulette. Pull the trigger and hope the chamber is empty.",
       "author": "ircuitry",
@@ -1156,6 +4631,594 @@
             "fromPin": 0,
             "to": "mrep",
             "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Seen",
+      "description": "Tracks the last message every nick said and answers !seen <nick> with their most recent line.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "db",
+        "social"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.message"
+      ],
+      "file": "workflows/Seen.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Seen",
+        "description": "Tracks the last message every nick said and answers !seen <nick> with their most recent line.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "db",
+          "social"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Any message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "record",
+            "type": "db.set",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Remember last line",
+            "params": {
+              "table": "seen",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone typed !seen",
+            "params": {
+              "prefix": "!",
+              "command": "seen",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "lookup",
+            "type": "db.get",
+            "x": 0,
+            "y": 460,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Last line for nick",
+            "params": {
+              "table": "seen",
+              "mode": "value",
+              "key": "{args}",
+              "default": "I haven't seen them say anything",
+              "find": ""
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 286,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build reply",
+            "params": {
+              "template": "last I saw {args}: \"{a}\""
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 572,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Answer the user",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "record",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "record",
+            "toPin": 1
+          },
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "lookup",
+            "fromPin": 0,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Standup Reminder",
+      "description": "Pings #team every weekday at 09:00 to remind everyone to drop their daily standup updates.",
+      "author": "ircuitry",
+      "tags": [
+        "team",
+        "reminder",
+        "schedule"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "action.say",
+        "event.schedule"
+      ],
+      "file": "workflows/StandupReminder.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Standup Reminder",
+        "description": "Pings #team every weekday at 09:00 to remind everyone to drop their daily standup updates.",
+        "author": "ircuitry",
+        "tags": [
+          "team",
+          "reminder",
+          "schedule"
+        ],
+        "nodes": [
+          {
+            "id": "sched",
+            "type": "event.schedule",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Weekdays 09:00",
+            "params": {
+              "mode": "weekly",
+              "time": "09:00",
+              "days": "Mon-Fri"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Ping the team",
+            "params": {
+              "channel": "#team",
+              "message": "🧍 standup in 5! drop your updates."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "sched",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tell (offline messages)",
+      "description": "Use !tell <nick> <message> to leave an offline note that gets delivered to that person the next time they speak in the channel.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "db",
+        "social"
+      ],
+      "nodeCount": 11,
+      "connectionCount": 12,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.message",
+        "logic.if",
+        "logic.regex"
+      ],
+      "file": "workflows/Tell.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Tell (offline messages)",
+        "description": "Use !tell <nick> <message> to leave an offline note that gets delivered to that person the next time they speak in the channel.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "db",
+          "social"
+        ],
+        "nodes": [
+          {
+            "id": "tellCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!tell nick message",
+            "params": {
+              "prefix": "!",
+              "command": "tell",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "parse",
+            "type": "logic.regex",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split nick + message",
+            "params": {
+              "pattern": "^(\\S+)\\s+(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "store",
+            "type": "db.set",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save tell",
+            "params": {
+              "table": "tells",
+              "key": "{1}",
+              "value": ""
+            }
+          },
+          {
+            "id": "okRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ack",
+            "params": {
+              "message": "ok, I'll tell them."
+            }
+          },
+          {
+            "id": "usage",
+            "type": "action.reply",
+            "x": 572,
+            "y": 170,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "usage",
+            "params": {
+              "message": "usage: !tell <nick> <message>"
+            }
+          },
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "anyone speaks",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "lookup",
+            "type": "db.get",
+            "x": 0,
+            "y": 620,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "pending tell?",
+            "params": {
+              "table": "tells",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "hasTell",
+            "type": "logic.if",
+            "x": 286,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "non-empty?",
+            "params": {
+              "op": "is empty",
+              "b": "",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "deliverFmt",
+            "type": "data.format",
+            "x": 572,
+            "y": 560,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "build message",
+            "params": {
+              "template": "{nick}, message: {a}"
+            }
+          },
+          {
+            "id": "deliverRep",
+            "type": "action.reply",
+            "x": 858,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "deliver",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "clear",
+            "type": "db.set",
+            "x": 1144,
+            "y": 420,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "clear tell",
+            "params": {
+              "table": "tells",
+              "key": "{nick}",
+              "value": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "tellCmd",
+            "fromPin": 0,
+            "to": "parse",
+            "toPin": 0
+          },
+          {
+            "from": "tellCmd",
+            "fromPin": 1,
+            "to": "parse",
+            "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 0,
+            "to": "store",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 3,
+            "to": "store",
+            "toPin": 1
+          },
+          {
+            "from": "store",
+            "fromPin": 0,
+            "to": "okRep",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 1,
+            "to": "usage",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "hasTell",
+            "toPin": 0
+          },
+          {
+            "from": "lookup",
+            "fromPin": 0,
+            "to": "hasTell",
+            "toPin": 1
+          },
+          {
+            "from": "hasTell",
+            "fromPin": 1,
+            "to": "deliverRep",
+            "toPin": 0
+          },
+          {
+            "from": "lookup",
+            "fromPin": 0,
+            "to": "deliverFmt",
+            "toPin": 0
+          },
+          {
+            "from": "deliverFmt",
+            "fromPin": 0,
+            "to": "deliverRep",
+            "toPin": 1
+          },
+          {
+            "from": "deliverRep",
+            "fromPin": 0,
+            "to": "clear",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tip of the Day",
+      "description": "Every day at 10:00 it reads tips.txt and posts one random tip line to #general.",
+      "author": "ircuitry",
+      "tags": [
+        "fun",
+        "schedule",
+        "file"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.say",
+        "code.run",
+        "event.schedule",
+        "file.read"
+      ],
+      "file": "workflows/TipOfDay.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Tip of the Day",
+        "description": "Every day at 10:00 it reads tips.txt and posts one random tip line to #general.",
+        "author": "ircuitry",
+        "tags": [
+          "fun",
+          "schedule",
+          "file"
+        ],
+        "nodes": [
+          {
+            "id": "sched",
+            "type": "event.schedule",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Daily at 10:00",
+            "params": {
+              "mode": "daily",
+              "every": "1",
+              "unit": "days",
+              "time": "10:00",
+              "days": "",
+              "datetime": ""
+            }
+          },
+          {
+            "id": "read",
+            "type": "file.read",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Read tips.txt",
+            "params": {
+              "path": "tips.txt"
+            }
+          },
+          {
+            "id": "pick",
+            "type": "code.run",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Pick a random tip",
+            "params": {
+              "language": "javascript",
+              "code": "const lines=(process.env.INPUT||'').split('\\n').map(l=>l.trim()).filter(l=>l.length>0);\nif(lines.length===0){console.log('No tips found in tips.txt yet.');}else{console.log('\\uD83D\\uDCA1 Tip of the day: '+lines[Math.floor(Math.random()*lines.length)]);}",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Post to #general",
+            "params": {
+              "channel": "#general",
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "sched",
+            "fromPin": 0,
+            "to": "read",
+            "toPin": 0
+          },
+          {
+            "from": "read",
+            "fromPin": 0,
+            "to": "pick",
+            "toPin": 0
+          },
+          {
+            "from": "read",
+            "fromPin": 2,
+            "to": "pick",
+            "toPin": 1
+          },
+          {
+            "from": "pick",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "pick",
+            "fromPin": 1,
+            "to": "say",
+            "toPin": 2
           }
         ]
       }
@@ -1579,6 +5642,315 @@
             "from": "tsFmt",
             "fromPin": 0,
             "to": "tsRep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "URL Title",
+      "description": "Watches the channel for links and replies with the page's HTML <title> so people know what was shared.",
+      "author": "ircuitry",
+      "tags": [
+        "utility",
+        "web"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "event.message",
+        "logic.regex",
+        "net.http"
+      ],
+      "file": "workflows/UrlTitle.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "URL Title",
+        "description": "Watches the channel for links and replies with the page's HTML <title> so people know what was shared.",
+        "author": "ircuitry",
+        "tags": [
+          "utility",
+          "web"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "On any message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "findUrl",
+            "type": "logic.regex",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Find a URL",
+            "params": {
+              "pattern": "(https?://\\S+)",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "fetch",
+            "type": "net.http",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Fetch the page",
+            "params": {
+              "method": "GET",
+              "url": "",
+              "headers": "User-Agent: ircuitry-urltitle",
+              "body": ""
+            }
+          },
+          {
+            "id": "findTitle",
+            "type": "logic.regex",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Extract <title>",
+            "params": {
+              "pattern": "<title[^>]*>(.*?)</title>",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 1144,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Build reply",
+            "params": {
+              "template": "↳ {a}"
+            }
+          },
+          {
+            "id": "reply",
+            "type": "action.reply",
+            "x": 1430,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Announce title",
+            "params": {
+              "message": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "findUrl",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "findUrl",
+            "toPin": 1
+          },
+          {
+            "from": "findUrl",
+            "fromPin": 0,
+            "to": "fetch",
+            "toPin": 0
+          },
+          {
+            "from": "findUrl",
+            "fromPin": 2,
+            "to": "fetch",
+            "toPin": 1
+          },
+          {
+            "from": "fetch",
+            "fromPin": 0,
+            "to": "findTitle",
+            "toPin": 0
+          },
+          {
+            "from": "fetch",
+            "fromPin": 1,
+            "to": "findTitle",
+            "toPin": 1
+          },
+          {
+            "from": "findTitle",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 0
+          },
+          {
+            "from": "findTitle",
+            "fromPin": 2,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "reply",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Welcome + Rules",
+      "description": "Greets everyone who joins the channel and shows the channel rules from a rules.txt file (or a friendly note if none is set).",
+      "author": "ircuitry",
+      "tags": [
+        "community",
+        "onboarding",
+        "file"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 8,
+      "nodeTypes": [
+        "action.say",
+        "event.join",
+        "file.read"
+      ],
+      "file": "workflows/Welcome.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Welcome + Rules",
+        "description": "Greets everyone who joins the channel and shows the channel rules from a rules.txt file (or a friendly note if none is set).",
+        "author": "ircuitry",
+        "tags": [
+          "community",
+          "onboarding",
+          "file"
+        ],
+        "nodes": [
+          {
+            "id": "join",
+            "type": "event.join",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Someone joined",
+            "params": {}
+          },
+          {
+            "id": "greet",
+            "type": "action.say",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Greet the joiner",
+            "params": {
+              "channel": "",
+              "message": "welcome {nick}! 🎉",
+              "server": ""
+            }
+          },
+          {
+            "id": "rules",
+            "type": "file.read",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Read rules.txt",
+            "params": {
+              "path": "rules.txt"
+            }
+          },
+          {
+            "id": "sayRules",
+            "type": "action.say",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Post the rules",
+            "params": {
+              "channel": "",
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "noRules",
+            "type": "action.say",
+            "x": 858,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "No rules file",
+            "params": {
+              "channel": "",
+              "message": "(no rules file set)",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "join",
+            "fromPin": 0,
+            "to": "greet",
+            "toPin": 0
+          },
+          {
+            "from": "join",
+            "fromPin": 2,
+            "to": "greet",
+            "toPin": 1
+          },
+          {
+            "from": "greet",
+            "fromPin": 0,
+            "to": "rules",
+            "toPin": 0
+          },
+          {
+            "from": "rules",
+            "fromPin": 0,
+            "to": "sayRules",
+            "toPin": 0
+          },
+          {
+            "from": "join",
+            "fromPin": 2,
+            "to": "sayRules",
+            "toPin": 1
+          },
+          {
+            "from": "rules",
+            "fromPin": 2,
+            "to": "sayRules",
+            "toPin": 2
+          },
+          {
+            "from": "rules",
+            "fromPin": 1,
+            "to": "noRules",
+            "toPin": 0
+          },
+          {
+            "from": "join",
+            "fromPin": 2,
+            "to": "noRules",
             "toPin": 1
           }
         ]
@@ -2043,6 +6415,114 @@
             "fromPin": 1,
             "to": "vRep",
             "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Word Filter",
+      "description": "Watches channel messages for a banned word and kicks the offending user with a warning, logging each removal.",
+      "author": "ircuitry",
+      "tags": [
+        "moderation",
+        "safety"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.log",
+        "event.message",
+        "filter.contains",
+        "irc.kick"
+      ],
+      "file": "workflows/WordFilter.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Word Filter",
+        "description": "Watches channel messages for a banned word and kicks the offending user with a warning, logging each removal.",
+        "author": "ircuitry",
+        "tags": [
+          "moderation",
+          "safety"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "On any message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "filter",
+            "type": "filter.contains",
+            "x": 286,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Has banned word?",
+            "params": {
+              "needle": "badword",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "kick",
+            "type": "irc.kick",
+            "x": 572,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Kick offender",
+            "params": {
+              "channel": "{channel}",
+              "nick": "{nick}",
+              "reason": "watch the language",
+              "server": ""
+            }
+          },
+          {
+            "id": "log",
+            "type": "action.log",
+            "x": 858,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "Log the kick",
+            "params": {
+              "text": "kicked {nick}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "filter",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "filter",
+            "toPin": 1
+          },
+          {
+            "from": "filter",
+            "fromPin": 0,
+            "to": "kick",
+            "toPin": 0
+          },
+          {
+            "from": "kick",
+            "fromPin": 0,
+            "to": "log",
+            "toPin": 0
           }
         ]
       }

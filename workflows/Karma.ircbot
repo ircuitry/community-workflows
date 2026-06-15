@@ -1,0 +1,280 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Karma",
+  "description": "Track word karma: say word++ or word-- in chat to adjust a counter, and use !karma <word> to look up its current score.",
+  "author": "ircuitry",
+  "tags": [
+    "fun",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "incRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "word++",
+      "params": {
+        "pattern": "(\\w+)\\+\\+",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "incGet",
+      "type": "db.get",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current karma",
+      "params": {
+        "table": "karma",
+        "mode": "value",
+        "key": "{1}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "incMath",
+      "type": "data.math",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "incSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save karma",
+      "params": {
+        "table": "karma",
+        "key": "{1}",
+        "value": ""
+      }
+    },
+    {
+      "id": "decRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "word--",
+      "params": {
+        "pattern": "(\\w+)--",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "decGet",
+      "type": "db.get",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current karma",
+      "params": {
+        "table": "karma",
+        "mode": "value",
+        "key": "{1}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "decMath",
+      "type": "data.math",
+      "x": 858,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "-1",
+      "params": {
+        "op": "-",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "decSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save karma",
+      "params": {
+        "table": "karma",
+        "key": "{1}",
+        "value": ""
+      }
+    },
+    {
+      "id": "karmaCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!karma <word>",
+      "params": {
+        "prefix": "!",
+        "command": "karma",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookupGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 980,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up karma",
+      "params": {
+        "table": "karma",
+        "mode": "value",
+        "key": "{args}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "lookupFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{b} has {a} karma."
+      }
+    },
+    {
+      "id": "lookupRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 800,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "incRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "incRegex",
+      "toPin": 1
+    },
+    {
+      "from": "incRegex",
+      "fromPin": 0,
+      "to": "incSet",
+      "toPin": 0
+    },
+    {
+      "from": "incGet",
+      "fromPin": 0,
+      "to": "incMath",
+      "toPin": 0
+    },
+    {
+      "from": "incMath",
+      "fromPin": 0,
+      "to": "incSet",
+      "toPin": 1
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "decRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "decRegex",
+      "toPin": 1
+    },
+    {
+      "from": "decRegex",
+      "fromPin": 0,
+      "to": "decSet",
+      "toPin": 0
+    },
+    {
+      "from": "decGet",
+      "fromPin": 0,
+      "to": "decMath",
+      "toPin": 0
+    },
+    {
+      "from": "decMath",
+      "fromPin": 0,
+      "to": "decSet",
+      "toPin": 1
+    },
+    {
+      "from": "karmaCmd",
+      "fromPin": 0,
+      "to": "lookupRep",
+      "toPin": 0
+    },
+    {
+      "from": "lookupGet",
+      "fromPin": 0,
+      "to": "lookupFmt",
+      "toPin": 0
+    },
+    {
+      "from": "karmaCmd",
+      "fromPin": 1,
+      "to": "lookupFmt",
+      "toPin": 1
+    },
+    {
+      "from": "lookupFmt",
+      "fromPin": 0,
+      "to": "lookupRep",
+      "toPin": 1
+    }
+  ]
+}

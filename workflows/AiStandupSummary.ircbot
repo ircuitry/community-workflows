@@ -1,0 +1,121 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Standup Summary",
+  "description": "Every day at 09:30 it pulls today's standup notes from the database, asks an AI to summarize them, and posts the digest to #team.",
+  "author": "ircuitry",
+  "tags": [
+    "ai",
+    "team",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 09:30",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "09:30",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "notes",
+      "type": "db.get",
+      "x": 286,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Today's notes",
+      "params": {
+        "table": "standup",
+        "mode": "value",
+        "key": "today",
+        "default": "(no notes were logged today)",
+        "find": ""
+      }
+    },
+    {
+      "id": "prompt",
+      "type": "data.format",
+      "x": 572,
+      "y": 170,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build prompt",
+      "params": {
+        "template": "Summarize today's standup notes into a short bullet-point digest highlighting progress, blockers, and next steps:\n{a}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a concise team assistant that turns raw standup notes into a clear daily digest.",
+        "prompt": "",
+        "maxTokens": "400"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post to #team",
+      "params": {
+        "channel": "#team",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "notes",
+      "fromPin": 0,
+      "to": "prompt",
+      "toPin": 0
+    },
+    {
+      "from": "prompt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}
