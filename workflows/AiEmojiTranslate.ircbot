@@ -1,0 +1,84 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Emoji Translate",
+  "description": "Say !emojify2 <sentence> and an AI rewrites it using only emoji that convey its meaning, with no words at all.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "fun",
+    "emoji"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!emojify2 <sentence>",
+      "params": {
+        "prefix": "!",
+        "command": "emojify2",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Translate to emoji",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Rewrite the sentence using ONLY emoji that convey its meaning. No words.",
+        "prompt": "",
+        "maxTokens": "100"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send emoji reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

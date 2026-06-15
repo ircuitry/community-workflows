@@ -1,0 +1,131 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Mass Mention Guard",
+  "description": "Counts the @ mentions in each chat line and kicks anyone who packs more than five mentions into a single message as likely spam.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "spam",
+    "regex"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "count",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count @ mentions",
+      "params": {
+        "language": "javascript",
+        "code": "return (input.match(/@/g)||[]).length.toString()",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "gate",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "more than 5?",
+      "params": {
+        "op": ">",
+        "b": "5",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "kick spammer",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "Mass mention spam",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the kick",
+      "params": {
+        "text": "Kicked {nick} for {output} mentions."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "count",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "count",
+      "toPin": 1
+    },
+    {
+      "from": "count",
+      "fromPin": 0,
+      "to": "gate",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 1,
+      "to": "gate",
+      "toPin": 1
+    },
+    {
+      "from": "gate",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "kick",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 1,
+      "to": "log",
+      "toPin": 1
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Quote Attribution Game",
+  "description": "Say !whosaid to get a random stored quote and guess who said it, then !whoanswer <name> to check your guess and earn karma when you are right.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "quotes",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "askCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whosaid",
+      "params": {
+        "prefix": "!",
+        "command": "whosaid",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pickQuote",
+      "type": "db.get",
+      "x": 286,
+      "y": 120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "random quote",
+      "params": {
+        "table": "quotes",
+        "mode": "find",
+        "key": "",
+        "default": "nobody: no quotes stored yet",
+        "find": "*"
+      }
+    },
+    {
+      "id": "splitQuote",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split author: text",
+      "params": {
+        "pattern": "^(.+?): (.+)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "storeAnswer",
+      "type": "db.set",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember author",
+      "params": {
+        "table": "whosaid",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "askSay",
+      "type": "action.say",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ask the channel",
+      "params": {
+        "channel": "",
+        "message": "Who said: \"{2}\"?",
+        "server": ""
+      }
+    },
+    {
+      "id": "ansCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whoanswer <name>",
+      "params": {
+        "prefix": "!",
+        "command": "whoanswer",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "loadAnswer",
+      "type": "db.get",
+      "x": 286,
+      "y": 620,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "load stored author",
+      "params": {
+        "table": "whosaid",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "checkAnswer",
+      "type": "logic.if",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess == author?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "loadKarma",
+      "type": "db.get",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current karma",
+      "params": {
+        "table": "karma",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "addKarma",
+      "type": "data.math",
+      "x": 858,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "saveKarma",
+      "type": "db.set",
+      "x": 1144,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save karma",
+      "params": {
+        "table": "karma",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "rightSay",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct!",
+      "params": {
+        "message": "Correct, {nick}! You earn +1 karma.",
+        "server": ""
+      }
+    },
+    {
+      "id": "wrongSay",
+      "type": "action.reply",
+      "x": 858,
+      "y": 680,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wrong",
+      "params": {
+        "message": "Nope, that's not who said it. Try again with !whoanswer <name>.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "askCmd",
+      "fromPin": 0,
+      "to": "splitQuote",
+      "toPin": 0
+    },
+    {
+      "from": "pickQuote",
+      "fromPin": 0,
+      "to": "splitQuote",
+      "toPin": 1
+    },
+    {
+      "from": "splitQuote",
+      "fromPin": 0,
+      "to": "storeAnswer",
+      "toPin": 0
+    },
+    {
+      "from": "splitQuote",
+      "fromPin": 2,
+      "to": "storeAnswer",
+      "toPin": 1
+    },
+    {
+      "from": "storeAnswer",
+      "fromPin": 0,
+      "to": "askSay",
+      "toPin": 0
+    },
+    {
+      "from": "askCmd",
+      "fromPin": 3,
+      "to": "askSay",
+      "toPin": 1
+    },
+    {
+      "from": "ansCmd",
+      "fromPin": 0,
+      "to": "checkAnswer",
+      "toPin": 0
+    },
+    {
+      "from": "ansCmd",
+      "fromPin": 1,
+      "to": "checkAnswer",
+      "toPin": 1
+    },
+    {
+      "from": "loadAnswer",
+      "fromPin": 0,
+      "to": "checkAnswer",
+      "toPin": 2
+    },
+    {
+      "from": "checkAnswer",
+      "fromPin": 0,
+      "to": "saveKarma",
+      "toPin": 0
+    },
+    {
+      "from": "loadKarma",
+      "fromPin": 0,
+      "to": "addKarma",
+      "toPin": 0
+    },
+    {
+      "from": "addKarma",
+      "fromPin": 0,
+      "to": "saveKarma",
+      "toPin": 1
+    },
+    {
+      "from": "saveKarma",
+      "fromPin": 0,
+      "to": "rightSay",
+      "toPin": 0
+    },
+    {
+      "from": "checkAnswer",
+      "fromPin": 1,
+      "to": "wrongSay",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Poll Of The Day",
+  "description": "Every day at noon the bot announces a random poll question to the channel and lets people vote with !vote A or !vote B.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "poll",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily at noon",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "12:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a question",
+      "params": {
+        "options": "Coffee or tea?\nCats or dogs?\nBeach or mountains?\nMorning or night?\nPizza or tacos?"
+      }
+    },
+    {
+      "id": "saveQ",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Save today's question",
+      "params": {
+        "table": "potd",
+        "key": "question",
+        "value": "{value}"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce poll",
+      "params": {
+        "channel": "#main",
+        "message": "Poll of the day: {value} | Vote with !vote A/B",
+        "server": ""
+      }
+    },
+    {
+      "id": "voteCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!vote A/B",
+      "params": {
+        "prefix": "!",
+        "command": "vote",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "saveVote",
+      "type": "db.set",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Record vote",
+      "params": {
+        "table": "votes",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "confirm",
+      "type": "action.reply",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Confirm vote",
+      "params": {
+        "message": "Vote recorded.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "saveQ",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "saveQ",
+      "toPin": 1
+    },
+    {
+      "from": "saveQ",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 2
+    },
+    {
+      "from": "voteCmd",
+      "fromPin": 0,
+      "to": "saveVote",
+      "toPin": 0
+    },
+    {
+      "from": "voteCmd",
+      "fromPin": 1,
+      "to": "saveVote",
+      "toPin": 1
+    },
+    {
+      "from": "saveVote",
+      "fromPin": 0,
+      "to": "confirm",
+      "toPin": 0
+    }
+  ]
+}

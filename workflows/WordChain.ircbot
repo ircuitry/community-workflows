@@ -1,0 +1,156 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Word Chain Game",
+  "description": "Play word chain in your channel: !chain <word> accepts a word only if it starts with the last letter of the previous word, then remembers it for the next player.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "words",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!chain <word>",
+      "params": {
+        "prefix": "!",
+        "command": "chain",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lastGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "last word in channel",
+      "params": {
+        "table": "chain",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "lastChar",
+      "type": "data.transform",
+      "x": 286,
+      "y": 380,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reverse to grab last char",
+      "params": {
+        "op": "reverse",
+        "find": "",
+        "replace": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "new word starts with last letter?",
+      "params": {
+        "op": "starts with",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "save",
+      "type": "db.set",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember new word",
+      "params": {
+        "table": "chain",
+        "key": "{channel}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "okReply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "accepted",
+      "params": {
+        "message": "Good, {nick}! Next word must start with the last letter.",
+        "server": ""
+      }
+    },
+    {
+      "id": "noReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "rejected",
+      "params": {
+        "message": "Nope, {nick}, that word must start with the right letter.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "lastGet",
+      "fromPin": 0,
+      "to": "lastChar",
+      "toPin": 0
+    },
+    {
+      "from": "lastChar",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "save",
+      "fromPin": 0,
+      "to": "okReply",
+      "toPin": 0
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "noReply",
+      "toPin": 0
+    }
+  ]
+}

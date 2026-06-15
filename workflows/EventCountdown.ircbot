@@ -1,0 +1,123 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Community Countdown",
+  "description": "Every hour, look up the next event from a local iCalendar file and announce a friendly hours-until countdown in the channel.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "countdown",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Every hour",
+      "params": {
+        "mode": "interval",
+        "every": "1",
+        "unit": "hours",
+        "time": "",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "ical",
+      "type": "file.ical",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Next event",
+      "params": {
+        "source": "~/ircuitry/events.ics",
+        "mode": "next",
+        "max": "1"
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Hours until event",
+      "params": {
+        "language": "javascript",
+        "code": "return Math.round((new Date(input) - Date.now()) / 3600000) + \"h\"",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce countdown",
+      "params": {
+        "channel": "#events",
+        "message": "Next event \"{summary}\" in {output}.",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "No events",
+      "params": {
+        "text": "No upcoming events."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "ical",
+      "toPin": 0
+    },
+    {
+      "from": "ical",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "ical",
+      "fromPin": 3,
+      "to": "code",
+      "toPin": 1
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "ical",
+      "fromPin": 1,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

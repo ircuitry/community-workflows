@@ -1,0 +1,126 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Meeting Notes",
+  "description": "Say !notes (ops only) and an AI turns the recalled channel transcript into an action-item checklist and a one-line decision summary, then saves it to a dated Markdown file.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "notes",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!notes (ops)",
+      "params": {
+        "prefix": "!",
+        "command": "notes",
+        "contexts": "ops"
+      }
+    },
+    {
+      "id": "mem",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Recall transcript",
+      "params": {
+        "session": "{channel}-meeting",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "60"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize meeting",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Produce action items as a checklist and a one-line decision summary from this transcript.",
+        "prompt": "",
+        "maxTokens": "500"
+      }
+    },
+    {
+      "id": "write",
+      "type": "file.write",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Save notes",
+      "params": {
+        "path": "~/ircuitry/notes/{channel}-{date}.md",
+        "mode": "overwrite",
+        "text": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Confirm",
+      "params": {
+        "message": "Notes saved.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "mem",
+      "toPin": 0
+    },
+    {
+      "from": "mem",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "mem",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "write",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "write",
+      "toPin": 1
+    },
+    {
+      "from": "write",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

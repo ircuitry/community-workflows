@@ -1,0 +1,187 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Raid Warden",
+  "description": "Counts channel joins and, when too many arrive in a short window, locks the channel to invite-only and announces a raid, with a periodic timer that resets the join counter.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "raid",
+    "join"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on join",
+      "params": {}
+    },
+    {
+      "id": "getCount",
+      "type": "data.getvar",
+      "x": 286,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current joincount",
+      "params": {
+        "name": "joincount",
+        "default": "0"
+      }
+    },
+    {
+      "id": "inc",
+      "type": "data.math",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "joincount + 1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "setCount",
+      "type": "data.setvar",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save joincount",
+      "params": {
+        "name": "joincount",
+        "value": ""
+      }
+    },
+    {
+      "id": "ifRaid",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "joincount > 8 ?",
+      "params": {
+        "op": ">",
+        "b": "8",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "lock",
+      "type": "irc.mode",
+      "x": 1144,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lock channel +i",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+i",
+        "target": "{channel}",
+        "server": ""
+      }
+    },
+    {
+      "id": "alert",
+      "type": "action.say",
+      "x": 1430,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce raid",
+      "params": {
+        "channel": "{channel}",
+        "message": "Raid detected, channel locked.",
+        "server": ""
+      }
+    },
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "every 60s",
+      "params": {
+        "mode": "interval",
+        "every": "60",
+        "unit": "seconds",
+        "time": "",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "reset",
+      "type": "data.setvar",
+      "x": 286,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reset joincount",
+      "params": {
+        "name": "joincount",
+        "value": "0"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "setCount",
+      "toPin": 0
+    },
+    {
+      "from": "getCount",
+      "fromPin": 0,
+      "to": "inc",
+      "toPin": 0
+    },
+    {
+      "from": "inc",
+      "fromPin": 0,
+      "to": "setCount",
+      "toPin": 1
+    },
+    {
+      "from": "setCount",
+      "fromPin": 0,
+      "to": "ifRaid",
+      "toPin": 0
+    },
+    {
+      "from": "inc",
+      "fromPin": 0,
+      "to": "ifRaid",
+      "toPin": 1
+    },
+    {
+      "from": "ifRaid",
+      "fromPin": 0,
+      "to": "lock",
+      "toPin": 0
+    },
+    {
+      "from": "lock",
+      "fromPin": 0,
+      "to": "alert",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "reset",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Impersonation Guard",
+  "description": "Monitors your staff nicks with MONITOR and warns #staff when one comes online without being logged into the registered staff account.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "ircv3",
+    "monitor"
+  ],
+  "nodes": [
+    {
+      "id": "connect",
+      "type": "event.connect",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on connect",
+      "params": {}
+    },
+    {
+      "id": "monitor",
+      "type": "action.monitor",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "watch staff nicks",
+      "params": {
+        "nicks": "admin,owner,staffbot",
+        "mode": "add",
+        "server": ""
+      }
+    },
+    {
+      "id": "signal",
+      "type": "event.signal",
+      "x": 0,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "staff nick online",
+      "params": {
+        "signal": "monitor-online"
+      }
+    },
+    {
+      "id": "acct",
+      "type": "filter.fromAccount",
+      "x": 286,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is registered staff?",
+      "params": {
+        "account": "staff"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.say",
+      "x": 572,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn #staff",
+      "params": {
+        "channel": "#staff",
+        "message": "Possible impersonation: {data} is online but not the registered staff account.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "connect",
+      "fromPin": 0,
+      "to": "monitor",
+      "toPin": 0
+    },
+    {
+      "from": "signal",
+      "fromPin": 0,
+      "to": "acct",
+      "toPin": 0
+    },
+    {
+      "from": "acct",
+      "fromPin": 1,
+      "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "signal",
+      "fromPin": 1,
+      "to": "warn",
+      "toPin": 2
+    }
+  ]
+}

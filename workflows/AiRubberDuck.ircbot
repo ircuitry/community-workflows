@@ -1,0 +1,162 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Rubber Duck",
+  "description": "Say !duck <problem> and an AI rubber-duck partner remembers your conversation and replies with one Socratic clarifying question instead of the full answer.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "dev",
+    "help"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!duck <problem>",
+      "params": {
+        "prefix": "!",
+        "command": "duck",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "memUser",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remember user message",
+      "params": {
+        "session": "{nick}",
+        "mode": "remember",
+        "role": "user",
+        "text": "{args}",
+        "max": "20"
+      }
+    },
+    {
+      "id": "memRecall",
+      "type": "ai.memory",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Recall conversation",
+      "params": {
+        "session": "{nick}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "20"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Socratic duck",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a rubber-duck debugging partner. Ask one clarifying Socratic question, do not give the full answer.",
+        "prompt": "",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Reply in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "memAssistant",
+      "type": "ai.memory",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Remember duck reply",
+      "params": {
+        "session": "{nick}",
+        "mode": "remember",
+        "role": "assistant",
+        "text": "",
+        "max": "20"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "memUser",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "memUser",
+      "toPin": 1
+    },
+    {
+      "from": "memUser",
+      "fromPin": 0,
+      "to": "memRecall",
+      "toPin": 0
+    },
+    {
+      "from": "memRecall",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "memRecall",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "reply",
+      "fromPin": 0,
+      "to": "memAssistant",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "memAssistant",
+      "toPin": 1
+    }
+  ]
+}

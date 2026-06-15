@@ -1,0 +1,110 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Poll Insight",
+  "description": "Say !pollresult and the bot tallies votes from a SQLite poll database, then has an AI summarize the results into a one-sentence takeaway naming the winning option.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "community",
+    "poll"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!pollresult",
+      "params": {
+        "prefix": "!",
+        "command": "pollresult",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "tally",
+      "type": "db.sql",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Tally votes",
+      "params": {
+        "file": "polls.db",
+        "sql": "SELECT value, COUNT(*) FROM votes GROUP BY value"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize poll",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize these poll tallies into a one-sentence takeaway with the winning option.",
+        "prompt": "",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce result",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "tally",
+      "toPin": 0
+    },
+    {
+      "from": "tally",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "tally",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "cmd",
+      "fromPin": 3,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Duplicate Message Purge",
+  "description": "Detects when a user repeats their previous message verbatim, redacts the copy-paste flood and warns them, otherwise remembers the line for next time.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "spam",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "last",
+      "type": "db.get",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "last message for nick",
+      "params": {
+        "table": "lastmsg",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "isDup",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "same as last?",
+      "params": {
+        "op": "=",
+        "b": "{message}",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "msgid",
+      "type": "data.gettag",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "message id tag",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "purge the dupe",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "duplicate message",
+        "server": ""
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn user",
+      "params": {
+        "message": "No copy-paste flooding, {nick}.",
+        "server": ""
+      }
+    },
+    {
+      "id": "remember",
+      "type": "db.set",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember this line",
+      "params": {
+        "table": "lastmsg",
+        "key": "{nick}",
+        "value": "{message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "isDup",
+      "toPin": 0
+    },
+    {
+      "from": "last",
+      "fromPin": 0,
+      "to": "isDup",
+      "toPin": 1
+    },
+    {
+      "from": "isDup",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "msgid",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "isDup",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 1
+    }
+  ]
+}

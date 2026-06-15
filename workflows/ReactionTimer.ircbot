@@ -1,0 +1,191 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Reaction Timer",
+  "description": "Ops start a round with !ready, the bot waits a random few seconds then shouts GO!, and the first person to reply wins the reaction-time race.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "speed",
+    "timer"
+  ],
+  "nodes": [
+    {
+      "id": "ready",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ready (ops)",
+      "params": {
+        "prefix": "!",
+        "command": "ready",
+        "contexts": "ops"
+      }
+    },
+    {
+      "id": "rng",
+      "type": "data.randnum",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "random 3-9s",
+      "params": {
+        "min": "3",
+        "max": "9"
+      }
+    },
+    {
+      "id": "wait",
+      "type": "flow.delay",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "suspense delay",
+      "params": {
+        "seconds": "5"
+      }
+    },
+    {
+      "id": "armed",
+      "type": "data.setvar",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mark round live",
+      "params": {
+        "name": "goTime",
+        "value": "{time}"
+      }
+    },
+    {
+      "id": "go",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "shout GO!",
+      "params": {
+        "channel": "",
+        "message": "GO! First to type wins!",
+        "server": ""
+      }
+    },
+    {
+      "id": "line",
+      "type": "event.message",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "started",
+      "type": "db.get",
+      "x": 286,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "round start time",
+      "params": {
+        "table": "vars",
+        "mode": "value",
+        "key": "goTime",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "elapsed",
+      "type": "code.run",
+      "x": 286,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "compute elapsed ms",
+      "params": {
+        "language": "javascript",
+        "code": "const start = parseInt(input, 10) || Date.now();\nreturn (Date.now() - start) + 'ms';",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "win",
+      "type": "action.reply",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce winner",
+      "params": {
+        "message": "First! {nick} reacted in {output}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "ready",
+      "fromPin": 0,
+      "to": "wait",
+      "toPin": 0
+    },
+    {
+      "from": "wait",
+      "fromPin": 0,
+      "to": "armed",
+      "toPin": 0
+    },
+    {
+      "from": "rng",
+      "fromPin": 0,
+      "to": "armed",
+      "toPin": 1
+    },
+    {
+      "from": "armed",
+      "fromPin": 0,
+      "to": "go",
+      "toPin": 0
+    },
+    {
+      "from": "ready",
+      "fromPin": 3,
+      "to": "go",
+      "toPin": 1
+    },
+    {
+      "from": "line",
+      "fromPin": 0,
+      "to": "elapsed",
+      "toPin": 0
+    },
+    {
+      "from": "started",
+      "fromPin": 0,
+      "to": "elapsed",
+      "toPin": 1
+    },
+    {
+      "from": "elapsed",
+      "fromPin": 0,
+      "to": "win",
+      "toPin": 0
+    },
+    {
+      "from": "elapsed",
+      "fromPin": 1,
+      "to": "win",
+      "toPin": 1
+    }
+  ]
+}

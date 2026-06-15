@@ -1,0 +1,159 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Link Whitelist Enforcer",
+  "description": "Detects URLs posted in chat and redacts any whose domain is not in your allowed_domains list, warning the poster that only approved links are permitted.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "links",
+    "regex"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "urlRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "find a URL",
+      "params": {
+        "pattern": "https?://([^/\\s]+)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is domain approved?",
+      "params": {
+        "table": "allowed_domains",
+        "mode": "value",
+        "key": "{1}",
+        "default": "NO",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "domain not allowed?",
+      "params": {
+        "op": "=",
+        "b": "NO",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "msgid",
+      "type": "data.gettag",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "message id tag",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "delete the link",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "Link from a non-approved domain",
+        "server": ""
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn the poster",
+      "params": {
+        "message": "Only approved links allowed, {nick}.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "urlRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "urlRegex",
+      "toPin": 1
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 3,
+      "to": "redact",
+      "toPin": 1
+    },
+    {
+      "from": "msgid",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

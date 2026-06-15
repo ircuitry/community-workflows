@@ -1,0 +1,155 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Auto-Voice Regulars",
+  "description": "Count each member's joins and automatically give voice (+v) plus a warm welcome once they pass ten visits, marking them as a regular.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "ircv3",
+    "voice"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on join",
+      "params": {}
+    },
+    {
+      "id": "get",
+      "type": "db.get",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current visits",
+      "params": {
+        "table": "visits",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "math",
+      "type": "data.math",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1 visit",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "set",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save visits",
+      "params": {
+        "table": "visits",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "if",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "more than 10 visits?",
+      "params": {
+        "op": ">",
+        "b": "10",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "mode",
+      "type": "irc.mode",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "give voice",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+v",
+        "target": "{nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome back",
+      "params": {
+        "channel": "{channel}",
+        "message": "Welcome back {nick}, voiced for being a regular!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "get",
+      "fromPin": 0,
+      "to": "math",
+      "toPin": 0
+    },
+    {
+      "from": "math",
+      "fromPin": 0,
+      "to": "set",
+      "toPin": 1
+    },
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "set",
+      "toPin": 0
+    },
+    {
+      "from": "set",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 0
+    },
+    {
+      "from": "math",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 1
+    },
+    {
+      "from": "if",
+      "fromPin": 0,
+      "to": "mode",
+      "toPin": 0
+    },
+    {
+      "from": "mode",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    }
+  ]
+}

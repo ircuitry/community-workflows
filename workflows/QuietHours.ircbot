@@ -1,0 +1,132 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Quiet Hours Mode",
+  "description": "Automatically puts #main into moderated (+m) mode at 11pm and lifts it at 7am, announcing each change so chat knows when quiet hours start and end.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "schedule",
+    "mode"
+  ],
+  "nodes": [
+    {
+      "id": "schedOn",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 23:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "hours",
+        "time": "23:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "modeOn",
+      "type": "irc.mode",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Set +m on #main",
+      "params": {
+        "channel": "#main",
+        "modes": "+m",
+        "target": "{channel}",
+        "server": ""
+      }
+    },
+    {
+      "id": "sayOn",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce quiet hours",
+      "params": {
+        "channel": "#main",
+        "message": "Quiet hours active (voiced only). Back at 7am.",
+        "server": ""
+      }
+    },
+    {
+      "id": "schedOff",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 07:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "hours",
+        "time": "07:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "modeOff",
+      "type": "irc.mode",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Set -m on #main",
+      "params": {
+        "channel": "#main",
+        "modes": "-m",
+        "target": "{channel}",
+        "server": ""
+      }
+    },
+    {
+      "id": "sayOff",
+      "type": "action.say",
+      "x": 572,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Announce chat is open",
+      "params": {
+        "channel": "#main",
+        "message": "Quiet hours over, chat freely!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "schedOn",
+      "fromPin": 0,
+      "to": "modeOn",
+      "toPin": 0
+    },
+    {
+      "from": "modeOn",
+      "fromPin": 0,
+      "to": "sayOn",
+      "toPin": 0
+    },
+    {
+      "from": "schedOff",
+      "fromPin": 0,
+      "to": "modeOff",
+      "toPin": 0
+    },
+    {
+      "from": "modeOff",
+      "fromPin": 0,
+      "to": "sayOff",
+      "toPin": 0
+    }
+  ]
+}

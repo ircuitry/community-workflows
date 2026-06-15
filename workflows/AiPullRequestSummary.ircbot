@@ -1,0 +1,146 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI PR Summarizer",
+  "description": "Say !pr <number> and the bot fetches that GitHub pull request, then an AI summarizes its description in two lines and flags any risk.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "github",
+    "dev"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!pr <number>",
+      "params": {
+        "prefix": "!",
+        "command": "pr",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build GitHub API URL",
+      "params": {
+        "template": "https://api.github.com/repos/myorg/myrepo/pulls/{a}"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch pull request",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: ircuitry\nAccept: application/vnd.github+json",
+        "body": ""
+      }
+    },
+    {
+      "id": "json",
+      "type": "data.json",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Extract PR body",
+      "params": {
+        "path": "body"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize PR",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize this PR description in 2 lines and flag any risk.",
+        "prompt": "",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post summary",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "json",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "json",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

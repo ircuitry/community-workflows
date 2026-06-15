@@ -1,0 +1,121 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Onboarding Buddy",
+  "description": "When a human joins the channel, an AI greets the newcomer warmly in one friendly line and points them to !rules and !ask.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "welcome",
+    "join"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "user joins",
+      "params": {}
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "skip bots",
+      "params": {}
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build prompt",
+      "params": {
+        "template": "New user {a} just joined #project."
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Greeter AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Greet the newcomer warmly and point them to !rules and !ask. Keep it to one friendly line.",
+        "prompt": "",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome message",
+      "params": {
+        "channel": "{channel}",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Friendly Roast",
+  "description": "Say !roast <target> and an AI delivers a silly, PG roast of the target, with a 30s per-user cooldown to keep the banter friendly.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "fun",
+    "banter"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!roast <target>",
+      "params": {
+        "prefix": "!",
+        "command": "roast",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cooldown",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "30s per-user",
+      "params": {
+        "seconds": "30",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Roast AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Deliver a light, playful, PG roast of the target in one line. Keep it silly, never cruel.",
+        "prompt": "",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Send roast",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "waitReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Cooldown notice",
+      "params": {
+        "message": "Easy, let them recover ({args})."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cooldown",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cooldown",
+      "toPin": 1
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 1,
+      "to": "waitReply",
+      "toPin": 0
+    }
+  ]
+}

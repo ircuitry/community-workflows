@@ -1,0 +1,154 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Regex Profanity Guard",
+  "description": "Detects banned words from real humans via a regex, redacts the offending message, quiets the offender, and posts a polite warning.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "filter",
+    "regex"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "skip bots",
+      "params": {}
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "banned words",
+      "params": {
+        "pattern": "(?i)(badword1|badword2|slur3)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "msgid",
+      "type": "data.gettag",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "message id",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "delete message",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "profanity filter",
+        "server": ""
+      }
+    },
+    {
+      "id": "quiet",
+      "type": "irc.mode",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "quiet offender",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+q",
+        "target": "{nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn user",
+      "params": {
+        "message": "Watch the language, {nick}.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 3,
+      "to": "redact",
+      "toPin": 1
+    },
+    {
+      "from": "msgid",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "quiet",
+      "toPin": 0
+    },
+    {
+      "from": "quiet",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

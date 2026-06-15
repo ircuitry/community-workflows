@@ -1,0 +1,117 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Gist Explainer",
+  "description": "Say !explainfile <raw gist URL> and an AI fetches the code, then explains what it does in plain English as a short multi-line bullet list.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "code",
+    "url"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!explainfile <url>",
+      "params": {
+        "prefix": "!",
+        "command": "explainfile",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch gist code",
+      "params": {
+        "method": "GET",
+        "url": "{args}",
+        "headers": "User-Agent: ircuitry/1.0",
+        "body": ""
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Explain the code",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Explain what this code does in plain English, 3 bullets max.",
+        "prompt": "",
+        "maxTokens": "400"
+      }
+    },
+    {
+      "id": "out",
+      "type": "action.multiline",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post explanation",
+      "params": {
+        "target": "{channel}",
+        "text": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "out",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 3,
+      "to": "out",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "out",
+      "toPin": 2
+    }
+  ]
+}

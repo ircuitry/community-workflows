@@ -1,0 +1,181 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Profanity Strike Log",
+  "description": "When a chat message contains a banned word, increment that user's strike count in the database and kick them once they reach three strikes.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "strikes",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "filter",
+      "type": "filter.contains",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "contains banned word",
+      "params": {
+        "needle": "heck",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "get",
+      "type": "db.get",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current strikes",
+      "params": {
+        "table": "strikes",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "math",
+      "type": "data.math",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1 strike",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "set",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save strikes",
+      "params": {
+        "table": "strikes",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "if",
+      "type": "logic.if",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "3 strikes?",
+      "params": {
+        "op": ">",
+        "b": "3",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 1430,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "kick at 3 strikes",
+      "params": {
+        "channel": "{channel}",
+        "nick": "{nick}",
+        "reason": "3 strikes",
+        "server": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn user",
+      "params": {
+        "message": "Strike {result}/3, {nick}.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "filter",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "filter",
+      "toPin": 1
+    },
+    {
+      "from": "filter",
+      "fromPin": 0,
+      "to": "set",
+      "toPin": 0
+    },
+    {
+      "from": "get",
+      "fromPin": 0,
+      "to": "math",
+      "toPin": 0
+    },
+    {
+      "from": "math",
+      "fromPin": 0,
+      "to": "set",
+      "toPin": 1
+    },
+    {
+      "from": "set",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 0
+    },
+    {
+      "from": "math",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 1
+    },
+    {
+      "from": "if",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "if",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

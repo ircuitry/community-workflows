@@ -1,0 +1,256 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Lucky Dice Bet",
+  "description": "Say !bet to roll a six-sided die on a 15s per-user cooldown: roll above 4 and you win a coin in the db, otherwise you lose one.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "gamble",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!bet",
+      "params": {
+        "prefix": "!",
+        "command": "bet",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "15s per user",
+      "params": {
+        "seconds": "15",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "roll",
+      "type": "data.randnum",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "roll d6",
+      "params": {
+        "min": "1",
+        "max": "6"
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "rolled > 4?",
+      "params": {
+        "op": ">",
+        "b": "4",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "winGet",
+      "type": "db.get",
+      "x": 858,
+      "y": -260,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current coins",
+      "params": {
+        "table": "coins",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "winMath",
+      "type": "data.math",
+      "x": 858,
+      "y": -120,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "coins + 1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "winSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save coins",
+      "params": {
+        "table": "coins",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "winReply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "win reply",
+      "params": {
+        "message": "Won! Rolled {value} and earned a coin, {nick}.",
+        "server": ""
+      }
+    },
+    {
+      "id": "loseGet",
+      "type": "db.get",
+      "x": 858,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current coins",
+      "params": {
+        "table": "coins",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "loseMath",
+      "type": "data.math",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "coins - 1",
+      "params": {
+        "op": "-",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "loseSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": 300,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save coins",
+      "params": {
+        "table": "coins",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "loseReply",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 300,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lose reply",
+      "params": {
+        "message": "Lost! Rolled {value} and lost a coin, {nick}.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "roll",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "winSet",
+      "toPin": 0
+    },
+    {
+      "from": "winGet",
+      "fromPin": 0,
+      "to": "winMath",
+      "toPin": 0
+    },
+    {
+      "from": "winMath",
+      "fromPin": 0,
+      "to": "winSet",
+      "toPin": 1
+    },
+    {
+      "from": "winSet",
+      "fromPin": 0,
+      "to": "winReply",
+      "toPin": 0
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "loseSet",
+      "toPin": 0
+    },
+    {
+      "from": "loseGet",
+      "fromPin": 0,
+      "to": "loseMath",
+      "toPin": 0
+    },
+    {
+      "from": "loseMath",
+      "fromPin": 0,
+      "to": "loseSet",
+      "toPin": 1
+    },
+    {
+      "from": "loseSet",
+      "fromPin": 0,
+      "to": "loseReply",
+      "toPin": 0
+    }
+  ]
+}

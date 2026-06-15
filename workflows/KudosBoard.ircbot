@@ -1,0 +1,180 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Kudos Board",
+  "description": "Say !kudos <nick> <reason> to record a shout-out in a database, then !kudosboard lists the recent kudos people have given each other.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "kudos",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "kudosCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!kudos <nick> <reason>",
+      "params": {
+        "prefix": "!",
+        "command": "kudos",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "parse",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split target + reason",
+      "params": {
+        "pattern": "^(\\S+)\\s+(.+)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save kudos",
+      "params": {
+        "table": "kudos",
+        "key": "{time}-{nick}",
+        "value": "{1}|{2}|from {nick}"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce kudos",
+      "params": {
+        "channel": "",
+        "message": "Kudos to {1}: {2} (from {nick})",
+        "server": ""
+      }
+    },
+    {
+      "id": "boardCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!kudosboard",
+      "params": {
+        "prefix": "!",
+        "command": "kudosboard",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "fetch",
+      "type": "db.get",
+      "x": 286,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recent kudos",
+      "params": {
+        "table": "kudos",
+        "mode": "find",
+        "key": "",
+        "default": "No kudos yet. Be the first with !kudos <nick> <reason>!",
+        "find": "*"
+      }
+    },
+    {
+      "id": "loop",
+      "type": "logic.forEach",
+      "x": 572,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "each kudos line",
+      "params": {
+        "sep": "newline"
+      }
+    },
+    {
+      "id": "listReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "list a kudos",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "kudosCmd",
+      "fromPin": 0,
+      "to": "parse",
+      "toPin": 0
+    },
+    {
+      "from": "kudosCmd",
+      "fromPin": 1,
+      "to": "parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "kudosCmd",
+      "fromPin": 3,
+      "to": "announce",
+      "toPin": 1
+    },
+    {
+      "from": "boardCmd",
+      "fromPin": 0,
+      "to": "loop",
+      "toPin": 0
+    },
+    {
+      "from": "fetch",
+      "fromPin": 0,
+      "to": "loop",
+      "toPin": 1
+    },
+    {
+      "from": "loop",
+      "fromPin": 0,
+      "to": "listReply",
+      "toPin": 0
+    },
+    {
+      "from": "loop",
+      "fromPin": 2,
+      "to": "listReply",
+      "toPin": 1
+    }
+  ]
+}

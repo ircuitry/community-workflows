@@ -1,0 +1,149 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Karma Lookup Agent",
+  "description": "Say !karmabot and ask in plain language like 'how is bob doing on karma' and an AI agent calls a lookup_karma tool that reads the karma table and answers naturally.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "agent",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!karmabot <question>",
+      "params": {
+        "prefix": "!",
+        "command": "karmabot",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "tool",
+      "type": "ai.tool",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lookup_karma tool",
+      "params": {
+        "name": "lookup_karma",
+        "description": "Look up the current karma score for a given user or word.",
+        "arg1name": "user",
+        "arg1desc": "The user or word to look up the karma score for, e.g. bob.",
+        "arg2name": "",
+        "arg2desc": "",
+        "arg3name": "",
+        "arg3desc": ""
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Karma agent",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a karma assistant. When a user asks about someone's karma in natural language, use the lookup_karma tool to fetch their current score, then answer in one short, friendly sentence.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "get",
+      "type": "db.get",
+      "x": 572,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "read karma table",
+      "params": {
+        "table": "karma",
+        "mode": "value",
+        "key": "{arg1}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "toolreply",
+      "type": "tool.reply",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "return score to AI",
+      "params": {
+        "result": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "answer in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "tool",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 2
+    },
+    {
+      "from": "tool",
+      "fromPin": 1,
+      "to": "toolreply",
+      "toPin": 0
+    },
+    {
+      "from": "get",
+      "fromPin": 0,
+      "to": "toolreply",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

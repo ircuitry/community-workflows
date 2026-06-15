@@ -1,0 +1,242 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Trivia Master",
+  "description": "Say !quizme <category> to have an AI generate a trivia question and stash the answer, then !ans <guess> to check whether your answer matches.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "game",
+    "trivia"
+  ],
+  "nodes": [
+    {
+      "id": "quizCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!quizme <category>",
+      "params": {
+        "prefix": "!",
+        "command": "quizme",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Generate question",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Generate one trivia question. Output format: Q: ...|A: ...",
+        "prompt": "category {args}",
+        "maxTokens": "150"
+      }
+    },
+    {
+      "id": "parse",
+      "type": "logic.regex",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split Q and A",
+      "params": {
+        "pattern": "Q: (.+)\\|A: (.+)",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save answer",
+      "params": {
+        "table": "trivia",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "ask",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ask the question",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "ansCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ans <guess>",
+      "params": {
+        "prefix": "!",
+        "command": "ans",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "answer",
+      "type": "db.get",
+      "x": 286,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stored answer",
+      "params": {
+        "table": "trivia",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess contains answer",
+      "params": {
+        "op": "contains",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "correct",
+      "type": "action.reply",
+      "x": 858,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct",
+      "params": {
+        "message": "Correct, {nick}! Well done.",
+        "server": ""
+      }
+    },
+    {
+      "id": "wrong",
+      "type": "action.reply",
+      "x": 858,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wrong",
+      "params": {
+        "message": "Not quite, {nick}. Try !quizme for a new one.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "quizCmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "quizCmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "parse",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 3,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "ask",
+      "toPin": 0
+    },
+    {
+      "from": "quizCmd",
+      "fromPin": 3,
+      "to": "ask",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 2,
+      "to": "ask",
+      "toPin": 2
+    },
+    {
+      "from": "ansCmd",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "ansCmd",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "answer",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "correct",
+      "toPin": 0
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "wrong",
+      "toPin": 0
+    }
+  ]
+}

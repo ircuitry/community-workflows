@@ -1,0 +1,136 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Anonymous Confessions",
+  "description": "PM the bot with !confess <secret> and it posts your confession anonymously to #confessions, with a 2-minute cooldown to curb spam.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "anon",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!confess <secret> (PM)",
+      "params": {
+        "prefix": "!",
+        "command": "confess",
+        "contexts": "pm"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "2 min cooldown",
+      "params": {
+        "seconds": "120",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "rand",
+      "type": "data.random",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "prefix",
+      "params": {
+        "options": "Anonymous says:"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build confession",
+      "params": {
+        "template": "{a} {b}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post to #confessions",
+      "params": {
+        "channel": "#confessions",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm to sender",
+      "params": {
+        "message": "Your confession was posted anonymously.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "rand",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "say",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

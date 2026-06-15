@@ -1,0 +1,128 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Dream Interpreter",
+  "description": "Say !dream <your dream> and the bot theatrically gazes into it, then an AI gives a short mystical-but-grounded two-sentence interpretation.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "fun",
+    "whimsy"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!dream <your dream>",
+      "params": {
+        "prefix": "!",
+        "command": "dream",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "20s cooldown",
+      "params": {
+        "seconds": "20",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Interpret the dream",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Give a short, mystical-but-grounded interpretation of the dream in 2 sentences.",
+        "prompt": "",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "gaze",
+      "type": "irc.action",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "gazes into the dream",
+      "params": {
+        "text": "gazes into the dream of {nick}...",
+        "server": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "speak the interpretation",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "gaze",
+      "toPin": 0
+    },
+    {
+      "from": "gaze",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

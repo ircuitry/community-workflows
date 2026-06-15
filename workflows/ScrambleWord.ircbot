@@ -1,0 +1,226 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Word Scramble",
+  "description": "Say !scramble to get a random shuffled word to unscramble, then guess it with !unscramble <word> to see if you got it right.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "words",
+    "random"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!scramble",
+      "params": {
+        "prefix": "!",
+        "command": "scramble",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick a word",
+      "params": {
+        "options": "circuit\nchannel\nmessage\nkeyboard\nnetwork\nwizard\npuzzle\nrandom\nwidget\nrocket"
+      }
+    },
+    {
+      "id": "shuffle",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "shuffle letters",
+      "params": {
+        "language": "javascript",
+        "code": "return input.split(\"\").sort(()=>Math.random()-0.5).join(\"\")",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember answer",
+      "params": {
+        "table": "scramble",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce scramble",
+      "params": {
+        "channel": "",
+        "message": "Unscramble: {output}",
+        "server": ""
+      }
+    },
+    {
+      "id": "guessCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!unscramble <word>",
+      "params": {
+        "prefix": "!",
+        "command": "unscramble",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "answer",
+      "type": "db.get",
+      "x": 286,
+      "y": 760,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stored answer",
+      "params": {
+        "table": "scramble",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess == answer?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "winRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct",
+      "params": {
+        "message": "Correct, {nick}! The word was indeed it. Well played!",
+        "server": ""
+      }
+    },
+    {
+      "id": "loseRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 680,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wrong",
+      "params": {
+        "message": "Not quite, {nick}. Keep trying!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "shuffle",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "shuffle",
+      "toPin": 1
+    },
+    {
+      "from": "shuffle",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 3,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "shuffle",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "answer",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "winRep",
+      "toPin": 0
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "loseRep",
+      "toPin": 0
+    }
+  ]
+}

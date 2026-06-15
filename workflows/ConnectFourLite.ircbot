@@ -1,0 +1,220 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Tic Tac Toe",
+  "description": "Play tic-tac-toe in chat with !ttt <1-9>: a JavaScript node places your mark, checks for a win, persists the board per channel in the database, and prints the grid.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "grid",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ttt <1-9>",
+      "params": {
+        "prefix": "!",
+        "command": "ttt",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "chk",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "valid cell 1-9?",
+      "params": {
+        "op": "matches",
+        "b": "^[1-9]$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "get",
+      "type": "db.get",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "load board",
+      "params": {
+        "table": "ttt",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "_________",
+        "find": ""
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "board|move|nick",
+      "params": {
+        "template": "{a}|{args}|{nick}"
+      }
+    },
+    {
+      "id": "run",
+      "type": "code.run",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "place mark + check win",
+      "params": {
+        "language": "javascript",
+        "code": "const [board, move, nick] = input.split('|');\nconst cells = (board || '_________').split('');\nconst i = parseInt(move, 10) - 1;\nlet mark = (cells.filter(c => c === 'X').length <= cells.filter(c => c === 'O').length) ? 'X' : 'O';\nlet status = '';\nif (cells[i] && cells[i] !== '_') {\n  status = 'Cell taken, pick another.';\n} else {\n  cells[i] = mark;\n  const b = cells;\n  const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];\n  const won = wins.some(w => b[w[0]] !== '_' && b[w[0]] === b[w[1]] && b[w[1]] === b[w[2]]);\n  if (won) status = mark + ' wins!';\n  else if (b.every(c => c !== '_')) status = \"It's a draw!\";\n  else status = mark + ' played by ' + nick + '.';\n}\nreturn cells.join('') + '||' + status;",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "board",
+      "type": "code.run",
+      "x": 858,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stored board only",
+      "params": {
+        "language": "javascript",
+        "code": "return input.split('||')[0];",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "set",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save board",
+      "params": {
+        "table": "ttt",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "grid",
+      "type": "code.run",
+      "x": 1144,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "render grid",
+      "params": {
+        "language": "javascript",
+        "code": "const [b, status] = input.split('||');\nconst c = b.split('').map((x, n) => x === '_' ? String(n + 1) : x);\nreturn c[0] + ' ' + c[1] + ' ' + c[2] + '\\n' + c[3] + ' ' + c[4] + ' ' + c[5] + '\\n' + c[6] + ' ' + c[7] + ' ' + c[8] + '\\n' + (status || '');",
+        "timeout": "2000"
+      }
+    },
+    {
+      "id": "out",
+      "type": "action.multiline",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "print grid",
+      "params": {
+        "target": "{channel}",
+        "text": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "chk",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "chk",
+      "toPin": 1
+    },
+    {
+      "from": "get",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "chk",
+      "fromPin": 0,
+      "to": "run",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "run",
+      "toPin": 1
+    },
+    {
+      "from": "run",
+      "fromPin": 0,
+      "to": "set",
+      "toPin": 0
+    },
+    {
+      "from": "run",
+      "fromPin": 1,
+      "to": "board",
+      "toPin": 1
+    },
+    {
+      "from": "board",
+      "fromPin": 1,
+      "to": "set",
+      "toPin": 1
+    },
+    {
+      "from": "set",
+      "fromPin": 0,
+      "to": "grid",
+      "toPin": 0
+    },
+    {
+      "from": "run",
+      "fromPin": 1,
+      "to": "grid",
+      "toPin": 1
+    },
+    {
+      "from": "grid",
+      "fromPin": 0,
+      "to": "out",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 3,
+      "to": "out",
+      "toPin": 1
+    },
+    {
+      "from": "grid",
+      "fromPin": 1,
+      "to": "out",
+      "toPin": 2
+    }
+  ]
+}

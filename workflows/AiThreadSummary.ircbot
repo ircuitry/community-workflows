@@ -1,0 +1,146 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Thread Summarizer",
+  "description": "Remembers recent chat per channel, then say !recap to have an AI summarize the conversation into three concise bullet points.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "summary",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "recapCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!recap",
+      "params": {
+        "prefix": "!",
+        "command": "recap",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "recall",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recall chat log",
+      "params": {
+        "session": "{channel}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "40"
+      }
+    },
+    {
+      "id": "summarize",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "summarize log",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize this chat log into 3 concise bullet points of what was discussed.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post summary",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "chatMsg",
+      "type": "event.message",
+      "x": 0,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "remember",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 320,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember line",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "user",
+        "text": "{message}",
+        "max": "40"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "recapCmd",
+      "fromPin": 0,
+      "to": "recall",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 0,
+      "to": "summarize",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 1,
+      "to": "summarize",
+      "toPin": 1
+    },
+    {
+      "from": "summarize",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "summarize",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "chatMsg",
+      "fromPin": 0,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "chatMsg",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 1
+    }
+  ]
+}

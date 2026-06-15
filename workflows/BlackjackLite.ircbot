@@ -1,0 +1,240 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Blackjack Lite",
+  "description": "A tiny per-nick blackjack game: say !hit to draw a card (1-11) added to your running total stored in the db, busting over 21, with !deal to reset back to zero.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "cards",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "hitCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!hit",
+      "params": {
+        "prefix": "!",
+        "command": "hit",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "card",
+      "type": "data.randnum",
+      "x": 286,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "draw card 1-11",
+      "params": {
+        "min": "1",
+        "max": "11"
+      }
+    },
+    {
+      "id": "cur",
+      "type": "db.get",
+      "x": 286,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current total",
+      "params": {
+        "table": "bj",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "sum",
+      "type": "data.math",
+      "x": 572,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "total + card",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "0"
+      }
+    },
+    {
+      "id": "save",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save total",
+      "params": {
+        "table": "bj",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "over 21?",
+      "params": {
+        "op": ">",
+        "b": "21",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "bust",
+      "type": "action.reply",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "bust",
+      "params": {
+        "message": "Bust at {a}! You lose. Say !deal to start a new hand.",
+        "server": ""
+      }
+    },
+    {
+      "id": "ask",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "still in",
+      "params": {
+        "message": "You have {a}. !hit or !stand?",
+        "server": ""
+      }
+    },
+    {
+      "id": "dealCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!deal",
+      "params": {
+        "prefix": "!",
+        "command": "deal",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "reset",
+      "type": "db.set",
+      "x": 286,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reset total",
+      "params": {
+        "table": "bj",
+        "key": "{nick}",
+        "value": "0"
+      }
+    },
+    {
+      "id": "dealt",
+      "type": "action.reply",
+      "x": 572,
+      "y": 560,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "new hand",
+      "params": {
+        "message": "New hand for {nick}, total reset to 0. Say !hit to draw a card!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "hitCmd",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "cur",
+      "fromPin": 0,
+      "to": "sum",
+      "toPin": 0
+    },
+    {
+      "from": "card",
+      "fromPin": 0,
+      "to": "sum",
+      "toPin": 1
+    },
+    {
+      "from": "sum",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 1
+    },
+    {
+      "from": "save",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "sum",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "bust",
+      "toPin": 0
+    },
+    {
+      "from": "sum",
+      "fromPin": 0,
+      "to": "bust",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "ask",
+      "toPin": 0
+    },
+    {
+      "from": "sum",
+      "fromPin": 0,
+      "to": "ask",
+      "toPin": 1
+    },
+    {
+      "from": "dealCmd",
+      "fromPin": 0,
+      "to": "reset",
+      "toPin": 0
+    },
+    {
+      "from": "reset",
+      "fromPin": 0,
+      "to": "dealt",
+      "toPin": 0
+    }
+  ]
+}

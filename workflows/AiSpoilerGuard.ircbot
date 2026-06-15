@@ -1,0 +1,165 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Spoiler Detector",
+  "description": "Watches chat for messages mentioning a show and asks an AI whether they contain a TV or movie spoiler, then redacts confirmed spoilers and warns the user.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "moderation",
+    "spoiler"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "filter",
+      "type": "filter.contains",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mentions a show?",
+      "params": {
+        "needle": "show",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "spoiler?",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Does this contain a TV/movie spoiler? Answer ONLY YES or NO.",
+        "prompt": "",
+        "maxTokens": "5"
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "AI said YES?",
+      "params": {
+        "op": "=",
+        "b": "YES",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "tag",
+      "type": "data.gettag",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "message id",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "redact spoiler",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "spoiler"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn user",
+      "params": {
+        "message": "Spoiler redacted, {nick}.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "filter",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "filter",
+      "toPin": 1
+    },
+    {
+      "from": "filter",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "tag",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

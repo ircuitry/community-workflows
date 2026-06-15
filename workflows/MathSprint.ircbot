@@ -1,0 +1,243 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Math Sprint",
+  "description": "Type !mathsprint to get a random multiplication challenge, then race to answer it first in chat for a win.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "math",
+    "timer"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!mathsprint",
+      "params": {
+        "prefix": "!",
+        "command": "mathsprint",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "randA",
+      "type": "data.randnum",
+      "x": 286,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "number a",
+      "params": {
+        "min": "2",
+        "max": "20"
+      }
+    },
+    {
+      "id": "randB",
+      "type": "data.randnum",
+      "x": 286,
+      "y": 60,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "number b",
+      "params": {
+        "min": "2",
+        "max": "20"
+      }
+    },
+    {
+      "id": "math",
+      "type": "data.math",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "a x b",
+      "params": {
+        "op": "×",
+        "a": "",
+        "b": ""
+      }
+    },
+    {
+      "id": "save",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store answer",
+      "params": {
+        "table": "math",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "prompt",
+      "type": "data.format",
+      "x": 858,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build prompt",
+      "params": {
+        "template": "Solve: {a} x {b}"
+      }
+    },
+    {
+      "id": "ask",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post challenge",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "answer",
+      "type": "db.get",
+      "x": 286,
+      "y": 660,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current answer",
+      "params": {
+        "table": "math",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "win",
+      "type": "action.reply",
+      "x": 858,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "winner",
+      "params": {
+        "message": "{nick} got it!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "randA",
+      "fromPin": 0,
+      "to": "math",
+      "toPin": 0
+    },
+    {
+      "from": "randB",
+      "fromPin": 0,
+      "to": "math",
+      "toPin": 1
+    },
+    {
+      "from": "math",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 1
+    },
+    {
+      "from": "save",
+      "fromPin": 0,
+      "to": "ask",
+      "toPin": 0
+    },
+    {
+      "from": "randA",
+      "fromPin": 0,
+      "to": "prompt",
+      "toPin": 0
+    },
+    {
+      "from": "randB",
+      "fromPin": 0,
+      "to": "prompt",
+      "toPin": 1
+    },
+    {
+      "from": "cmd",
+      "fromPin": 3,
+      "to": "ask",
+      "toPin": 1
+    },
+    {
+      "from": "prompt",
+      "fromPin": 0,
+      "to": "ask",
+      "toPin": 2
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "answer",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "win",
+      "toPin": 0
+    }
+  ]
+}

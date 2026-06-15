@@ -1,0 +1,133 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Persona Swap",
+  "description": "Say !as <persona> <question> and the bot answers your question while staying fully in character as the persona you named.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "fun",
+    "persona"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!as <persona> <question>",
+      "params": {
+        "prefix": "!",
+        "command": "as",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "re",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split persona + question",
+      "params": {
+        "pattern": "^(\\w+)\\s+(.+)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build persona prompt",
+      "params": {
+        "template": "Respond as {a}, staying fully in character. {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer in persona",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a versatile role-play assistant. Fully adopt the persona named in the prompt and answer the user's question in that character's voice, in one or two short sentences.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "re",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "re",
+      "toPin": 1
+    },
+    {
+      "from": "re",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "re",
+      "fromPin": 2,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "re",
+      "fromPin": 3,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

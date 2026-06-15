@@ -1,0 +1,190 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Word Bounty Hunt",
+  "description": "Every 30 minutes a secret bounty word is hidden in the channel, and the first person to say it earns karma points.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "words",
+    "passive"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "every 30 min",
+      "params": {
+        "mode": "interval",
+        "every": "30",
+        "unit": "minutes",
+        "time": "",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick secret word",
+      "params": {
+        "options": "banana\nrocket\nwizard\nthunder\npickle\ngalaxy\nninja\nsphinx"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save bounty word",
+      "params": {
+        "table": "bounty",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce bounty",
+      "params": {
+        "channel": "",
+        "message": "A bounty word is hidden! Be the first to say it for points.",
+        "server": ""
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "lookup",
+      "type": "db.get",
+      "x": 286,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current bounty",
+      "params": {
+        "table": "bounty",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 286,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "message contains word?",
+      "params": {
+        "op": "contains",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "award",
+      "type": "db.set",
+      "x": 572,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+5 karma",
+      "params": {
+        "table": "karma",
+        "key": "{nick}",
+        "value": "+5"
+      }
+    },
+    {
+      "id": "claim",
+      "type": "action.reply",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "claimed reply",
+      "params": {
+        "message": "Bounty claimed by {nick}!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "lookup",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "award",
+      "toPin": 0
+    },
+    {
+      "from": "award",
+      "fromPin": 0,
+      "to": "claim",
+      "toPin": 0
+    }
+  ]
+}

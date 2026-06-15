@@ -1,0 +1,211 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Welcome Wagon Roster",
+  "description": "Greets each first-time joiner in the channel, records them as a member, and answers !members with the current roster count.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "join",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "someone joins",
+      "params": {}
+    },
+    {
+      "id": "seen",
+      "type": "db.get",
+      "x": 0,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "have we seen them?",
+      "params": {
+        "table": "seen",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "NEW",
+        "find": ""
+      }
+    },
+    {
+      "id": "isNew",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "first time?",
+      "params": {
+        "op": "=",
+        "b": "NEW",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "remember",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "record member",
+      "params": {
+        "table": "members",
+        "key": "{nick}",
+        "value": "{date}"
+      }
+    },
+    {
+      "id": "welcomeMsg",
+      "type": "data.format",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build welcome",
+      "params": {
+        "template": "Everyone welcome our newest member {a}!"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say welcome",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "membersCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 500,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!members",
+      "params": {
+        "prefix": "!",
+        "command": "members",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "count",
+      "type": "db.get",
+      "x": 286,
+      "y": 700,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count members",
+      "params": {
+        "table": "members",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "countMsg",
+      "type": "data.format",
+      "x": 286,
+      "y": 500,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build count reply",
+      "params": {
+        "template": "We have {a} members."
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 500,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply count",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "isNew",
+      "toPin": 0
+    },
+    {
+      "from": "seen",
+      "fromPin": 0,
+      "to": "isNew",
+      "toPin": 1
+    },
+    {
+      "from": "isNew",
+      "fromPin": 0,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "remember",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "welcomeMsg",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "welcomeMsg",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "membersCmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "count",
+      "fromPin": 1,
+      "to": "countMsg",
+      "toPin": 0
+    },
+    {
+      "from": "countMsg",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

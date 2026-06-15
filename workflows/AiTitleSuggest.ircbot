@@ -1,0 +1,104 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Topic Suggester",
+  "description": "Channel ops run !settopic <idea> and an AI turns the idea into a punchy under-80-character channel topic that is set automatically.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "topic",
+    "admin"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!settopic <idea>",
+      "params": {
+        "prefix": "!",
+        "command": "settopic",
+        "contexts": "ops"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Craft topic",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Turn the user idea into a punchy IRC channel topic under 80 chars, no quotes.",
+        "prompt": "",
+        "maxTokens": "60"
+      }
+    },
+    {
+      "id": "topic",
+      "type": "irc.topic",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Set channel topic",
+      "params": {
+        "channel": "{channel}",
+        "topic": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "ack",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Confirm",
+      "params": {
+        "message": "Topic updated.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "topic",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "topic",
+      "toPin": 1
+    },
+    {
+      "from": "topic",
+      "fromPin": 0,
+      "to": "ack",
+      "toPin": 0
+    }
+  ]
+}

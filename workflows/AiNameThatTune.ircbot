@@ -1,0 +1,229 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Lyric Guess",
+  "description": "Say !lyric and an AI picks a famous song and posts one line of its lyrics, then players use !guesstune <song> to check their answer against the stored title.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "game",
+    "music"
+  ],
+  "nodes": [
+    {
+      "id": "lyricCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!lyric",
+      "params": {
+        "prefix": "!",
+        "command": "lyric",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pick a song lyric",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You run a song-guessing game. Pick a well-known song and output ONLY a single line of its lyrics. Never include the title or artist.",
+        "prompt": "Pick a famous song. Output ONLY one line of its lyrics, no title.",
+        "maxTokens": "60"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store answer",
+      "params": {
+        "table": "tune",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "lyricFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build clue",
+      "params": {
+        "template": "Guess the song: {a}"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post clue",
+      "params": {
+        "channel": "",
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "guessCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!guesstune <song>",
+      "params": {
+        "prefix": "!",
+        "command": "guesstune",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "answer",
+      "type": "db.get",
+      "x": 286,
+      "y": 660,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stored answer",
+      "params": {
+        "table": "tune",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "logic.if",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess correct?",
+      "params": {
+        "op": "contains",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "rightRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct",
+      "params": {
+        "message": "Correct, {nick}! Nicely done. Say !lyric for another round.",
+        "server": ""
+      }
+    },
+    {
+      "id": "wrongRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 600,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wrong",
+      "params": {
+        "message": "Not quite, {nick}. Keep guessing!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "lyricCmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "lyricFmt",
+      "toPin": 0
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "lyricCmd",
+      "fromPin": 3,
+      "to": "say",
+      "toPin": 1
+    },
+    {
+      "from": "lyricFmt",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 2
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 1,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "answer",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 2
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "rightRep",
+      "toPin": 0
+    },
+    {
+      "from": "check",
+      "fromPin": 1,
+      "to": "wrongRep",
+      "toPin": 0
+    }
+  ]
+}

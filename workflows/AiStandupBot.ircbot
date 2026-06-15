@@ -1,0 +1,181 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Standup Collector",
+  "description": "Prompts the team for daily standups at 09:00, stores each !standup update by nick, and posts an AI-written digest of everyone's updates at 17:00.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "team",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "morning",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 09:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "09:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "promptSay",
+      "type": "action.say",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Ask for standups",
+      "params": {
+        "channel": "#team",
+        "message": "Standup time. Reply with !standup <your update>",
+        "server": ""
+      }
+    },
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 260,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!standup <update>",
+      "params": {
+        "prefix": "!",
+        "command": "standup",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 286,
+      "y": 260,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Save standup by nick",
+      "params": {
+        "table": "standup",
+        "key": "{nick}",
+        "value": ""
+      }
+    },
+    {
+      "id": "evening",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 17:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "17:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "fetch",
+      "type": "db.get",
+      "x": 286,
+      "y": 720,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Find all standups",
+      "params": {
+        "table": "standup",
+        "mode": "find",
+        "key": "",
+        "default": "",
+        "find": "*"
+      }
+    },
+    {
+      "id": "digest",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize standups",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize the team standups into a digest.",
+        "prompt": "",
+        "maxTokens": "500"
+      }
+    },
+    {
+      "id": "digestSay",
+      "type": "action.say",
+      "x": 858,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post digest",
+      "params": {
+        "channel": "#team",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "morning",
+      "fromPin": 0,
+      "to": "promptSay",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "evening",
+      "fromPin": 0,
+      "to": "digest",
+      "toPin": 0
+    },
+    {
+      "from": "fetch",
+      "fromPin": 0,
+      "to": "digest",
+      "toPin": 1
+    },
+    {
+      "from": "digest",
+      "fromPin": 0,
+      "to": "digestSay",
+      "toPin": 0
+    },
+    {
+      "from": "digest",
+      "fromPin": 1,
+      "to": "digestSay",
+      "toPin": 2
+    }
+  ]
+}

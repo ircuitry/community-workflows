@@ -1,0 +1,215 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Emoji Reaction Race",
+  "description": "Run !race in an ops context to pick a random target emoji, then the first person to type it within the round wins the reaction race.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "reaction",
+    "speed"
+  ],
+  "nodes": [
+    {
+      "id": "raceCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!race (ops)",
+      "params": {
+        "prefix": "!",
+        "command": "race",
+        "contexts": "ops"
+      }
+    },
+    {
+      "id": "pick",
+      "type": "data.random",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick target emoji",
+      "params": {
+        "options": "🔥\n🚀\n🎯\n⚡\n🍀\n🎉\n🌟\n👑"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store target",
+      "params": {
+        "table": "race",
+        "key": "{channel}",
+        "value": ""
+      }
+    },
+    {
+      "id": "delay",
+      "type": "flow.delay",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wait 3s",
+      "params": {
+        "seconds": "3"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce target",
+      "params": {
+        "channel": "{channel}",
+        "message": "React with {a} NOW!",
+        "server": ""
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "target",
+      "type": "db.get",
+      "x": 286,
+      "y": 640,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current target",
+      "params": {
+        "table": "race",
+        "mode": "value",
+        "key": "{channel}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "check",
+      "type": "filter.contains",
+      "x": 286,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "contains target?",
+      "params": {
+        "needle": "{message}",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "one winner per round",
+      "params": {
+        "seconds": "60",
+        "perUser": "false"
+      }
+    },
+    {
+      "id": "win",
+      "type": "action.reply",
+      "x": 858,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce winner",
+      "params": {
+        "message": "{nick} wins the race!",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "raceCmd",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "delay",
+      "toPin": 0
+    },
+    {
+      "from": "delay",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    },
+    {
+      "from": "raceCmd",
+      "fromPin": 3,
+      "to": "announce",
+      "toPin": 1
+    },
+    {
+      "from": "pick",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 2
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 0
+    },
+    {
+      "from": "target",
+      "fromPin": 0,
+      "to": "check",
+      "toPin": 1
+    },
+    {
+      "from": "check",
+      "fromPin": 0,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 0,
+      "to": "win",
+      "toPin": 0
+    }
+  ]
+}

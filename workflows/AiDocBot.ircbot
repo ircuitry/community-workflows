@@ -1,0 +1,129 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Doc Q&A",
+  "description": "Say !ask <question> and the bot fetches your project's FAQ.md, then answers strictly from those docs using AI.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "docs",
+    "support"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ask <question>",
+      "params": {
+        "prefix": "!",
+        "command": "ask",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch FAQ.md",
+      "params": {
+        "method": "GET",
+        "url": "https://raw.githubusercontent.com/myproject/docs/main/FAQ.md",
+        "headers": "User-Agent: ircuitry-bot",
+        "body": ""
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Docs + question",
+      "params": {
+        "template": "Docs:\n{a}\n\nQuestion: {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer from docs",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Answer ONLY from the provided docs. If not covered, say so.",
+        "prompt": "",
+        "maxTokens": "400"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Reply in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

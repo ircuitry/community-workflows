@@ -1,0 +1,139 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Sentiment Watch",
+  "description": "Watches human chat messages, has an AI classify each one's tone as TOXIC, HEATED, or OK, then nudges toxic users to stay civil and reacts to heated ones with a cool-down emoji.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "moderation",
+    "sentiment"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "isBot",
+      "type": "filter.isBot",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "humans only",
+      "params": {}
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Classify tone",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Classify the message tone. Output ONLY one word: TOXIC, HEATED, or OK.",
+        "prompt": "",
+        "maxTokens": "10"
+      }
+    },
+    {
+      "id": "sw",
+      "type": "logic.switch",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Route by tone",
+      "params": {
+        "case1": "TOXIC",
+        "case2": "HEATED",
+        "case3": "",
+        "case4": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "toxicRep",
+      "type": "action.reply",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Civility nudge",
+      "params": {
+        "message": "Let us keep it civil, {nick}.",
+        "server": ""
+      }
+    },
+    {
+      "id": "heatedReact",
+      "type": "action.react",
+      "x": 1144,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Cool down react",
+      "params": {
+        "emoji": "cool_down",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "isBot",
+      "toPin": 0
+    },
+    {
+      "from": "isBot",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "sw",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "sw",
+      "toPin": 1
+    },
+    {
+      "from": "sw",
+      "fromPin": 0,
+      "to": "toxicRep",
+      "toPin": 0
+    },
+    {
+      "from": "sw",
+      "fromPin": 1,
+      "to": "heatedReact",
+      "toPin": 0
+    }
+  ]
+}

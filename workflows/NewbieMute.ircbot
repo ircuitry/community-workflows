@@ -1,0 +1,129 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "New Account Throttle",
+  "description": "Rate-limit unregistered (logged-out) users by redacting and warning them when they send messages faster than once every 30 seconds.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "ircv3",
+    "spam"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "acct",
+      "type": "filter.fromAccount",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "logged in?",
+      "params": {
+        "account": ""
+      }
+    },
+    {
+      "id": "cool",
+      "type": "logic.cooldown",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "30s per unregistered user",
+      "params": {
+        "seconds": "30",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "tag",
+      "type": "data.gettag",
+      "x": 572,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "msgid tag",
+      "params": {
+        "name": "msgid"
+      }
+    },
+    {
+      "id": "redact",
+      "type": "action.redact",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "redact message",
+      "params": {
+        "target": "{channel}",
+        "msgid": "",
+        "reason": "rate limit",
+        "server": ""
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn user",
+      "params": {
+        "message": "Unregistered users: please slow down or log in.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "acct",
+      "toPin": 0
+    },
+    {
+      "from": "acct",
+      "fromPin": 1,
+      "to": "cool",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "cool",
+      "toPin": 1
+    },
+    {
+      "from": "cool",
+      "fromPin": 1,
+      "to": "redact",
+      "toPin": 0
+    },
+    {
+      "from": "tag",
+      "fromPin": 0,
+      "to": "redact",
+      "toPin": 2
+    },
+    {
+      "from": "redact",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    }
+  ]
+}

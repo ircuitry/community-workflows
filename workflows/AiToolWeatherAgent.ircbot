@@ -1,0 +1,177 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Weather Agent",
+  "description": "Say !agent <city> and an AI agent calls a get_weather tool that fetches live conditions from wttr.in, then answers in plain language.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "agent",
+    "tool"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!agent <city>",
+      "params": {
+        "prefix": "!",
+        "command": "agent",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Weather agent",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a helpful weather agent. When asked about the weather, call the get_weather tool with the requested city, then answer in one short, natural sentence.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "tool",
+      "type": "ai.tool",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "get_weather tool",
+      "params": {
+        "name": "get_weather",
+        "description": "Get the current weather conditions for a given city.",
+        "arg1name": "city",
+        "arg1desc": "The city to look up the weather for, e.g. London or Tokyo.",
+        "arg2name": "",
+        "arg2desc": "",
+        "arg3name": "",
+        "arg3desc": ""
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 572,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build wttr.in URL",
+      "params": {
+        "template": "https://wttr.in/{a}?format=3"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch wttr.in",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: curl/8.0",
+        "body": ""
+      }
+    },
+    {
+      "id": "toolreply",
+      "type": "tool.reply",
+      "x": 1144,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Return result to agent",
+      "params": {
+        "result": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer in channel",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "tool",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 2
+    },
+    {
+      "from": "tool",
+      "fromPin": 1,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "tool",
+      "fromPin": 2,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "toolreply",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "toolreply",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}
