@@ -1,0 +1,158 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Persona Chat",
+  "description": "Say !pirate <message> to chat with a witty pirate AI that remembers the conversation per channel using rolling memory.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "chat",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!pirate <msg>",
+      "params": {
+        "prefix": "!",
+        "command": "pirate",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "recall",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recall history",
+      "params": {
+        "session": "{channel}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "10"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build prompt",
+      "params": {
+        "template": "{a}\nUser: {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Pirate AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Reply as a witty pirate.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "remember",
+      "type": "ai.memory",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember user msg",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "user",
+        "text": "",
+        "max": "10"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "recall",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "reply",
+      "fromPin": 0,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 1
+    }
+  ]
+}

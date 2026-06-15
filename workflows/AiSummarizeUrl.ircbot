@@ -1,0 +1,110 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI URL Summary",
+  "description": "Say !sum <url> and the bot fetches that web page and replies with a two-sentence AI summary of its contents.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "web",
+    "summary"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!sum <url>",
+      "params": {
+        "prefix": "!",
+        "command": "sum",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch the page",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: curl/8.0",
+        "body": ""
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Summarize page",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Summarize this web page in 2 sentences.",
+        "prompt": "",
+        "maxTokens": "300"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Reply with summary",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

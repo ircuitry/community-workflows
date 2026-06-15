@@ -1,0 +1,141 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Ticket Router",
+  "description": "Say !ticket <text> and an AI classifies the request as BUG, BILLING, or OTHER, then routes a reply to the right support team.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "support",
+    "logic"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ticket <text>",
+      "params": {
+        "prefix": "!",
+        "command": "ticket",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Classify ticket",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a support ticket classifier. Reply with exactly one word: BUG, BILLING, or OTHER.",
+        "prompt": "",
+        "maxTokens": "10"
+      }
+    },
+    {
+      "id": "sw",
+      "type": "logic.switch",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Route by category",
+      "params": {
+        "case1": "BUG",
+        "case2": "BILLING",
+        "case3": "",
+        "case4": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "bugRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Bug team",
+      "params": {
+        "message": "🐞 Thanks {nick}, this looks like a BUG. Routing it to the engineering team."
+      }
+    },
+    {
+      "id": "billRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Billing team",
+      "params": {
+        "message": "💳 Thanks {nick}, this looks like a BILLING question. Routing it to the billing team."
+      }
+    },
+    {
+      "id": "otherRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "General team",
+      "params": {
+        "message": "📨 Thanks {nick}, your request has been logged and routed to our general support team."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "sw",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "sw",
+      "toPin": 1
+    },
+    {
+      "from": "sw",
+      "fromPin": 0,
+      "to": "bugRep",
+      "toPin": 0
+    },
+    {
+      "from": "sw",
+      "fromPin": 1,
+      "to": "billRep",
+      "toPin": 0
+    },
+    {
+      "from": "sw",
+      "fromPin": 4,
+      "to": "otherRep",
+      "toPin": 0
+    }
+  ]
+}

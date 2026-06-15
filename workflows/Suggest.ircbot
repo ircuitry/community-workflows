@@ -1,0 +1,159 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Suggestion Box",
+  "description": "Say !suggest <text> to drop an anonymous-friendly suggestion into a database, and !suggestions to see how many have been collected so far.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "suggestCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!suggest <text>",
+      "params": {
+        "prefix": "!",
+        "command": "suggest",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "entryFmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build entry",
+      "params": {
+        "template": "{nick}: {args}"
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save suggestion",
+      "params": {
+        "table": "suggestions",
+        "key": "{time}",
+        "value": ""
+      }
+    },
+    {
+      "id": "thanks",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say thanks",
+      "params": {
+        "message": "Thanks, {nick} - your suggestion has been noted!",
+        "server": ""
+      }
+    },
+    {
+      "id": "listCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!suggestions",
+      "params": {
+        "prefix": "!",
+        "command": "suggestions",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "countGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count suggestions",
+      "params": {
+        "table": "suggestions",
+        "mode": "count",
+        "key": "",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "countFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 520,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build count reply",
+      "params": {
+        "template": "{a} suggestions so far - keep them coming with !suggest <text>."
+      }
+    },
+    {
+      "id": "countRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "report count",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "suggestCmd",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "entryFmt",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 1
+    },
+    {
+      "from": "store",
+      "fromPin": 0,
+      "to": "thanks",
+      "toPin": 0
+    },
+    {
+      "from": "listCmd",
+      "fromPin": 0,
+      "to": "countRep",
+      "toPin": 0
+    },
+    {
+      "from": "countGet",
+      "fromPin": 1,
+      "to": "countFmt",
+      "toPin": 0
+    },
+    {
+      "from": "countFmt",
+      "fromPin": 0,
+      "to": "countRep",
+      "toPin": 1
+    }
+  ]
+}

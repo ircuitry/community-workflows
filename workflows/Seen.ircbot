@@ -3,6 +3,7 @@
   "name": "Seen",
   "description": "Tracks the last message every nick said and answers !seen <nick> with their most recent line.",
   "author": "ircuitry",
+  "category": "Community",
   "tags": [
     "utility",
     "db",

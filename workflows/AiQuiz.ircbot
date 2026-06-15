@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Quiz",
+  "description": "Say !quiz and an AI poses one trivia question, revealing the answer after a dash so the channel can play along.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "game",
+    "trivia"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!quiz",
+      "params": {
+        "prefix": "!",
+        "command": "quiz",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Quiz AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Ask one trivia question and reveal the answer after a dash.",
+        "prompt": "Give me a fresh trivia question now.",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post the quiz",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

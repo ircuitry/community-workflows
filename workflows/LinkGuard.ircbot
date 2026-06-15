@@ -1,0 +1,97 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Link Guard",
+  "description": "Watches every chat line and kicks anyone who posts a blacklisted domain (badsite.com or spam.link), then logs the action.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "safety"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "blacklisted domain?",
+      "params": {
+        "pattern": "(badsite\\.com|spam\\.link)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "kick offender",
+      "params": {
+        "channel": "{channel}",
+        "nick": "",
+        "reason": "no spam links",
+        "server": ""
+      }
+    },
+    {
+      "id": "log",
+      "type": "action.log",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log the kick",
+      "params": {
+        "text": "Link Guard kicked {nick} from {channel} for posting a blacklisted link."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 2,
+      "to": "kick",
+      "toPin": 1
+    },
+    {
+      "from": "kick",
+      "fromPin": 0,
+      "to": "log",
+      "toPin": 0
+    }
+  ]
+}

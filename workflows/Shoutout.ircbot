@@ -1,0 +1,72 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Shoutout",
+  "description": "Say !so <nick> and the bot posts a celebratory shoutout for that person in the channel.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!so <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "so",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build shoutout",
+      "params": {
+        "template": "🎉 Big shoutout to {a}! 🎉"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post shoutout",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

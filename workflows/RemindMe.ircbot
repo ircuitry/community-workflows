@@ -1,0 +1,85 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Remind Me",
+  "description": "Say !remindme <message> and the bot confirms, waits a short delay, then pings you back with your reminder.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "reminder"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!remindme <message>",
+      "params": {
+        "prefix": "!",
+        "command": "remindme",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ack",
+      "type": "action.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm",
+      "params": {
+        "message": "ok, reminding you soon",
+        "server": ""
+      }
+    },
+    {
+      "id": "wait",
+      "type": "flow.delay",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "wait 10s",
+      "params": {
+        "seconds": "10"
+      }
+    },
+    {
+      "id": "remind",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ping back",
+      "params": {
+        "message": "⏰ {nick}, reminder: {args}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ack",
+      "toPin": 0
+    },
+    {
+      "from": "ack",
+      "fromPin": 0,
+      "to": "wait",
+      "toPin": 0
+    },
+    {
+      "from": "wait",
+      "fromPin": 0,
+      "to": "remind",
+      "toPin": 0
+    }
+  ]
+}

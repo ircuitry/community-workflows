@@ -1,0 +1,67 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Mad Libs",
+  "description": "Say !madlib <noun> <verb> <place> and the bot drops your three words into a silly story template and replies with the finished sentence.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "fun",
+    "word"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!madlib <noun> <verb> <place>",
+      "params": {
+        "prefix": "!",
+        "command": "madlib",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "story",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build the story",
+      "params": {
+        "template": "📖 One day, a wild {arg1} decided to {arg2} all the way to {arg3}. Nobody at {arg3} has been the same since!"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "tell the story",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "story",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

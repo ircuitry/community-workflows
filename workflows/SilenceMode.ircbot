@@ -1,0 +1,123 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Silence Toggle",
+  "description": "Lets operators silence or reopen the channel with !mute and !unmute, which set channel mode +m and -m and then confirm the change in chat.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "admin"
+  ],
+  "nodes": [
+    {
+      "id": "muteCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!mute",
+      "params": {
+        "prefix": "!",
+        "command": "mute",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "muteMode",
+      "type": "irc.mode",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "set +m",
+      "params": {
+        "channel": "{channel}",
+        "modes": "+m",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "muteRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm mute",
+      "params": {
+        "message": "🔇 Channel muted (+m) by {nick}. Only voiced and op users can speak.",
+        "server": ""
+      }
+    },
+    {
+      "id": "unmuteCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!unmute",
+      "params": {
+        "prefix": "!",
+        "command": "unmute",
+        "contexts": "public"
+      }
+    },
+    {
+      "id": "unmuteMode",
+      "type": "irc.mode",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "set -m",
+      "params": {
+        "channel": "{channel}",
+        "modes": "-m",
+        "target": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "unmuteRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm unmute",
+      "params": {
+        "message": "🔊 Channel unmuted (-m) by {nick}. Everyone can speak again.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "muteCmd",
+      "fromPin": 0,
+      "to": "muteMode",
+      "toPin": 0
+    },
+    {
+      "from": "muteMode",
+      "fromPin": 0,
+      "to": "muteRep",
+      "toPin": 0
+    },
+    {
+      "from": "unmuteCmd",
+      "fromPin": 0,
+      "to": "unmuteMode",
+      "toPin": 0
+    },
+    {
+      "from": "unmuteMode",
+      "fromPin": 0,
+      "to": "unmuteRep",
+      "toPin": 0
+    }
+  ]
+}

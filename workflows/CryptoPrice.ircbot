@@ -3,6 +3,7 @@
   "name": "Crypto Price",
   "description": "Use !price <coin> to fetch a cryptocurrency's current USD price from the CoinGecko API (the example reply parses bitcoin.usd; CoinGecko coin ids like ethereum or dogecoin also work).",
   "author": "ircuitry",
+  "category": "Utility",
   "tags": [
     "utility",
     "web",

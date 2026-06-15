@@ -3,6 +3,7 @@
   "name": "AI Weather (tool use)",
   "description": "Say !weather <city> and an AI assistant calls a get_weather tool that fetches live conditions from wttr.in, then answers in plain language.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "weather",

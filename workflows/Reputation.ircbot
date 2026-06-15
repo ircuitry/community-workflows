@@ -1,0 +1,243 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Reputation",
+  "description": "Say \"thanks <nick>\" in chat to award that person a reputation point, and use !rep <nick> to look up anyone's current reputation score.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "thankRegex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "thanks <nick>",
+      "params": {
+        "pattern": "thank(s| you) (\\w+)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "repGet",
+      "type": "db.get",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current rep",
+      "params": {
+        "table": "rep",
+        "mode": "value",
+        "key": "{2}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "repInc",
+      "type": "data.math",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "repSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save rep",
+      "params": {
+        "table": "rep",
+        "key": "{2}",
+        "value": ""
+      }
+    },
+    {
+      "id": "thankFmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build confirm",
+      "params": {
+        "template": "Reputation +1 for {b} (now at {a})."
+      }
+    },
+    {
+      "id": "thankRep",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm thanks",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "repCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!rep <nick>",
+      "params": {
+        "prefix": "!",
+        "command": "rep",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "lookupGet",
+      "type": "db.get",
+      "x": 286,
+      "y": 720,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "look up rep",
+      "params": {
+        "table": "rep",
+        "mode": "value",
+        "key": "{args}",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "lookupFmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "{b} has {a} reputation."
+      }
+    },
+    {
+      "id": "lookupRep",
+      "type": "action.reply",
+      "x": 858,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "thankRegex",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "thankRegex",
+      "toPin": 1
+    },
+    {
+      "from": "thankRegex",
+      "fromPin": 0,
+      "to": "repSet",
+      "toPin": 0
+    },
+    {
+      "from": "repGet",
+      "fromPin": 0,
+      "to": "repInc",
+      "toPin": 0
+    },
+    {
+      "from": "repInc",
+      "fromPin": 0,
+      "to": "repSet",
+      "toPin": 1
+    },
+    {
+      "from": "repSet",
+      "fromPin": 0,
+      "to": "thankRep",
+      "toPin": 0
+    },
+    {
+      "from": "thankRegex",
+      "fromPin": 3,
+      "to": "thankFmt",
+      "toPin": 1
+    },
+    {
+      "from": "repInc",
+      "fromPin": 0,
+      "to": "thankFmt",
+      "toPin": 0
+    },
+    {
+      "from": "thankFmt",
+      "fromPin": 0,
+      "to": "thankRep",
+      "toPin": 1
+    },
+    {
+      "from": "repCmd",
+      "fromPin": 0,
+      "to": "lookupRep",
+      "toPin": 0
+    },
+    {
+      "from": "lookupGet",
+      "fromPin": 0,
+      "to": "lookupFmt",
+      "toPin": 0
+    },
+    {
+      "from": "repCmd",
+      "fromPin": 1,
+      "to": "lookupFmt",
+      "toPin": 1
+    },
+    {
+      "from": "lookupFmt",
+      "fromPin": 0,
+      "to": "lookupRep",
+      "toPin": 1
+    }
+  ]
+}

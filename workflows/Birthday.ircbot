@@ -1,0 +1,128 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Birthday Bot",
+  "description": "Say !birthday MM-DD to save your birthday, and every morning at 08:00 the bot posts a friendly reminder to check who is celebrating today.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "db",
+    "schedule"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!birthday MM-DD",
+      "params": {
+        "prefix": "!",
+        "command": "birthday",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "save",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store birthday",
+      "params": {
+        "table": "birthdays",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "ack",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "noted!",
+      "params": {
+        "message": "Noted, {nick}! I've saved your birthday as {args}. 🎂",
+        "server": ""
+      }
+    },
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "daily 08:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "08:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "today",
+      "type": "db.get",
+      "x": 286,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "match today's date",
+      "params": {
+        "table": "birthdays",
+        "mode": "find",
+        "key": "",
+        "default": "",
+        "find": "{date}"
+      }
+    },
+    {
+      "id": "announce",
+      "type": "action.say",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "morning announce",
+      "params": {
+        "channel": "",
+        "message": "🎉 Good morning! Any birthdays today? Type !birthday MM-DD to add yours.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "save",
+      "toPin": 1
+    },
+    {
+      "from": "save",
+      "fromPin": 0,
+      "to": "ack",
+      "toPin": 0
+    },
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "announce",
+      "toPin": 0
+    }
+  ]
+}

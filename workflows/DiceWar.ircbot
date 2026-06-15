@@ -1,0 +1,161 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Dice War",
+  "description": "Type !war to roll a six-sided die against the bot; it shows your roll versus the bot's roll and tells you whether you won or lost.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "dice"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!war",
+      "params": {
+        "prefix": "!",
+        "command": "war",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rollA",
+      "type": "data.randnum",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "your roll",
+      "params": {
+        "min": "1",
+        "max": "6"
+      }
+    },
+    {
+      "id": "rollB",
+      "type": "data.randnum",
+      "x": 0,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "bot roll",
+      "params": {
+        "min": "1",
+        "max": "6"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "you {a} vs bot {b}",
+      "params": {
+        "template": "you rolled {a} vs bot {b}"
+      }
+    },
+    {
+      "id": "cmp",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "a > b?",
+      "params": {
+        "op": ">",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "winRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "win",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "loseRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lose",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 0
+    },
+    {
+      "from": "rollA",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 1
+    },
+    {
+      "from": "rollB",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 2
+    },
+    {
+      "from": "rollA",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "rollB",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "cmp",
+      "fromPin": 0,
+      "to": "winRep",
+      "toPin": 0
+    },
+    {
+      "from": "cmp",
+      "fromPin": 1,
+      "to": "loseRep",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "winRep",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "loseRep",
+      "toPin": 1
+    }
+  ]
+}

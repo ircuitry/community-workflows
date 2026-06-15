@@ -1,0 +1,79 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Rock Paper Scissors",
+  "description": "Play rock paper scissors against the bot with !rps rock|paper|scissors, and it reports whether you win, lose, or tie.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!rps rock|paper|scissors",
+      "params": {
+        "prefix": "!",
+        "command": "rps",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "play",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "decide winner",
+      "params": {
+        "language": "javascript",
+        "code": "var choices=['rock','paper','scissors'];\nvar player=(input||'').trim().toLowerCase();\nvar emoji={rock:'\\u270a',paper:'\\u270b',scissors:'\\u270c\\ufe0f'};\nif(choices.indexOf(player)===-1){print('Pick one: !rps rock | paper | scissors');return;}\nvar bot=choices[Math.floor(Math.random()*3)];\nvar beats={rock:'scissors',paper:'rock',scissors:'paper'};\nvar result;\nif(player===bot){result='Tie!';}\nelse if(beats[player]===bot){result='You win!';}\nelse{result='I win!';}\nprint('You '+emoji[player]+' '+player+' vs me '+emoji[bot]+' '+bot+' \\u2014 '+result);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce result",
+      "params": {
+        "message": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "play",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "play",
+      "toPin": 1
+    },
+    {
+      "from": "play",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "play",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

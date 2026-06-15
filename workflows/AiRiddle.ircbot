@@ -3,6 +3,7 @@
   "name": "AI Hourly Riddle",
   "description": "Every hour an AI poses a short riddle (with no answer) to #general for everyone to puzzle over.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "fun",

@@ -3,6 +3,7 @@
   "name": "Auto-Op Trusted",
   "description": "Automatically grants channel operator (+o) status to users on your trusted list the moment they join the channel.",
   "author": "ircuitry",
+  "category": "Moderation",
   "tags": [
     "moderation",
     "db",

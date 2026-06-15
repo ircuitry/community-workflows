@@ -3,6 +3,7 @@
   "name": "AI Chat with Memory",
   "description": "!chat <message> talks to an AI that remembers the conversation per channel, recalling prior turns for context and storing each new exchange.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "chat",

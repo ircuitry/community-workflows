@@ -1,0 +1,84 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Tarot Draw",
+  "description": "Say !tarot to draw a single random tarot card with a short upright meaning, delivered straight to the channel.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!tarot",
+      "params": {
+        "prefix": "!",
+        "command": "tarot",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "draw",
+      "type": "data.random",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "draw a card",
+      "params": {
+        "options": "🃏 The Sun - success, joy, and warmth ahead.\n🃏 The Moon - trust your intuition through the fog.\n🃏 The Star - hope and renewal are on the way.\n🃏 The Tower - sudden change clears the old.\n🃏 The Fool - take a leap; a fresh start beckons.\n🃏 The Magician - you have all the tools you need.\n🃏 The Lovers - a meaningful choice or connection.\n🃏 The Hermit - step back and seek inner wisdom.\n🃏 Wheel of Fortune - luck is turning in your favor.\n🃏 Strength - quiet courage will carry you through.\n🃏 The Empress - abundance and creativity bloom.\n🃏 Death - an ending makes room for new growth.\n🃏 Temperance - balance and patience win the day.\n🃏 The World - a cycle completes; well done."
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "frame the draw",
+      "params": {
+        "template": "{nick} draws: {a}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reveal the card",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "draw",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

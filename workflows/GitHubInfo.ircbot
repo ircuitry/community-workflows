@@ -1,0 +1,136 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "GitHub Repo",
+  "description": "Say !gh owner/repo and the bot fetches the repository from the GitHub API and replies with its current star count.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "utility",
+    "web",
+    "dev"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!gh owner/repo",
+      "params": {
+        "prefix": "!",
+        "command": "gh",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build API url",
+      "params": {
+        "template": "https://api.github.com/repos/{a}"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "GitHub API",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: ircuitry",
+        "body": ""
+      }
+    },
+    {
+      "id": "stars",
+      "type": "data.json",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "stargazers_count",
+      "params": {
+        "path": "stargazers_count"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "⭐ {a} stars"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "stars",
+      "toPin": 0
+    },
+    {
+      "from": "stars",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

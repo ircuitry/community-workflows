@@ -1,0 +1,205 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Number Guess",
+  "description": "Play a number guessing game: type !guess <n> with a number from 1 to 100 and the bot replies higher, lower, or correct, picking a fresh random target each time someone wins.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "guessCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!guess <n>",
+      "params": {
+        "prefix": "!",
+        "command": "guess",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "targetGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current target",
+      "params": {
+        "table": "game",
+        "mode": "value",
+        "key": "target",
+        "default": "50",
+        "find": ""
+      }
+    },
+    {
+      "id": "ifEqual",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess = target?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "ifGreater",
+      "type": "logic.if",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess > target?",
+      "params": {
+        "op": ">",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "correctReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct",
+      "params": {
+        "message": "🎉 Correct, {nick}! The number was {args}. A new secret number (1-100) has been chosen.",
+        "server": ""
+      }
+    },
+    {
+      "id": "newTarget",
+      "type": "data.randnum",
+      "x": 858,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "pick new target",
+      "params": {
+        "min": "1",
+        "max": "100"
+      }
+    },
+    {
+      "id": "targetSet",
+      "type": "db.set",
+      "x": 1144,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "store new target",
+      "params": {
+        "table": "game",
+        "key": "target",
+        "value": ""
+      }
+    },
+    {
+      "id": "lowerReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "too high -> lower",
+      "params": {
+        "message": "📉 Too high, {nick}. Try a lower number.",
+        "server": ""
+      }
+    },
+    {
+      "id": "higherReply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "too low -> higher",
+      "params": {
+        "message": "📈 Too low, {nick}. Try a higher number.",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "guessCmd",
+      "fromPin": 0,
+      "to": "ifEqual",
+      "toPin": 0
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 1,
+      "to": "ifEqual",
+      "toPin": 1
+    },
+    {
+      "from": "targetGet",
+      "fromPin": 0,
+      "to": "ifEqual",
+      "toPin": 2
+    },
+    {
+      "from": "ifEqual",
+      "fromPin": 0,
+      "to": "correctReply",
+      "toPin": 0
+    },
+    {
+      "from": "correctReply",
+      "fromPin": 0,
+      "to": "targetSet",
+      "toPin": 0
+    },
+    {
+      "from": "newTarget",
+      "fromPin": 0,
+      "to": "targetSet",
+      "toPin": 1
+    },
+    {
+      "from": "ifEqual",
+      "fromPin": 1,
+      "to": "ifGreater",
+      "toPin": 0
+    },
+    {
+      "from": "guessCmd",
+      "fromPin": 1,
+      "to": "ifGreater",
+      "toPin": 1
+    },
+    {
+      "from": "targetGet",
+      "fromPin": 0,
+      "to": "ifGreater",
+      "toPin": 2
+    },
+    {
+      "from": "ifGreater",
+      "fromPin": 0,
+      "to": "lowerReply",
+      "toPin": 0
+    },
+    {
+      "from": "ifGreater",
+      "fromPin": 1,
+      "to": "higherReply",
+      "toPin": 0
+    }
+  ]
+}

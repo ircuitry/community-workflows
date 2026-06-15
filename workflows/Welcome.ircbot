@@ -3,6 +3,7 @@
   "name": "Welcome + Rules",
   "description": "Greets everyone who joins the channel and shows the channel rules from a rules.txt file (or a friendly note if none is set).",
   "author": "ircuitry",
+  "category": "Community",
   "tags": [
     "community",
     "onboarding",

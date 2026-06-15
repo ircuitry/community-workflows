@@ -1,0 +1,178 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Search (tool use)",
+  "description": "Say !ask2 <question> and an AI assistant calls a search tool that queries the DuckDuckGo instant-answer API, then replies with a grounded answer.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "tools",
+    "web"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ask2 <question>",
+      "params": {
+        "prefix": "!",
+        "command": "ask2",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Search AI",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "You are a helpful research assistant. When a question needs current or factual information, use the search tool to look it up, then answer in one or two short, natural sentences. If the search returns nothing useful, answer from your own knowledge and say you are not certain.",
+        "prompt": "",
+        "maxTokens": "400"
+      }
+    },
+    {
+      "id": "tool",
+      "type": "ai.tool",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "search tool",
+      "params": {
+        "name": "search",
+        "description": "Search the web for current or factual information and return a JSON result.",
+        "arg1name": "query",
+        "arg1desc": "The search query, e.g. 'capital of Australia' or 'who wrote Dune'.",
+        "arg2name": "",
+        "arg2desc": "",
+        "arg3name": "",
+        "arg3desc": ""
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 572,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build DuckDuckGo URL",
+      "params": {
+        "template": "https://api.duckduckgo.com/?q={a}&format=json&no_html=1"
+      }
+    },
+    {
+      "id": "http",
+      "type": "net.http",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Fetch DuckDuckGo",
+      "params": {
+        "method": "GET",
+        "url": "",
+        "headers": "User-Agent: ircuitry-bot",
+        "body": ""
+      }
+    },
+    {
+      "id": "toolreply",
+      "type": "tool.reply",
+      "x": 1144,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Return result to AI",
+      "params": {
+        "result": ""
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Answer in channel",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "tool",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 2
+    },
+    {
+      "from": "tool",
+      "fromPin": 1,
+      "to": "http",
+      "toPin": 0
+    },
+    {
+      "from": "tool",
+      "fromPin": 2,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "http",
+      "toPin": 1
+    },
+    {
+      "from": "http",
+      "fromPin": 0,
+      "to": "toolreply",
+      "toPin": 0
+    },
+    {
+      "from": "http",
+      "fromPin": 1,
+      "to": "toolreply",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

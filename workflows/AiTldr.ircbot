@@ -3,6 +3,7 @@
   "name": "AI TL;DR",
   "description": "Type !tldr followed by a wall of text and the bot replies with a single-sentence AI summary.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "summary",

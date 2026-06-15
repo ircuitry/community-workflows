@@ -3,6 +3,7 @@
   "name": "Poll",
   "description": "Run a simple channel poll: !vote <option> tallies a vote into a per-option counter and !results lists every option with its current vote count.",
   "author": "ircuitry",
+  "category": "Community",
   "tags": [
     "utility",
     "db",

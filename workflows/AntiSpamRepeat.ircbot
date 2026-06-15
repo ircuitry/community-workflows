@@ -1,0 +1,120 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Anti-Repeat",
+  "description": "Warns a user who sends the exact same message twice in a row, then remembers each person's last line so it can catch the next repeat.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "spam"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "lastGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "this nick's last line",
+      "params": {
+        "table": "lastmsg",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "sameIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "same as last?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "warn",
+      "type": "action.reply",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "warn repeater",
+      "params": {
+        "message": "stop repeating, {nick}",
+        "server": ""
+      }
+    },
+    {
+      "id": "store",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember last line",
+      "params": {
+        "table": "lastmsg",
+        "key": "{nick}",
+        "value": "{message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "sameIf",
+      "toPin": 0
+    },
+    {
+      "from": "lastGet",
+      "fromPin": 0,
+      "to": "sameIf",
+      "toPin": 1
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "sameIf",
+      "toPin": 2
+    },
+    {
+      "from": "sameIf",
+      "fromPin": 0,
+      "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "warn",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
+    },
+    {
+      "from": "sameIf",
+      "fromPin": 1,
+      "to": "store",
+      "toPin": 0
+    }
+  ]
+}

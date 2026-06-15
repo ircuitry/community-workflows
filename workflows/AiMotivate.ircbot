@@ -1,0 +1,82 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Daily Motivation",
+  "description": "Every day at 09:00 an AI writes a fresh one-line pep talk and posts it to #general.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "schedule",
+    "wellbeing"
+  ],
+  "nodes": [
+    {
+      "id": "sched",
+      "type": "event.schedule",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Daily 09:00",
+      "params": {
+        "mode": "daily",
+        "every": "1",
+        "unit": "days",
+        "time": "09:00",
+        "days": "",
+        "datetime": ""
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Write pep talk",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Give a one-line motivational message.",
+        "prompt": "Write today's short motivational message for the channel.",
+        "maxTokens": "120"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Post to #general",
+      "params": {
+        "channel": "#general",
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "sched",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "say",
+      "toPin": 2
+    }
+  ]
+}

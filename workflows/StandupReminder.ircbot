@@ -3,6 +3,7 @@
   "name": "Standup Reminder",
   "description": "Pings #team every weekday at 09:00 to remind everyone to drop their daily standup updates.",
   "author": "ircuitry",
+  "category": "Reminders",
   "tags": [
     "team",
     "reminder",

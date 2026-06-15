@@ -3,6 +3,7 @@
   "name": "AI Auto-Moderator",
   "description": "Classifies every channel message with an AI model and gently warns the sender when their message is flagged as toxic, without auto-kicking anyone.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "moderation",

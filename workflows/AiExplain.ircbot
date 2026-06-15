@@ -3,6 +3,7 @@
   "name": "AI Explain",
   "description": "Type !explain <thing> and the bot gives a short, plain-English explanation of it.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "help",

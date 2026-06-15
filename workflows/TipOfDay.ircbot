@@ -3,6 +3,7 @@
   "name": "Tip of the Day",
   "description": "Every day at 10:00 it reads tips.txt and posts one random tip line to #general.",
   "author": "ircuitry",
+  "category": "Reminders",
   "tags": [
     "fun",
     "schedule",

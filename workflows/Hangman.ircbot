@@ -3,6 +3,7 @@
   "name": "Hangman",
   "description": "Play hangman in your channel. Guess letters to reveal the word before the tries run out.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "word",

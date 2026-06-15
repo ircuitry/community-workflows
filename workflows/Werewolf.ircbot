@@ -3,6 +3,7 @@
   "name": "Werewolf",
   "description": "A social-deduction party game for your channel: villagers hunt the hidden wolves at night.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "social",

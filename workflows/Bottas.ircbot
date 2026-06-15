@@ -3,6 +3,7 @@
   "name": "Bottas",
   "description": "Formula 1 race-weekend reminder. Reads an iCal feed and announces each session about an hour before it starts.",
   "author": "ircuitry",
+  "category": "Reminders",
   "tags": [
     "reminder",
     "calendar",

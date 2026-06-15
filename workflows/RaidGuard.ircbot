@@ -1,0 +1,139 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Raid Guard",
+  "description": "Counts channel joins in the database and, when a burst pushes the count above five, sets the channel to moderated (+m) to ride out the raid.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "join"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "someone joins",
+      "params": {}
+    },
+    {
+      "id": "getCount",
+      "type": "db.get",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "join count",
+      "params": {
+        "table": "joins",
+        "mode": "value",
+        "key": "count",
+        "default": "0",
+        "find": ""
+      }
+    },
+    {
+      "id": "incCount",
+      "type": "data.math",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "+1",
+      "params": {
+        "op": "+",
+        "a": "0",
+        "b": "1"
+      }
+    },
+    {
+      "id": "setCount",
+      "type": "db.set",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save count",
+      "params": {
+        "table": "joins",
+        "key": "count",
+        "value": ""
+      }
+    },
+    {
+      "id": "burstIf",
+      "type": "logic.if",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "raid? (>5)",
+      "params": {
+        "op": ">",
+        "b": "5",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "lock",
+      "type": "irc.mode",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lock channel +m",
+      "params": {
+        "channel": "",
+        "modes": "+m",
+        "target": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "setCount",
+      "toPin": 0
+    },
+    {
+      "from": "getCount",
+      "fromPin": 0,
+      "to": "incCount",
+      "toPin": 0
+    },
+    {
+      "from": "incCount",
+      "fromPin": 0,
+      "to": "setCount",
+      "toPin": 1
+    },
+    {
+      "from": "setCount",
+      "fromPin": 0,
+      "to": "burstIf",
+      "toPin": 0
+    },
+    {
+      "from": "incCount",
+      "fromPin": 0,
+      "to": "burstIf",
+      "toPin": 1
+    },
+    {
+      "from": "burstIf",
+      "fromPin": 0,
+      "to": "lock",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 2,
+      "to": "lock",
+      "toPin": 1
+    }
+  ]
+}

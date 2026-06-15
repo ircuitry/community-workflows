@@ -55,11 +55,18 @@ def validate(f, m, errors):
             fail(errors, f, f"must not contain connection/secret key '{k}'")
 
 
+CATEGORIES = {"AI", "Games", "Moderation", "Community", "Utility", "Reminders"}
+
+
 def entry(f, m):
+    cat = m.get("category", "")
+    if cat not in CATEGORIES:
+        cat = "Utility"
     return {
         "name": m.get("name", f[:-7]),
         "description": m.get("description", ""),
         "author": m.get("author", "ircuitry"),
+        "category": cat,
         "tags": m.get("tags", []),
         "nodeCount": len(m.get("nodes", [])),
         "connectionCount": len(m.get("connections", [])),

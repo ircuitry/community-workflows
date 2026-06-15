@@ -1,0 +1,92 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Flood Control",
+  "description": "Rate-limit a noisy command per user with a 5-second cooldown, replying normally when ready and asking spammers to slow down while they wait.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "ratelimit"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!spammy",
+      "params": {
+        "prefix": "!",
+        "command": "spammy",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cooldown",
+      "type": "logic.cooldown",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "5s per user",
+      "params": {
+        "seconds": "5",
+        "perUser": "true"
+      }
+    },
+    {
+      "id": "okReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ready",
+      "params": {
+        "message": "ok!",
+        "server": ""
+      }
+    },
+    {
+      "id": "slowReply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on cooldown",
+      "params": {
+        "message": "slow down, {nick}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cooldown",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "cooldown",
+      "toPin": 1
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 0,
+      "to": "okReply",
+      "toPin": 0
+    },
+    {
+      "from": "cooldown",
+      "fromPin": 1,
+      "to": "slowReply",
+      "toPin": 0
+    }
+  ]
+}

@@ -3,6 +3,7 @@
   "name": "Choose",
   "description": "Picks one option at random from a pipe-separated list, e.g. !choose pizza | tacos | sushi.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "fun",
     "utility"

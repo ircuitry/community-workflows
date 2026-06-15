@@ -3,6 +3,7 @@
   "name": "RSS Headlines",
   "description": "Every 30 minutes it fetches an RSS feed, extracts the latest headline title, and posts it to #news.",
   "author": "ircuitry",
+  "category": "Reminders",
   "tags": [
     "news",
     "web",

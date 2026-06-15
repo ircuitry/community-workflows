@@ -1,0 +1,97 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Caps Guard",
+  "description": "Watches chat and politely warns anyone whose message is mostly UPPERCASE (over 60% caps and longer than 8 characters) that there is no need to shout.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation"
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "detect shouting",
+      "params": {
+        "language": "javascript",
+        "code": "const msg = (typeof INPUT !== 'undefined' ? INPUT : '').toString();\nconst letters = msg.replace(/[^A-Za-z]/g, '');\nconst uppers = msg.replace(/[^A-Z]/g, '');\nconst ratio = letters.length ? uppers.length / letters.length : 0;\nif (msg.length > 8 && ratio > 0.6) {\n  print('SHOUT');\n} else {\n  print('');\n}",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "if",
+      "type": "logic.if",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is it a shout?",
+      "params": {
+        "op": "=",
+        "b": "SHOUT",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "gentle warning",
+      "params": {
+        "message": "no need to shout, {nick}",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 1,
+      "to": "code",
+      "toPin": 1
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "if",
+      "toPin": 1
+    },
+    {
+      "from": "if",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Slot Machine",
+  "description": "Say !slots to spin a three-reel fruit slot machine that prints your reels and tells you when all three match for a jackpot.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!slots",
+      "params": {
+        "prefix": "!",
+        "command": "slots",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "spin",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "spin reels",
+      "params": {
+        "language": "javascript",
+        "code": "const fruits=['🍒','🍋','🍊','🍇','🍉','🔔','⭐','7️⃣'];\nconst r=()=>fruits[Math.floor(Math.random()*fruits.length)];\nconst a=r(),b=r(),c=r();\nlet line='[ '+a+' | '+b+' | '+c+' ]';\nif(a===b&&b===c){line+='  🎉 JACKPOT! Three '+a+' in a row!';}else if(a===b||b===c||a===c){line+='  ✨ Two of a kind, so close!';}else{line+='  💀 No match, spin again!';}\nprint(line);",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "show result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "spin",
+      "toPin": 0
+    },
+    {
+      "from": "spin",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "spin",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

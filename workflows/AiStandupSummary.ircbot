@@ -3,6 +3,7 @@
   "name": "AI Standup Summary",
   "description": "Every day at 09:30 it pulls today's standup notes from the database, asks an AI to summarize them, and posts the digest to #team.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "team",

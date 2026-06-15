@@ -3,6 +3,7 @@
   "name": "Connect Greeter",
   "description": "On connect, sets the #general topic and announces that the bot is online so users know to type !help.",
   "author": "ircuitry",
+  "category": "Reminders",
   "tags": [
     "utility",
     "startup",

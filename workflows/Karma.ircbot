@@ -3,6 +3,7 @@
   "name": "Karma",
   "description": "Track word karma: say word++ or word-- in chat to adjust a counter, and use !karma <word> to look up its current score.",
   "author": "ircuitry",
+  "category": "Community",
   "tags": [
     "fun",
     "db",

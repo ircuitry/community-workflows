@@ -1,0 +1,77 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Nick Guard",
+  "description": "When someone joins a channel, kick them if their nick matches a disallowed pattern (spam or bot followed by digits).",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "moderation",
+    "join"
+  ],
+  "nodes": [
+    {
+      "id": "join",
+      "type": "event.join",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on join",
+      "params": {}
+    },
+    {
+      "id": "regex",
+      "type": "logic.regex",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "disallowed nick?",
+      "params": {
+        "pattern": "(spam|bot[0-9]+)",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "kick",
+      "type": "irc.kick",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "kick offender",
+      "params": {
+        "channel": "{channel}",
+        "nick": "",
+        "reason": "nick not allowed",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "join",
+      "fromPin": 0,
+      "to": "regex",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "kick",
+      "toPin": 0
+    },
+    {
+      "from": "join",
+      "fromPin": 1,
+      "to": "kick",
+      "toPin": 1
+    }
+  ]
+}

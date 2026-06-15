@@ -3,6 +3,7 @@
   "name": "Dictionary",
   "description": "Look up the definition of any word with !define <word>, fetched live from the free dictionaryapi.dev API.",
   "author": "ircuitry",
+  "category": "Utility",
   "tags": [
     "utility",
     "web",

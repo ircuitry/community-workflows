@@ -3,6 +3,7 @@
   "name": "AI Mood Reactions",
   "description": "Reads every channel message, asks an AI for a single emoji matching its mood, and reacts to the message with that emoji using IRCv3 reactions.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "ircv3",

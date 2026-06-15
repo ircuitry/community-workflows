@@ -3,6 +3,7 @@
   "name": "Russian Roulette",
   "description": "A game of !roulette. Pull the trigger and hope the chamber is empty.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "fun"

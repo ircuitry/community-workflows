@@ -3,6 +3,7 @@
   "name": "Magic 8-Ball",
   "description": "Ask the Magic 8-Ball a yes-or-no question with !8ball <question> and it replies with a random fortune.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "fun",
     "game"

@@ -3,6 +3,7 @@
   "name": "DuckHunt",
   "description": "The classic IRC duck hunt game. Ducks appear in the channel; be first to !bang or !befriend them to score.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "fun"

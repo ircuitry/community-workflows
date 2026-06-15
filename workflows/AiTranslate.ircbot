@@ -3,6 +3,7 @@
   "name": "AI Translator",
   "description": "Type !tr <text> and the bot replies with an English translation of whatever you wrote.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "translate",

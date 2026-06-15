@@ -3,6 +3,7 @@
   "name": "Dice Roller",
   "description": "Roll dice with !roll NdM (e.g. !roll 2d6) and the bot replies with each die and the total.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "fun",

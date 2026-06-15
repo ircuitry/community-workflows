@@ -1,0 +1,98 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Hash Text",
+  "description": "Say !sha256 <text> and the bot replies with the SHA-256 hex digest of that text, computed in a sandboxed code.run node.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "utility",
+    "dev"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!sha256 <text>",
+      "params": {
+        "prefix": "!",
+        "command": "sha256",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "hash",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "sha256 hex",
+      "params": {
+        "language": "javascript",
+        "code": "const crypto = require('crypto');\nconst text = (input || '').trim();\nif (!text) { print('Usage: !sha256 <text>'); }\nelse { print(crypto.createHash('sha256').update(text).digest('hex')); }",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "sha256: {a}"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply digest",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "hash",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "hash",
+      "toPin": 1
+    },
+    {
+      "from": "hash",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "hash",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

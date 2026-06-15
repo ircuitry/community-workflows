@@ -3,6 +3,7 @@
   "name": "Tell (offline messages)",
   "description": "Use !tell <nick> <message> to leave an offline note that gets delivered to that person the next time they speak in the channel.",
   "author": "ircuitry",
+  "category": "Community",
   "tags": [
     "utility",
     "db",

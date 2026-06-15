@@ -1,0 +1,74 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Anagram Scramble",
+  "description": "Say !anagram and the bot picks a random word, scrambles its letters, and posts the jumble along with a hint for players to unscramble.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "word"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!anagram",
+      "params": {
+        "prefix": "!",
+        "command": "anagram",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "code",
+      "type": "code.run",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "scramble a word",
+      "params": {
+        "language": "javascript",
+        "code": "const words=[['melon','a juicy fruit'],['planet','orbits a star'],['guitar','a stringed instrument'],['castle','a royal stronghold'],['river','flowing water'],['dragon','a mythical beast'],['rocket','blasts into space'],['forest','full of trees'],['island','land in the sea'],['coffee','a morning drink']];const pick=words[Math.floor(Math.random()*words.length)];const word=pick[0];const hint=pick[1];let s=word.split('');for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]];}let scrambled=s.join('');if(scrambled===word){scrambled=word.split('').reverse().join('');}print('\\u{1F500} Unscramble this: '+scrambled.toUpperCase()+'  (hint: '+hint+')');",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post the puzzle",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "code",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "code",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

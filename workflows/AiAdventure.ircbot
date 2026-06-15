@@ -3,6 +3,7 @@
   "name": "AI Text Adventure",
   "description": "Play a continuing text adventure with !go <action>; an AI dungeon master remembers your story per channel using ai.memory so it persists across turns.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "game",

@@ -1,0 +1,158 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AI Story Builder",
+  "description": "Say !add <sentence> and an AI continues a shared, collaboratively-written story one sentence at a time, remembering everything that came before.",
+  "author": "ircuitry",
+  "category": "AI",
+  "tags": [
+    "ai",
+    "collab",
+    "memory"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!add <sentence>",
+      "params": {
+        "prefix": "!",
+        "command": "add",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "recall",
+      "type": "ai.memory",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "recall story",
+      "params": {
+        "session": "{channel}",
+        "mode": "recall",
+        "role": "user",
+        "text": "",
+        "max": "40"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build prompt",
+      "params": {
+        "template": "Story so far:\n{a}\nAdd: {b}"
+      }
+    },
+    {
+      "id": "ai",
+      "type": "ai.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "continue story",
+      "params": {
+        "baseUrl": "",
+        "model": "",
+        "apiKey": "",
+        "system": "Continue the story by one sentence. Build naturally on what came before, then stop.",
+        "prompt": "",
+        "maxTokens": "200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 1144,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "post the new line",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "remember",
+      "type": "ai.memory",
+      "x": 1430,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "remember addition",
+      "params": {
+        "session": "{channel}",
+        "mode": "remember",
+        "role": "user",
+        "text": "{args}",
+        "max": "40"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "recall",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 0
+    },
+    {
+      "from": "recall",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "fmt",
+      "toPin": 1
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "ai",
+      "toPin": 1
+    },
+    {
+      "from": "ai",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "ai",
+      "fromPin": 1,
+      "to": "reply",
+      "toPin": 1
+    },
+    {
+      "from": "reply",
+      "fromPin": 0,
+      "to": "remember",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "remember",
+      "toPin": 1
+    }
+  ]
+}

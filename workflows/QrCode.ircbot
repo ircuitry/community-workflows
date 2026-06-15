@@ -1,0 +1,72 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "QR Code",
+  "description": "Say !qr <text> and the bot replies with a QR code image URL that encodes your text via the qrserver.com API.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "utility",
+    "web"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!qr <text>",
+      "params": {
+        "prefix": "!",
+        "command": "qr",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "url",
+      "type": "data.format",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Build QR URL",
+      "params": {
+        "template": "https://api.qrserver.com/v1/create-qr-code/?data={a}&size=200x200"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "Reply with image URL",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "url",
+      "toPin": 0
+    },
+    {
+      "from": "url",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

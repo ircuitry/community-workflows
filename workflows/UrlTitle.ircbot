@@ -3,6 +3,7 @@
   "name": "URL Title",
   "description": "Watches the channel for links and replies with the page's HTML <title> so people know what was shared.",
   "author": "ircuitry",
+  "category": "Utility",
   "tags": [
     "utility",
     "web"

@@ -3,6 +3,7 @@
   "name": "Word Filter",
   "description": "Watches channel messages for a banned word and kicks the offending user with a warning, logging each removal.",
   "author": "ircuitry",
+  "category": "Moderation",
   "tags": [
     "moderation",
     "safety"

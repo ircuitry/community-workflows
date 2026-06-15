@@ -3,6 +3,7 @@
   "name": "Broadcast (signal)",
   "description": "Lets an admin run !broadcast <msg> to fan a single message out to several channels at once using an internal signal.",
   "author": "ircuitry",
+  "category": "Utility",
   "tags": [
     "utility",
     "signal",

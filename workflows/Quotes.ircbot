@@ -3,6 +3,7 @@
   "name": "Quote Book",
   "description": "A shared quote book: type !quote add <text> to save a memorable line, or just !quote to read one back.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "fun",
     "db",

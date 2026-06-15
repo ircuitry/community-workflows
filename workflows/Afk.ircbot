@@ -1,0 +1,162 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "AFK",
+  "description": "Say !afk <reason> to mark yourself away; when you next speak the bot clears your status and welcomes you back.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": [
+    "community",
+    "db",
+    "social"
+  ],
+  "nodes": [
+    {
+      "id": "afkCmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!afk <reason>",
+      "params": {
+        "prefix": "!",
+        "command": "afk",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "afkSet",
+      "type": "db.set",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "mark away",
+      "params": {
+        "table": "afk",
+        "key": "{nick}",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "afkRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "confirm away",
+      "params": {
+        "message": "You are now AFK, {nick}: {args}",
+        "server": ""
+      }
+    },
+    {
+      "id": "msg",
+      "type": "event.message",
+      "x": 0,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any chat line",
+      "params": {
+        "channel": ""
+      }
+    },
+    {
+      "id": "afkGet",
+      "type": "db.get",
+      "x": 0,
+      "y": 460,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "was sender AFK?",
+      "params": {
+        "table": "afk",
+        "mode": "value",
+        "key": "{nick}",
+        "default": "",
+        "find": ""
+      }
+    },
+    {
+      "id": "afkIf",
+      "type": "logic.if",
+      "x": 286,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "had AFK status?",
+      "params": {
+        "op": "≠",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "backRep",
+      "type": "action.reply",
+      "x": 572,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "welcome back",
+      "params": {
+        "message": "Welcome back, {nick}!",
+        "server": ""
+      }
+    },
+    {
+      "id": "afkClear",
+      "type": "db.set",
+      "x": 858,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "clear AFK",
+      "params": {
+        "table": "afk",
+        "key": "{nick}",
+        "value": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "afkCmd",
+      "fromPin": 0,
+      "to": "afkSet",
+      "toPin": 0
+    },
+    {
+      "from": "afkSet",
+      "fromPin": 0,
+      "to": "afkRep",
+      "toPin": 0
+    },
+    {
+      "from": "msg",
+      "fromPin": 0,
+      "to": "afkIf",
+      "toPin": 0
+    },
+    {
+      "from": "afkGet",
+      "fromPin": 0,
+      "to": "afkIf",
+      "toPin": 1
+    },
+    {
+      "from": "afkIf",
+      "fromPin": 0,
+      "to": "backRep",
+      "toPin": 0
+    },
+    {
+      "from": "backRep",
+      "fromPin": 0,
+      "to": "afkClear",
+      "toPin": 0
+    }
+  ]
+}

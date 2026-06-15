@@ -3,6 +3,7 @@
   "name": "Trivia",
   "description": "A trivia quiz that asks questions, tracks scores, and crowns a winner.",
   "author": "ircuitry",
+  "category": "Games",
   "tags": [
     "game",
     "quiz",

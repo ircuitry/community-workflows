@@ -3,6 +3,7 @@
   "name": "AI FAQ (from file)",
   "description": "Answers !faq <question> by reading a local knowledge file and asking an AI to respond using only that content.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "support",

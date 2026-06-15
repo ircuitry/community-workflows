@@ -1,0 +1,309 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Higher or Lower",
+  "description": "Play !hl higher or !hl lower to guess whether the next random number beats the stored one; correct guesses win and the new number is saved for the next round.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "db"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!hl higher|lower",
+      "params": {
+        "prefix": "!",
+        "command": "hl",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cur",
+      "type": "db.get",
+      "x": 0,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "current number",
+      "params": {
+        "table": "hl",
+        "mode": "value",
+        "key": "current",
+        "default": "50",
+        "find": ""
+      }
+    },
+    {
+      "id": "next",
+      "type": "data.randnum",
+      "x": 0,
+      "y": 388,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "next number",
+      "params": {
+        "min": "1",
+        "max": "100"
+      }
+    },
+    {
+      "id": "cmp",
+      "type": "logic.if",
+      "x": 286,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is next higher?",
+      "params": {
+        "op": ">",
+        "b": "",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "correctHigher",
+      "type": "data.setvar",
+      "x": 572,
+      "y": -160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "answer = higher",
+      "params": {
+        "name": "hl_correct",
+        "value": "higher"
+      }
+    },
+    {
+      "id": "correctLower",
+      "type": "data.setvar",
+      "x": 572,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "answer = lower",
+      "params": {
+        "name": "hl_correct",
+        "value": "lower"
+      }
+    },
+    {
+      "id": "guessIf",
+      "type": "logic.if",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "guess correct?",
+      "params": {
+        "op": "=",
+        "b": "",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "correctVar",
+      "type": "data.getvar",
+      "x": 858,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "correct answer",
+      "params": {
+        "name": "hl_correct",
+        "default": "higher"
+      }
+    },
+    {
+      "id": "winFmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": -218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "win text",
+      "params": {
+        "template": "You win, {nick}! It was {a} ({b} was correct). Play again with !hl higher or !hl lower."
+      }
+    },
+    {
+      "id": "winRep",
+      "type": "action.reply",
+      "x": 1430,
+      "y": -218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "win reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "loseFmt",
+      "type": "data.format",
+      "x": 1144,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lose text",
+      "params": {
+        "template": "You lose, {nick}. It was {a} ({b} was correct). Try again with !hl higher or !hl lower."
+      }
+    },
+    {
+      "id": "loseRep",
+      "type": "action.reply",
+      "x": 1430,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "lose reply",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    },
+    {
+      "id": "save",
+      "type": "db.set",
+      "x": 1716,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save new current",
+      "params": {
+        "table": "hl",
+        "key": "current",
+        "value": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 0
+    },
+    {
+      "from": "next",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 1
+    },
+    {
+      "from": "cur",
+      "fromPin": 0,
+      "to": "cmp",
+      "toPin": 2
+    },
+    {
+      "from": "cmp",
+      "fromPin": 0,
+      "to": "correctHigher",
+      "toPin": 0
+    },
+    {
+      "from": "cmp",
+      "fromPin": 1,
+      "to": "correctLower",
+      "toPin": 0
+    },
+    {
+      "from": "correctHigher",
+      "fromPin": 0,
+      "to": "guessIf",
+      "toPin": 0
+    },
+    {
+      "from": "correctLower",
+      "fromPin": 0,
+      "to": "guessIf",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 1,
+      "to": "guessIf",
+      "toPin": 1
+    },
+    {
+      "from": "correctVar",
+      "fromPin": 0,
+      "to": "guessIf",
+      "toPin": 2
+    },
+    {
+      "from": "guessIf",
+      "fromPin": 0,
+      "to": "winRep",
+      "toPin": 0
+    },
+    {
+      "from": "next",
+      "fromPin": 0,
+      "to": "winFmt",
+      "toPin": 0
+    },
+    {
+      "from": "correctVar",
+      "fromPin": 0,
+      "to": "winFmt",
+      "toPin": 1
+    },
+    {
+      "from": "winFmt",
+      "fromPin": 0,
+      "to": "winRep",
+      "toPin": 1
+    },
+    {
+      "from": "guessIf",
+      "fromPin": 1,
+      "to": "loseRep",
+      "toPin": 0
+    },
+    {
+      "from": "next",
+      "fromPin": 0,
+      "to": "loseFmt",
+      "toPin": 0
+    },
+    {
+      "from": "correctVar",
+      "fromPin": 0,
+      "to": "loseFmt",
+      "toPin": 1
+    },
+    {
+      "from": "loseFmt",
+      "fromPin": 0,
+      "to": "loseRep",
+      "toPin": 1
+    },
+    {
+      "from": "winRep",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "loseRep",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 0
+    },
+    {
+      "from": "next",
+      "fromPin": 0,
+      "to": "save",
+      "toPin": 1
+    }
+  ]
+}

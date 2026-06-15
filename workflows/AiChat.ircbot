@@ -3,6 +3,7 @@
   "name": "AI Chat",
   "description": "A friendly AI Q&A bot: ask it anything with !ask <question> and it replies with a witty answer while showing a typing indicator as it thinks.",
   "author": "ircuitry",
+  "category": "AI",
   "tags": [
     "ai",
     "chat",

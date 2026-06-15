@@ -1,0 +1,66 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Coin Flip",
+  "description": "Say !flip and the bot tosses a coin, replying with a random Heads or Tails result.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "fun"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!flip",
+      "params": {
+        "prefix": "!",
+        "command": "flip",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "coin",
+      "type": "data.random",
+      "x": 286,
+      "y": 160,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "toss the coin",
+      "params": {
+        "options": "🪙 Heads\n🪙 Tails"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 572,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "announce result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "coin",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}

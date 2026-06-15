@@ -1,0 +1,85 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Polyhedral Dice",
+  "description": "Type !d20 to roll a twenty-sided die and the bot replies with a random number from 1 to 20.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": [
+    "game",
+    "dice"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!d20",
+      "params": {
+        "prefix": "!",
+        "command": "d20",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "roll",
+      "type": "data.randnum",
+      "x": 286,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "roll 1-20",
+      "params": {
+        "min": "1",
+        "max": "20"
+      }
+    },
+    {
+      "id": "fmt",
+      "type": "data.format",
+      "x": 572,
+      "y": 218,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "build reply",
+      "params": {
+        "template": "🎲 {a} (d20)"
+      }
+    },
+    {
+      "id": "reply",
+      "type": "action.reply",
+      "x": 858,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say result",
+      "params": {
+        "message": "",
+        "server": ""
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 0
+    },
+    {
+      "from": "roll",
+      "fromPin": 0,
+      "to": "fmt",
+      "toPin": 0
+    },
+    {
+      "from": "fmt",
+      "fromPin": 0,
+      "to": "reply",
+      "toPin": 1
+    }
+  ]
+}
