@@ -1,0 +1,92 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "DCC Send a File on !sendfile",
+  "description": "When a trusted user types !sendfile, the bot offers them a file over DCC. Gated by authenticated account (allow-list), so only your trusted accounts can pull it. Set the file on 'Send File (DCC)' and your accounts on 'From Account'. Note: across the internet the receiver connects back to your machine, so a public IP / port-forward may be needed.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": [
+    "dcc",
+    "files",
+    "share"
+  ],
+  "nodes": [
+    {
+      "id": "cmd",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!sendfile",
+      "params": {
+        "prefix": "!",
+        "command": "sendfile",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "gate",
+      "type": "filter.fromAccount",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "trusted accounts only",
+      "params": {
+        "account": "alice"
+      }
+    },
+    {
+      "id": "send",
+      "type": "dcc.send",
+      "x": 620,
+      "y": -70,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send the file",
+      "params": {
+        "nick": "{nick}",
+        "file": "share/welcome.txt",
+        "ip": ""
+      }
+    },
+    {
+      "id": "deny",
+      "type": "action.reply",
+      "x": 620,
+      "y": 90,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "deny others",
+      "params": {
+        "message": "Sorry {nick}, you're not on my file allow-list."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cmd",
+      "fromPin": 0,
+      "to": "gate",
+      "toPin": 0
+    },
+    {
+      "from": "gate",
+      "fromPin": 0,
+      "to": "send",
+      "toPin": 0
+    },
+    {
+      "from": "gate",
+      "fromPin": 1,
+      "to": "deny",
+      "toPin": 0
+    },
+    {
+      "from": "cmd",
+      "fromPin": 2,
+      "to": "send",
+      "toPin": 1
+    }
+  ]
+}

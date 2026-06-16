@@ -1,0 +1,45 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "DCC Decline Everything",
+  "description": "A safe default: politely declines every DCC offer (file or chat). Drop it in if your bot should never accept direct connections.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "dcc",
+    "security"
+  ],
+  "nodes": [
+    {
+      "id": "dcc",
+      "type": "event.dcc",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any DCC offer",
+      "params": {
+        "only": "any"
+      }
+    },
+    {
+      "id": "reject",
+      "type": "dcc.reject",
+      "x": 320,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "decline it",
+      "params": {
+        "notice": "Thanks, but I don't accept DCC transfers."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "dcc",
+      "fromPin": 0,
+      "to": "reject",
+      "toPin": 0
+    }
+  ]
+}

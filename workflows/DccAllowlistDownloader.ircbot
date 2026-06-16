@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "DCC Safe Downloader (allow-list)",
+  "description": "Auto-accepts DCC file transfers ONLY from accounts you allow-list - the authenticated IRCv3 account, never the nick (nicks can be spoofed). Edit 'From Account' to your trusted accounts (comma-separated); files land in ~/ircuitry/files/dcc-inbox/. Everyone else is politely declined.",
+  "author": "ircuitry",
+  "category": "Moderation",
+  "tags": [
+    "dcc",
+    "files",
+    "security",
+    "allow-list"
+  ],
+  "nodes": [
+    {
+      "id": "dcc",
+      "type": "event.dcc",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on DCC file offer",
+      "params": {
+        "only": "send"
+      }
+    },
+    {
+      "id": "gate",
+      "type": "filter.fromAccount",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "trusted accounts only",
+      "params": {
+        "account": "alice, bob"
+      }
+    },
+    {
+      "id": "accept",
+      "type": "dcc.accept",
+      "x": 620,
+      "y": -70,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "save the file",
+      "params": {
+        "path": "dcc-inbox/"
+      }
+    },
+    {
+      "id": "reject",
+      "type": "dcc.reject",
+      "x": 620,
+      "y": 90,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "decline others",
+      "params": {
+        "notice": "Sorry, I only accept files from accounts on my allow-list."
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "dcc",
+      "fromPin": 0,
+      "to": "gate",
+      "toPin": 0
+    },
+    {
+      "from": "gate",
+      "fromPin": 0,
+      "to": "accept",
+      "toPin": 0
+    },
+    {
+      "from": "gate",
+      "fromPin": 1,
+      "to": "reject",
+      "toPin": 0
+    }
+  ]
+}
