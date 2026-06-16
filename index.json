@@ -1,5 +1,5 @@
 {
-  "count": 227,
+  "count": 230,
   "workflows": [
     {
       "name": "Random Advice",
@@ -13302,6 +13302,284 @@
             "fromPin": 0,
             "to": "say",
             "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "DCC Safe Downloader (allow-list)",
+      "description": "Auto-accepts DCC file transfers ONLY from accounts you allow-list - the authenticated IRCv3 account, never the nick (nicks can be spoofed). Edit 'From Account' to your trusted accounts (comma-separated); files land in ~/ircuitry/files/dcc-inbox/. Everyone else is politely declined.",
+      "author": "ircuitry",
+      "category": "Moderation",
+      "tags": [
+        "dcc",
+        "files",
+        "security",
+        "allow-list"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "dcc.accept",
+        "dcc.reject",
+        "event.dcc",
+        "filter.fromAccount"
+      ],
+      "file": "workflows/DccAllowlistDownloader.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "DCC Safe Downloader (allow-list)",
+        "description": "Auto-accepts DCC file transfers ONLY from accounts you allow-list - the authenticated IRCv3 account, never the nick (nicks can be spoofed). Edit 'From Account' to your trusted accounts (comma-separated); files land in ~/ircuitry/files/dcc-inbox/. Everyone else is politely declined.",
+        "author": "ircuitry",
+        "category": "Moderation",
+        "tags": [
+          "dcc",
+          "files",
+          "security",
+          "allow-list"
+        ],
+        "nodes": [
+          {
+            "id": "dcc",
+            "type": "event.dcc",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on DCC file offer",
+            "params": {
+              "only": "send"
+            }
+          },
+          {
+            "id": "gate",
+            "type": "filter.fromAccount",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "trusted accounts only",
+            "params": {
+              "account": "alice, bob"
+            }
+          },
+          {
+            "id": "accept",
+            "type": "dcc.accept",
+            "x": 620,
+            "y": -70,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "save the file",
+            "params": {
+              "path": "dcc-inbox/"
+            }
+          },
+          {
+            "id": "reject",
+            "type": "dcc.reject",
+            "x": 620,
+            "y": 90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "decline others",
+            "params": {
+              "notice": "Sorry, I only accept files from accounts on my allow-list."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "dcc",
+            "fromPin": 0,
+            "to": "gate",
+            "toPin": 0
+          },
+          {
+            "from": "gate",
+            "fromPin": 0,
+            "to": "accept",
+            "toPin": 0
+          },
+          {
+            "from": "gate",
+            "fromPin": 1,
+            "to": "reject",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "DCC Decline Everything",
+      "description": "A safe default: politely declines every DCC offer (file or chat). Drop it in if your bot should never accept direct connections.",
+      "author": "ircuitry",
+      "category": "Moderation",
+      "tags": [
+        "dcc",
+        "security"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "dcc.reject",
+        "event.dcc"
+      ],
+      "file": "workflows/DccDeclineAll.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "DCC Decline Everything",
+        "description": "A safe default: politely declines every DCC offer (file or chat). Drop it in if your bot should never accept direct connections.",
+        "author": "ircuitry",
+        "category": "Moderation",
+        "tags": [
+          "dcc",
+          "security"
+        ],
+        "nodes": [
+          {
+            "id": "dcc",
+            "type": "event.dcc",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "any DCC offer",
+            "params": {
+              "only": "any"
+            }
+          },
+          {
+            "id": "reject",
+            "type": "dcc.reject",
+            "x": 320,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "decline it",
+            "params": {
+              "notice": "Thanks, but I don't accept DCC transfers."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "dcc",
+            "fromPin": 0,
+            "to": "reject",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "DCC Send a File on !sendfile",
+      "description": "When a trusted user types !sendfile, the bot offers them a file over DCC. Gated by authenticated account (allow-list), so only your trusted accounts can pull it. Set the file on 'Send File (DCC)' and your accounts on 'From Account'. Note: across the internet the receiver connects back to your machine, so a public IP / port-forward may be needed.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "dcc",
+        "files",
+        "share"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "dcc.send",
+        "event.command",
+        "filter.fromAccount"
+      ],
+      "file": "workflows/DccSendOnRequest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "DCC Send a File on !sendfile",
+        "description": "When a trusted user types !sendfile, the bot offers them a file over DCC. Gated by authenticated account (allow-list), so only your trusted accounts can pull it. Set the file on 'Send File (DCC)' and your accounts on 'From Account'. Note: across the internet the receiver connects back to your machine, so a public IP / port-forward may be needed.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "dcc",
+          "files",
+          "share"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!sendfile",
+            "params": {
+              "prefix": "!",
+              "command": "sendfile",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "gate",
+            "type": "filter.fromAccount",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "trusted accounts only",
+            "params": {
+              "account": "alice"
+            }
+          },
+          {
+            "id": "send",
+            "type": "dcc.send",
+            "x": 620,
+            "y": -70,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send the file",
+            "params": {
+              "nick": "{nick}",
+              "file": "share/welcome.txt",
+              "ip": ""
+            }
+          },
+          {
+            "id": "deny",
+            "type": "action.reply",
+            "x": 620,
+            "y": 90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "deny others",
+            "params": {
+              "message": "Sorry {nick}, you're not on my file allow-list."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "gate",
+            "toPin": 0
+          },
+          {
+            "from": "gate",
+            "fromPin": 0,
+            "to": "send",
+            "toPin": 0
+          },
+          {
+            "from": "gate",
+            "fromPin": 1,
+            "to": "deny",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 2,
+            "to": "send",
+            "toPin": 1
           }
         ]
       }
