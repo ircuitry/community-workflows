@@ -1,130 +1,72 @@
 {
   "format": "ircuitry.workflow.v1",
   "name": "IRCv3 Typing Test",
-  "description": "Verify the typing client-tag (+typing). Type !typing start and the bot sends an active typing notification to the channel; !typing stop sends done. Use it to check your client shows/clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
+  "description": "Verify the typing client-tag (+typing). Type !typing start and the bot keeps a live 'is typing' notification going in the channel - it sets a variable and a 3s timer re-sends +typing=active so the indicator never times out. !typing stop clears the variable and sends +typing=done. Use it to check your client shows and clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
   "author": "ircuitry",
   "category": "Testing",
-  "tags": [
-    "ircv3",
-    "testing",
-    "developer",
-    "typing",
-    "tagmsg"
-  ],
+  "tags": ["ircv3", "testing", "developer", "typing", "tagmsg"],
   "nodes": [
     {
-      "id": "c",
-      "type": "event.command",
-      "x": 0,
-      "y": 0,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "!typing",
-      "params": {
-        "prefix": "!",
-        "command": "typing",
-        "contexts": "public, private, pm"
-      }
+      "id": "c", "type": "event.command", "x": 0, "y": 0, "muted": false, "streamAsTool": false,
+      "title": "!typing", "params": { "prefix": "!", "command": "typing", "contexts": "public, private, pm" }
     },
     {
-      "id": "if",
-      "type": "logic.if",
-      "x": 300,
-      "y": 0,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "args == start?",
-      "params": {
-        "op": "=",
-        "b": "start",
-        "ci": "true"
-      }
+      "id": "if", "type": "logic.if", "x": 300, "y": 0, "muted": false, "streamAsTool": false,
+      "title": "args == start?", "params": { "op": "=", "b": "start", "ci": "true" }
     },
     {
-      "id": "start",
-      "type": "irc.typing.start",
-      "x": 600,
-      "y": -90,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "typing active",
-      "params": {
-        "target": "{channel}"
-      }
+      "id": "seton", "type": "data.setvar", "x": 600, "y": -120, "muted": false, "streamAsTool": false,
+      "title": "typing := {channel}", "params": { "name": "typing", "value": "{channel}" }
     },
     {
-      "id": "stop",
-      "type": "irc.typing.stop",
-      "x": 600,
-      "y": 110,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "typing done",
-      "params": {
-        "target": "{channel}"
-      }
+      "id": "start", "type": "irc.typing.start", "x": 900, "y": -120, "muted": false, "streamAsTool": false,
+      "title": "typing active", "params": { "target": "{channel}" }
     },
     {
-      "id": "ra",
-      "type": "action.reply",
-      "x": 900,
-      "y": -90,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "ok",
-      "params": {
-        "message": "started typing in {channel} (sent +typing=active)"
-      }
+      "id": "ra", "type": "action.reply", "x": 1200, "y": -120, "muted": false, "streamAsTool": false,
+      "title": "ok", "params": { "message": "typing in {channel} - refreshing +typing=active every 3s until !typing stop" }
     },
     {
-      "id": "rb",
-      "type": "action.reply",
-      "x": 900,
-      "y": 110,
-      "muted": false,
-      "streamAsTool": false,
-      "title": "ok",
-      "params": {
-        "message": "stopped typing (sent +typing=done)"
-      }
+      "id": "setoff", "type": "data.setvar", "x": 600, "y": 120, "muted": false, "streamAsTool": false,
+      "title": "typing := (clear)", "params": { "name": "typing", "value": "" }
+    },
+    {
+      "id": "stop", "type": "irc.typing.stop", "x": 900, "y": 120, "muted": false, "streamAsTool": false,
+      "title": "typing done", "params": { "target": "{channel}" }
+    },
+    {
+      "id": "rb", "type": "action.reply", "x": 1200, "y": 120, "muted": false, "streamAsTool": false,
+      "title": "ok", "params": { "message": "stopped typing (sent +typing=done)" }
+    },
+    {
+      "id": "tmr", "type": "event.timer", "x": 0, "y": 360, "muted": false, "streamAsTool": false,
+      "title": "every 3s", "params": { "seconds": "3" }
+    },
+    {
+      "id": "gv", "type": "data.getvar", "x": 280, "y": 440, "muted": false, "streamAsTool": false,
+      "title": "typing", "params": { "name": "typing", "default": "" }
+    },
+    {
+      "id": "if2", "type": "logic.if", "x": 600, "y": 360, "muted": false, "streamAsTool": false,
+      "title": "typing set?", "params": { "op": "=", "b": "", "ci": "false" }
+    },
+    {
+      "id": "refresh", "type": "irc.typing.start", "x": 920, "y": 420, "muted": false, "streamAsTool": false,
+      "title": "keep alive", "params": {}
     }
   ],
   "connections": [
-    {
-      "from": "c",
-      "fromPin": 0,
-      "to": "if",
-      "toPin": 0
-    },
-    {
-      "from": "c",
-      "fromPin": 1,
-      "to": "if",
-      "toPin": 1
-    },
-    {
-      "from": "if",
-      "fromPin": 0,
-      "to": "start",
-      "toPin": 0
-    },
-    {
-      "from": "if",
-      "fromPin": 1,
-      "to": "stop",
-      "toPin": 0
-    },
-    {
-      "from": "start",
-      "fromPin": 0,
-      "to": "ra",
-      "toPin": 0
-    },
-    {
-      "from": "stop",
-      "fromPin": 0,
-      "to": "rb",
-      "toPin": 0
-    }
+    { "from": "c", "fromPin": 0, "to": "if", "toPin": 0 },
+    { "from": "c", "fromPin": 1, "to": "if", "toPin": 1 },
+    { "from": "if", "fromPin": 0, "to": "seton", "toPin": 0 },
+    { "from": "seton", "fromPin": 0, "to": "start", "toPin": 0 },
+    { "from": "start", "fromPin": 0, "to": "ra", "toPin": 0 },
+    { "from": "if", "fromPin": 1, "to": "setoff", "toPin": 0 },
+    { "from": "setoff", "fromPin": 0, "to": "stop", "toPin": 0 },
+    { "from": "stop", "fromPin": 0, "to": "rb", "toPin": 0 },
+    { "from": "tmr", "fromPin": 0, "to": "if2", "toPin": 0 },
+    { "from": "gv", "fromPin": 0, "to": "if2", "toPin": 1 },
+    { "from": "if2", "fromPin": 1, "to": "refresh", "toPin": 0 },
+    { "from": "gv", "fromPin": 0, "to": "refresh", "toPin": 1 }
   ]
 }
