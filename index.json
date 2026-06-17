@@ -21604,7 +21604,7 @@
     },
     {
       "name": "IRCv3 Typing Test",
-      "description": "Verify the typing client-tag (+typing). Type !typing start and the bot keeps a live 'is typing' notification going in the channel - it sets a variable and a 3s timer re-sends +typing=active so the indicator never times out. !typing stop clears the variable and sends +typing=done. Use it to check your client shows and clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
+      "description": "Verify the typing client-tag (+typing). Type !typing start and the bot shows a live 'is typing' notification in the channel that stays up (the runtime re-sends +typing=active every few seconds) until you type !typing stop, which sends +typing=done. Use it to check your client shows and clears a 'bot is typing' indicator and that your server relays TAGMSG +typing. The confirmation is sent before typing starts, because a normal message ends the typing state.",
       "author": "ircuitry",
       "category": "Testing",
       "tags": [
@@ -21614,14 +21614,11 @@
         "typing",
         "tagmsg"
       ],
-      "nodeCount": 12,
-      "connectionCount": 12,
+      "nodeCount": 6,
+      "connectionCount": 6,
       "nodeTypes": [
         "action.reply",
-        "data.getvar",
-        "data.setvar",
         "event.command",
-        "event.timer",
         "irc.typing.start",
         "irc.typing.stop",
         "logic.if"
@@ -21630,7 +21627,7 @@
       "workflow": {
         "format": "ircuitry.workflow.v1",
         "name": "IRCv3 Typing Test",
-        "description": "Verify the typing client-tag (+typing). Type !typing start and the bot keeps a live 'is typing' notification going in the channel - it sets a variable and a 3s timer re-sends +typing=active so the indicator never times out. !typing stop clears the variable and sends +typing=done. Use it to check your client shows and clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
+        "description": "Verify the typing client-tag (+typing). Type !typing start and the bot shows a live 'is typing' notification in the channel that stays up (the runtime re-sends +typing=active every few seconds) until you type !typing stop, which sends +typing=done. Use it to check your client shows and clears a 'bot is typing' indicator and that your server relays TAGMSG +typing. The confirmation is sent before typing starts, because a normal message ends the typing state.",
         "author": "ircuitry",
         "category": "Testing",
         "tags": [
@@ -21670,60 +21667,34 @@
             }
           },
           {
-            "id": "seton",
-            "type": "data.setvar",
+            "id": "ra",
+            "type": "action.reply",
             "x": 600,
-            "y": -120,
+            "y": -90,
             "muted": false,
             "streamAsTool": false,
-            "title": "typing := {channel}",
+            "title": "ack (before typing)",
             "params": {
-              "name": "typing",
-              "value": "{channel}"
+              "message": "ok - showing a live typing indicator in {channel} until !typing stop"
             }
           },
           {
             "id": "start",
             "type": "irc.typing.start",
             "x": 900,
-            "y": -120,
+            "y": -90,
             "muted": false,
             "streamAsTool": false,
-            "title": "typing active",
+            "title": "typing active (stays up)",
             "params": {
               "target": "{channel}"
             }
           },
           {
-            "id": "ra",
-            "type": "action.reply",
-            "x": 1200,
-            "y": -120,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "ok",
-            "params": {
-              "message": "typing in {channel} - refreshing +typing=active every 3s until !typing stop"
-            }
-          },
-          {
-            "id": "setoff",
-            "type": "data.setvar",
-            "x": 600,
-            "y": 120,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "typing := (clear)",
-            "params": {
-              "name": "typing",
-              "value": ""
-            }
-          },
-          {
             "id": "stop",
             "type": "irc.typing.stop",
-            "x": 900,
-            "y": 120,
+            "x": 600,
+            "y": 110,
             "muted": false,
             "streamAsTool": false,
             "title": "typing done",
@@ -21734,63 +21705,14 @@
           {
             "id": "rb",
             "type": "action.reply",
-            "x": 1200,
-            "y": 120,
+            "x": 900,
+            "y": 110,
             "muted": false,
             "streamAsTool": false,
             "title": "ok",
             "params": {
               "message": "stopped typing (sent +typing=done)"
             }
-          },
-          {
-            "id": "tmr",
-            "type": "event.timer",
-            "x": 0,
-            "y": 360,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "every 3s",
-            "params": {
-              "seconds": "3"
-            }
-          },
-          {
-            "id": "gv",
-            "type": "data.getvar",
-            "x": 280,
-            "y": 440,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "typing",
-            "params": {
-              "name": "typing",
-              "default": ""
-            }
-          },
-          {
-            "id": "if2",
-            "type": "logic.if",
-            "x": 600,
-            "y": 360,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "typing set?",
-            "params": {
-              "op": "=",
-              "b": "",
-              "ci": "false"
-            }
-          },
-          {
-            "id": "refresh",
-            "type": "irc.typing.start",
-            "x": 920,
-            "y": 420,
-            "muted": false,
-            "streamAsTool": false,
-            "title": "keep alive",
-            "params": {}
           }
         ],
         "connections": [
@@ -21809,30 +21731,18 @@
           {
             "from": "if",
             "fromPin": 0,
-            "to": "seton",
+            "to": "ra",
             "toPin": 0
           },
           {
-            "from": "seton",
+            "from": "ra",
             "fromPin": 0,
             "to": "start",
             "toPin": 0
           },
           {
-            "from": "start",
-            "fromPin": 0,
-            "to": "ra",
-            "toPin": 0
-          },
-          {
             "from": "if",
             "fromPin": 1,
-            "to": "setoff",
-            "toPin": 0
-          },
-          {
-            "from": "setoff",
-            "fromPin": 0,
             "to": "stop",
             "toPin": 0
           },
@@ -21841,30 +21751,6 @@
             "fromPin": 0,
             "to": "rb",
             "toPin": 0
-          },
-          {
-            "from": "tmr",
-            "fromPin": 0,
-            "to": "if2",
-            "toPin": 0
-          },
-          {
-            "from": "gv",
-            "fromPin": 0,
-            "to": "if2",
-            "toPin": 1
-          },
-          {
-            "from": "if2",
-            "fromPin": 1,
-            "to": "refresh",
-            "toPin": 0
-          },
-          {
-            "from": "gv",
-            "fromPin": 0,
-            "to": "refresh",
-            "toPin": 1
           }
         ]
       }
