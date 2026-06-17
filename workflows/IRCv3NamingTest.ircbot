@@ -1,0 +1,168 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Setname & Away",
+  "description": "Verify setname and away-notify. !setname <realname> changes the bot's real name (SETNAME) live; !away <message> marks it away and !back clears it (AWAY). Watch for the SETNAME / away-notify broadcasts on your client.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "setname",
+    "away-notify"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!setname",
+      "params": {
+        "prefix": "!",
+        "command": "setname",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "sn",
+      "type": "action.setname",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "SETNAME",
+      "params": {
+        "name": "{args}"
+      }
+    },
+    {
+      "id": "r1",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "set real name to: {args}"
+      }
+    },
+    {
+      "id": "a",
+      "type": "event.command",
+      "x": 0,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!away",
+      "params": {
+        "prefix": "!",
+        "command": "away",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "aw",
+      "type": "action.away",
+      "x": 300,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "AWAY {args}",
+      "params": {
+        "message": "{args}"
+      }
+    },
+    {
+      "id": "r2",
+      "type": "action.reply",
+      "x": 600,
+      "y": 240,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "marked away: {args}"
+      }
+    },
+    {
+      "id": "b",
+      "type": "event.command",
+      "x": 0,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!back",
+      "params": {
+        "prefix": "!",
+        "command": "back",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "bk",
+      "type": "action.away",
+      "x": 300,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "AWAY (clear)",
+      "params": {
+        "message": ""
+      }
+    },
+    {
+      "id": "r3",
+      "type": "action.reply",
+      "x": 600,
+      "y": 480,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "no longer away"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "sn",
+      "toPin": 0
+    },
+    {
+      "from": "sn",
+      "fromPin": 0,
+      "to": "r1",
+      "toPin": 0
+    },
+    {
+      "from": "a",
+      "fromPin": 0,
+      "to": "aw",
+      "toPin": 0
+    },
+    {
+      "from": "aw",
+      "fromPin": 0,
+      "to": "r2",
+      "toPin": 0
+    },
+    {
+      "from": "b",
+      "fromPin": 0,
+      "to": "bk",
+      "toPin": 0
+    },
+    {
+      "from": "bk",
+      "fromPin": 0,
+      "to": "r3",
+      "toPin": 0
+    }
+  ]
+}

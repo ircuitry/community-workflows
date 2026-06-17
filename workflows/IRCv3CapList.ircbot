@@ -1,0 +1,68 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Cap List",
+  "description": "See the IRCv3 capabilities negotiated on this connection. Type !caps and the bot replies with the list of enabled caps (from CAP LS / ACK). Handy for confirming your server advertises and your client/bot negotiated what you expect.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "capabilities",
+    "cap"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!caps",
+      "params": {
+        "prefix": "!",
+        "command": "caps",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "me",
+      "type": "irc.me",
+      "x": 300,
+      "y": 110,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "negotiated caps",
+      "params": {
+        "field": "caps"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "report caps",
+      "params": {
+        "message": "enabled caps: "
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    },
+    {
+      "from": "me",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 1
+    }
+  ]
+}

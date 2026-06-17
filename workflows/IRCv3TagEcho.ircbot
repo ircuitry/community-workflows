@@ -1,0 +1,102 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Tag Echo",
+  "description": "Inspect the IRCv3 message tags your client sent. !tags echoes the common ones (msgid, account, server-time, label) back at you; !gettag <name> reads any single tag by name (e.g. label, +draft/reply, time). Great for verifying message-tags, account-tag, server-time and echo-message.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "message-tags",
+    "account-tag",
+    "server-time",
+    "labeled-response"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!tags",
+      "params": {
+        "prefix": "!",
+        "command": "tags",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rt",
+      "type": "action.reply",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "echo tags",
+      "params": {
+        "message": "msgid={msgid} | account={account} | server-time={tag.time} | label={tag.label}"
+      }
+    },
+    {
+      "id": "g",
+      "type": "event.command",
+      "x": 0,
+      "y": 260,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!gettag",
+      "params": {
+        "prefix": "!",
+        "command": "gettag",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "gt",
+      "type": "data.gettag",
+      "x": 300,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "read tag {args}",
+      "params": {
+        "name": "{args}"
+      }
+    },
+    {
+      "id": "rg",
+      "type": "action.reply",
+      "x": 600,
+      "y": 260,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "echo one tag",
+      "params": {
+        "message": "tag {args} = "
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rt",
+      "toPin": 0
+    },
+    {
+      "from": "g",
+      "fromPin": 0,
+      "to": "rg",
+      "toPin": 0
+    },
+    {
+      "from": "gt",
+      "fromPin": 0,
+      "to": "rg",
+      "toPin": 1
+    }
+  ]
+}

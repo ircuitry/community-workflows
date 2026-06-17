@@ -1,0 +1,70 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Redaction Test",
+  "description": "Verify message redaction (draft/message-redaction). Copy a message id from your client, type !redact <msgid>, and the bot sends a REDACT for that id in this channel. Check your client hides/strikes the message and that your server enforces who may redact.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "redact",
+    "message-redaction"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!redact",
+      "params": {
+        "prefix": "!",
+        "command": "redact",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rd",
+      "type": "action.redact",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "REDACT {args}",
+      "params": {
+        "target": "{channel}",
+        "msgid": "{args}",
+        "reason": "requested via !redact (IRCv3 test bot)"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "sent REDACT for msgid {args} in {channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rd",
+      "toPin": 0
+    },
+    {
+      "from": "rd",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

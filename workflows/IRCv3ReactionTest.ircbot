@@ -1,0 +1,69 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Reaction Test",
+  "description": "Verify message reactions (+draft/react). Type !react <emoji> and the bot reacts to your command message with a TAGMSG carrying +draft/react and +reply to your msgid. Check your client renders the reaction against the right message.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "react",
+    "tagmsg",
+    "reply"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!react",
+      "params": {
+        "prefix": "!",
+        "command": "react",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rx",
+      "type": "action.react",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react to your msg",
+      "params": {
+        "emoji": "{args}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "reacted to your message with: {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rx",
+      "toPin": 0
+    },
+    {
+      "from": "rx",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

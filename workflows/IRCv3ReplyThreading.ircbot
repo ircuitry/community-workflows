@@ -1,0 +1,83 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Reply Threading",
+  "description": "Compare a threaded reply against a plain one. !thread replies with +reply set to your message id (clients can thread it); !reply sends an ordinary reply. Verify your client threads the first and not the second, and that +reply correlation survives your server.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "reply",
+    "labeled-response",
+    "context"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!thread",
+      "params": {
+        "prefix": "!",
+        "command": "thread",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "t",
+      "type": "action.replythread",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "threaded",
+      "params": {
+        "message": "threaded reply: this carries +reply to your msgid {msgid}"
+      }
+    },
+    {
+      "id": "p",
+      "type": "event.command",
+      "x": 0,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!reply",
+      "params": {
+        "prefix": "!",
+        "command": "reply",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "pr",
+      "type": "action.reply",
+      "x": 300,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "plain",
+      "params": {
+        "message": "plain reply: no +reply tag, just a normal line"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "t",
+      "toPin": 0
+    },
+    {
+      "from": "p",
+      "fromPin": 0,
+      "to": "pr",
+      "toPin": 0
+    }
+  ]
+}

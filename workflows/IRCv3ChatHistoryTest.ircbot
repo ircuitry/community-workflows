@@ -1,0 +1,76 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Chat History",
+  "description": "Verify draft/chathistory. Type !history (optionally !history <count>) and the bot requests recent messages for this channel from the server and replies with what came back. Confirms your server answers CHATHISTORY LATEST and your client/bot can backfill.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "chathistory",
+    "history"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!history",
+      "params": {
+        "prefix": "!",
+        "command": "history",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "h",
+      "type": "action.chathistory",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "CHATHISTORY",
+      "params": {
+        "target": "{channel}",
+        "count": "{args}",
+        "timeout": "5"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "report",
+      "params": {
+        "message": "history for {channel}: "
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "h",
+      "toPin": 0
+    },
+    {
+      "from": "h",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    },
+    {
+      "from": "h",
+      "fromPin": 1,
+      "to": "r",
+      "toPin": 1
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 TAGMSG Test",
+  "description": "Send a bare TAGMSG carrying client-only tags. Type !tagmsg <tags> (e.g. !tagmsg +example-client/foo=bar) and the bot emits a TAGMSG to this channel with exactly those tags and no body. Verify your server relays TAGMSG and your client surfaces client-only (+) tags.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "tagmsg",
+    "client-tags",
+    "message-tags"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!tagmsg",
+      "params": {
+        "prefix": "!",
+        "command": "tagmsg",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "t",
+      "type": "action.tagmsg",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "TAGMSG {args}",
+      "params": {
+        "target": "{channel}",
+        "tags": "{args}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "sent a TAGMSG to {channel} with tags: {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "t",
+      "toPin": 0
+    },
+    {
+      "from": "t",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

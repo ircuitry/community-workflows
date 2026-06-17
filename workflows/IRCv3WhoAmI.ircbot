@@ -1,0 +1,52 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 WhoAmI",
+  "description": "Verify account-tag, server-time, msgid and reply context in one shot. Type !whoami in a channel, in a private message, or in a direct query - the bot reports your authenticated account, the message id and server-time, and replies back in the same context. The account comes from the account-tag, not the (spoofable) nick.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "account-tag",
+    "server-time",
+    "context",
+    "echo-message"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whoami",
+      "params": {
+        "prefix": "!",
+        "command": "whoami",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "report",
+      "params": {
+        "message": "nick={nick} | account={account} | bot?={isbot} | channel={channel} | msgid={msgid} | server-time={tag.time}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

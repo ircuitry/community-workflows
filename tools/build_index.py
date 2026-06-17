@@ -55,7 +55,7 @@ def validate(f, m, errors):
             fail(errors, f, f"must not contain connection/secret key '{k}'")
 
 
-CATEGORIES = {"AI", "Games", "Moderation", "Community", "Utility", "Reminders"}
+CATEGORIES = {"AI", "Games", "Moderation", "Community", "Utility", "Reminders", "Testing"}
 
 
 def entry(f, m):

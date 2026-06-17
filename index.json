@@ -1,5 +1,5 @@
 {
-  "count": 230,
+  "count": 242,
   "workflows": [
     {
       "name": "Random Advice",
@@ -18714,6 +18714,1342 @@
             "from": "lookup",
             "fromPin": 0,
             "to": "reply",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Cap List",
+      "description": "See the IRCv3 capabilities negotiated on this connection. Type !caps and the bot replies with the list of enabled caps (from CAP LS / ACK). Handy for confirming your server advertises and your client/bot negotiated what you expect.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "capabilities",
+        "cap"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.me"
+      ],
+      "file": "workflows/IRCv3CapList.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Cap List",
+        "description": "See the IRCv3 capabilities negotiated on this connection. Type !caps and the bot replies with the list of enabled caps (from CAP LS / ACK). Handy for confirming your server advertises and your client/bot negotiated what you expect.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "capabilities",
+          "cap"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!caps",
+            "params": {
+              "prefix": "!",
+              "command": "caps",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "me",
+            "type": "irc.me",
+            "x": 300,
+            "y": 110,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "negotiated caps",
+            "params": {
+              "field": "caps"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "report caps",
+            "params": {
+              "message": "enabled caps: "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          },
+          {
+            "from": "me",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Chat History",
+      "description": "Verify draft/chathistory. Type !history (optionally !history <count>) and the bot requests recent messages for this channel from the server and replies with what came back. Confirms your server answers CHATHISTORY LATEST and your client/bot can backfill.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "chathistory",
+        "history"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.chathistory",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3ChatHistoryTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Chat History",
+        "description": "Verify draft/chathistory. Type !history (optionally !history <count>) and the bot requests recent messages for this channel from the server and replies with what came back. Confirms your server answers CHATHISTORY LATEST and your client/bot can backfill.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "chathistory",
+          "history"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!history",
+            "params": {
+              "prefix": "!",
+              "command": "history",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "h",
+            "type": "action.chathistory",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "CHATHISTORY",
+            "params": {
+              "target": "{channel}",
+              "count": "{args}",
+              "timeout": "5"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "report",
+            "params": {
+              "message": "history for {channel}: "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "h",
+            "toPin": 0
+          },
+          {
+            "from": "h",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          },
+          {
+            "from": "h",
+            "fromPin": 1,
+            "to": "r",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Monitor Test",
+      "description": "Verify the MONITOR system. !monitor <nick> adds a nick to the bot's monitor list and !unmonitor <nick> removes it; the server then notifies the bot when that nick comes online or goes offline. Use it to check your server's MONITOR replies (RPL_MONONLINE / RPL_MONOFFLINE).",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "monitor"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.monitor",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3MonitorTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Monitor Test",
+        "description": "Verify the MONITOR system. !monitor <nick> adds a nick to the bot's monitor list and !unmonitor <nick> removes it; the server then notifies the bot when that nick comes online or goes offline. Use it to check your server's MONITOR replies (RPL_MONONLINE / RPL_MONOFFLINE).",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "monitor"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!monitor",
+            "params": {
+              "prefix": "!",
+              "command": "monitor",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "m",
+            "type": "action.monitor",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "MONITOR + {args}",
+            "params": {
+              "nicks": "{args}",
+              "mode": "add"
+            }
+          },
+          {
+            "id": "r1",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "now monitoring {args}"
+            }
+          },
+          {
+            "id": "u",
+            "type": "event.command",
+            "x": 0,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!unmonitor",
+            "params": {
+              "prefix": "!",
+              "command": "unmonitor",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "mu",
+            "type": "action.monitor",
+            "x": 300,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "MONITOR - {args}",
+            "params": {
+              "nicks": "{args}",
+              "mode": "remove"
+            }
+          },
+          {
+            "id": "r2",
+            "type": "action.reply",
+            "x": 600,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "stopped monitoring {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "m",
+            "toPin": 0
+          },
+          {
+            "from": "m",
+            "fromPin": 0,
+            "to": "r1",
+            "toPin": 0
+          },
+          {
+            "from": "u",
+            "fromPin": 0,
+            "to": "mu",
+            "toPin": 0
+          },
+          {
+            "from": "mu",
+            "fromPin": 0,
+            "to": "r2",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Multiline Test",
+      "description": "Verify draft/multiline. Type !multiline and the bot sends a single logical message split across three physical lines using the multiline batch. Check your client renders it as one message (not three) when the cap is enabled, and degrades to separate lines otherwise.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "multiline",
+        "batch"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.multiline",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3MultilineTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Multiline Test",
+        "description": "Verify draft/multiline. Type !multiline and the bot sends a single logical message split across three physical lines using the multiline batch. Check your client renders it as one message (not three) when the cap is enabled, and degrades to separate lines otherwise.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "multiline",
+          "batch"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!multiline",
+            "params": {
+              "prefix": "!",
+              "command": "multiline",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "m",
+            "type": "action.multiline",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send 3 lines",
+            "params": {
+              "target": "{channel}",
+              "text": "line one of a multiline message\nline two, same logical message\nline three (draft/multiline test)"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "sent a 3-line draft/multiline message to {channel}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "m",
+            "toPin": 0
+          },
+          {
+            "from": "m",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Setname & Away",
+      "description": "Verify setname and away-notify. !setname <realname> changes the bot's real name (SETNAME) live; !away <message> marks it away and !back clears it (AWAY). Watch for the SETNAME / away-notify broadcasts on your client.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "setname",
+        "away-notify"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.away",
+        "action.reply",
+        "action.setname",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3NamingTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Setname & Away",
+        "description": "Verify setname and away-notify. !setname <realname> changes the bot's real name (SETNAME) live; !away <message> marks it away and !back clears it (AWAY). Watch for the SETNAME / away-notify broadcasts on your client.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "setname",
+          "away-notify"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!setname",
+            "params": {
+              "prefix": "!",
+              "command": "setname",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "sn",
+            "type": "action.setname",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "SETNAME",
+            "params": {
+              "name": "{args}"
+            }
+          },
+          {
+            "id": "r1",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "set real name to: {args}"
+            }
+          },
+          {
+            "id": "a",
+            "type": "event.command",
+            "x": 0,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!away",
+            "params": {
+              "prefix": "!",
+              "command": "away",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "aw",
+            "type": "action.away",
+            "x": 300,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "AWAY {args}",
+            "params": {
+              "message": "{args}"
+            }
+          },
+          {
+            "id": "r2",
+            "type": "action.reply",
+            "x": 600,
+            "y": 240,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "marked away: {args}"
+            }
+          },
+          {
+            "id": "b",
+            "type": "event.command",
+            "x": 0,
+            "y": 480,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!back",
+            "params": {
+              "prefix": "!",
+              "command": "back",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "bk",
+            "type": "action.away",
+            "x": 300,
+            "y": 480,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "AWAY (clear)",
+            "params": {
+              "message": ""
+            }
+          },
+          {
+            "id": "r3",
+            "type": "action.reply",
+            "x": 600,
+            "y": 480,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "no longer away"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "sn",
+            "toPin": 0
+          },
+          {
+            "from": "sn",
+            "fromPin": 0,
+            "to": "r1",
+            "toPin": 0
+          },
+          {
+            "from": "a",
+            "fromPin": 0,
+            "to": "aw",
+            "toPin": 0
+          },
+          {
+            "from": "aw",
+            "fromPin": 0,
+            "to": "r2",
+            "toPin": 0
+          },
+          {
+            "from": "b",
+            "fromPin": 0,
+            "to": "bk",
+            "toPin": 0
+          },
+          {
+            "from": "bk",
+            "fromPin": 0,
+            "to": "r3",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Reaction Test",
+      "description": "Verify message reactions (+draft/react). Type !react <emoji> and the bot reacts to your command message with a TAGMSG carrying +draft/react and +reply to your msgid. Check your client renders the reaction against the right message.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "react",
+        "tagmsg",
+        "reply"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.react",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3ReactionTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Reaction Test",
+        "description": "Verify message reactions (+draft/react). Type !react <emoji> and the bot reacts to your command message with a TAGMSG carrying +draft/react and +reply to your msgid. Check your client renders the reaction against the right message.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "react",
+          "tagmsg",
+          "reply"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!react",
+            "params": {
+              "prefix": "!",
+              "command": "react",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rx",
+            "type": "action.react",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "react to your msg",
+            "params": {
+              "emoji": "{args}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "reacted to your message with: {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rx",
+            "toPin": 0
+          },
+          {
+            "from": "rx",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Redaction Test",
+      "description": "Verify message redaction (draft/message-redaction). Copy a message id from your client, type !redact <msgid>, and the bot sends a REDACT for that id in this channel. Check your client hides/strikes the message and that your server enforces who may redact.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "redact",
+        "message-redaction"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.redact",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3RedactTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Redaction Test",
+        "description": "Verify message redaction (draft/message-redaction). Copy a message id from your client, type !redact <msgid>, and the bot sends a REDACT for that id in this channel. Check your client hides/strikes the message and that your server enforces who may redact.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "redact",
+          "message-redaction"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!redact",
+            "params": {
+              "prefix": "!",
+              "command": "redact",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rd",
+            "type": "action.redact",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "REDACT {args}",
+            "params": {
+              "target": "{channel}",
+              "msgid": "{args}",
+              "reason": "requested via !redact (IRCv3 test bot)"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "sent REDACT for msgid {args} in {channel}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rd",
+            "toPin": 0
+          },
+          {
+            "from": "rd",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Reply Threading",
+      "description": "Compare a threaded reply against a plain one. !thread replies with +reply set to your message id (clients can thread it); !reply sends an ordinary reply. Verify your client threads the first and not the second, and that +reply correlation survives your server.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "reply",
+        "labeled-response",
+        "context"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "action.replythread",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3ReplyThreading.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Reply Threading",
+        "description": "Compare a threaded reply against a plain one. !thread replies with +reply set to your message id (clients can thread it); !reply sends an ordinary reply. Verify your client threads the first and not the second, and that +reply correlation survives your server.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "reply",
+          "labeled-response",
+          "context"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!thread",
+            "params": {
+              "prefix": "!",
+              "command": "thread",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "t",
+            "type": "action.replythread",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "threaded",
+            "params": {
+              "message": "threaded reply: this carries +reply to your msgid {msgid}"
+            }
+          },
+          {
+            "id": "p",
+            "type": "event.command",
+            "x": 0,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!reply",
+            "params": {
+              "prefix": "!",
+              "command": "reply",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "pr",
+            "type": "action.reply",
+            "x": 300,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "plain",
+            "params": {
+              "message": "plain reply: no +reply tag, just a normal line"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "t",
+            "toPin": 0
+          },
+          {
+            "from": "p",
+            "fromPin": 0,
+            "to": "pr",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Tag Echo",
+      "description": "Inspect the IRCv3 message tags your client sent. !tags echoes the common ones (msgid, account, server-time, label) back at you; !gettag <name> reads any single tag by name (e.g. label, +draft/reply, time). Great for verifying message-tags, account-tag, server-time and echo-message.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "message-tags",
+        "account-tag",
+        "server-time",
+        "labeled-response"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.reply",
+        "data.gettag",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3TagEcho.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Tag Echo",
+        "description": "Inspect the IRCv3 message tags your client sent. !tags echoes the common ones (msgid, account, server-time, label) back at you; !gettag <name> reads any single tag by name (e.g. label, +draft/reply, time). Great for verifying message-tags, account-tag, server-time and echo-message.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "message-tags",
+          "account-tag",
+          "server-time",
+          "labeled-response"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!tags",
+            "params": {
+              "prefix": "!",
+              "command": "tags",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rt",
+            "type": "action.reply",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "echo tags",
+            "params": {
+              "message": "msgid={msgid} | account={account} | server-time={tag.time} | label={tag.label}"
+            }
+          },
+          {
+            "id": "g",
+            "type": "event.command",
+            "x": 0,
+            "y": 260,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!gettag",
+            "params": {
+              "prefix": "!",
+              "command": "gettag",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "gt",
+            "type": "data.gettag",
+            "x": 300,
+            "y": 360,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "read tag {args}",
+            "params": {
+              "name": "{args}"
+            }
+          },
+          {
+            "id": "rg",
+            "type": "action.reply",
+            "x": 600,
+            "y": 260,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "echo one tag",
+            "params": {
+              "message": "tag {args} = "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rt",
+            "toPin": 0
+          },
+          {
+            "from": "g",
+            "fromPin": 0,
+            "to": "rg",
+            "toPin": 0
+          },
+          {
+            "from": "gt",
+            "fromPin": 0,
+            "to": "rg",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 TAGMSG Test",
+      "description": "Send a bare TAGMSG carrying client-only tags. Type !tagmsg <tags> (e.g. !tagmsg +example-client/foo=bar) and the bot emits a TAGMSG to this channel with exactly those tags and no body. Verify your server relays TAGMSG and your client surfaces client-only (+) tags.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "tagmsg",
+        "client-tags",
+        "message-tags"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "action.tagmsg",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3TagmsgTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 TAGMSG Test",
+        "description": "Send a bare TAGMSG carrying client-only tags. Type !tagmsg <tags> (e.g. !tagmsg +example-client/foo=bar) and the bot emits a TAGMSG to this channel with exactly those tags and no body. Verify your server relays TAGMSG and your client surfaces client-only (+) tags.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "tagmsg",
+          "client-tags",
+          "message-tags"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!tagmsg",
+            "params": {
+              "prefix": "!",
+              "command": "tagmsg",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "t",
+            "type": "action.tagmsg",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "TAGMSG {args}",
+            "params": {
+              "target": "{channel}",
+              "tags": "{args}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "sent a TAGMSG to {channel} with tags: {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "t",
+            "toPin": 0
+          },
+          {
+            "from": "t",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Typing Test",
+      "description": "Verify the typing client-tag (+typing). Type !typing start and the bot sends an active typing notification to the channel; !typing stop sends done. Use it to check your client shows/clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "typing",
+        "tagmsg"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.typing.start",
+        "irc.typing.stop",
+        "logic.if"
+      ],
+      "file": "workflows/IRCv3TypingTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Typing Test",
+        "description": "Verify the typing client-tag (+typing). Type !typing start and the bot sends an active typing notification to the channel; !typing stop sends done. Use it to check your client shows/clears a 'bot is typing' indicator and that your server relays TAGMSG +typing.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "typing",
+          "tagmsg"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!typing",
+            "params": {
+              "prefix": "!",
+              "command": "typing",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "if",
+            "type": "logic.if",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "args == start?",
+            "params": {
+              "op": "=",
+              "b": "start",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "start",
+            "type": "irc.typing.start",
+            "x": 600,
+            "y": -90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "typing active",
+            "params": {
+              "target": "{channel}"
+            }
+          },
+          {
+            "id": "stop",
+            "type": "irc.typing.stop",
+            "x": 600,
+            "y": 110,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "typing done",
+            "params": {
+              "target": "{channel}"
+            }
+          },
+          {
+            "id": "ra",
+            "type": "action.reply",
+            "x": 900,
+            "y": -90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "started typing in {channel} (sent +typing=active)"
+            }
+          },
+          {
+            "id": "rb",
+            "type": "action.reply",
+            "x": 900,
+            "y": 110,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "ok",
+            "params": {
+              "message": "stopped typing (sent +typing=done)"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "if",
+            "toPin": 0
+          },
+          {
+            "from": "c",
+            "fromPin": 1,
+            "to": "if",
+            "toPin": 1
+          },
+          {
+            "from": "if",
+            "fromPin": 0,
+            "to": "start",
+            "toPin": 0
+          },
+          {
+            "from": "if",
+            "fromPin": 1,
+            "to": "stop",
+            "toPin": 0
+          },
+          {
+            "from": "start",
+            "fromPin": 0,
+            "to": "ra",
+            "toPin": 0
+          },
+          {
+            "from": "stop",
+            "fromPin": 0,
+            "to": "rb",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 WhoAmI",
+      "description": "Verify account-tag, server-time, msgid and reply context in one shot. Type !whoami in a channel, in a private message, or in a direct query - the bot reports your authenticated account, the message id and server-time, and replies back in the same context. The account comes from the account-tag, not the (spoofable) nick.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "account-tag",
+        "server-time",
+        "context",
+        "echo-message"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3WhoAmI.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 WhoAmI",
+        "description": "Verify account-tag, server-time, msgid and reply context in one shot. Type !whoami in a channel, in a private message, or in a direct query - the bot reports your authenticated account, the message id and server-time, and replies back in the same context. The account comes from the account-tag, not the (spoofable) nick.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "account-tag",
+          "server-time",
+          "context",
+          "echo-message"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!whoami",
+            "params": {
+              "prefix": "!",
+              "command": "whoami",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "report",
+            "params": {
+              "message": "nick={nick} | account={account} | bot?={isbot} | channel={channel} | msgid={msgid} | server-time={tag.time}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "r",
             "toPin": 0
           }
         ]

@@ -1,0 +1,69 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Multiline Test",
+  "description": "Verify draft/multiline. Type !multiline and the bot sends a single logical message split across three physical lines using the multiline batch. Check your client renders it as one message (not three) when the cap is enabled, and degrades to separate lines otherwise.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "multiline",
+    "batch"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!multiline",
+      "params": {
+        "prefix": "!",
+        "command": "multiline",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "m",
+      "type": "action.multiline",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send 3 lines",
+      "params": {
+        "target": "{channel}",
+        "text": "line one of a multiline message\nline two, same logical message\nline three (draft/multiline test)"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "sent a 3-line draft/multiline message to {channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "m",
+      "toPin": 0
+    },
+    {
+      "from": "m",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

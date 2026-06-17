@@ -1,0 +1,119 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Monitor Test",
+  "description": "Verify the MONITOR system. !monitor <nick> adds a nick to the bot's monitor list and !unmonitor <nick> removes it; the server then notifies the bot when that nick comes online or goes offline. Use it to check your server's MONITOR replies (RPL_MONONLINE / RPL_MONOFFLINE).",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "monitor"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!monitor",
+      "params": {
+        "prefix": "!",
+        "command": "monitor",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "m",
+      "type": "action.monitor",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "MONITOR + {args}",
+      "params": {
+        "nicks": "{args}",
+        "mode": "add"
+      }
+    },
+    {
+      "id": "r1",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "now monitoring {args}"
+      }
+    },
+    {
+      "id": "u",
+      "type": "event.command",
+      "x": 0,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!unmonitor",
+      "params": {
+        "prefix": "!",
+        "command": "unmonitor",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "mu",
+      "type": "action.monitor",
+      "x": 300,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "MONITOR - {args}",
+      "params": {
+        "nicks": "{args}",
+        "mode": "remove"
+      }
+    },
+    {
+      "id": "r2",
+      "type": "action.reply",
+      "x": 600,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "ok",
+      "params": {
+        "message": "stopped monitoring {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "m",
+      "toPin": 0
+    },
+    {
+      "from": "m",
+      "fromPin": 0,
+      "to": "r1",
+      "toPin": 0
+    },
+    {
+      "from": "u",
+      "fromPin": 0,
+      "to": "mu",
+      "toPin": 0
+    },
+    {
+      "from": "mu",
+      "fromPin": 0,
+      "to": "r2",
+      "toPin": 0
+    }
+  ]
+}
