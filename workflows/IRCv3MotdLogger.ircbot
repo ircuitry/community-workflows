@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 MOTD Logger",
+  "description": "Logs the message of the day (RPL_MOTD, 372) to the bot's console. A quick check that MOTD delivery works end to end.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "motd",
+    "372"
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "event.numeric",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on 372",
+      "params": {
+        "which": "372 RPL_MOTD"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log motd",
+      "params": {
+        "text": "MOTD: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "n",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

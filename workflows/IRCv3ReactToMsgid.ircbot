@@ -1,0 +1,106 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 React to Message",
+  "description": "Verify reacting to a SPECIFIC message. Type !reactid <msgid> <emoji> and the bot sends +draft/react with +reply set to that msgid. Lets you check reactions land on an arbitrary (older) message, not just the latest.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "react",
+    "reply",
+    "message-ids"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!reactid",
+      "params": {
+        "prefix": "!",
+        "command": "reactid",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rx",
+      "type": "logic.regex",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "split id + emoji",
+      "params": {
+        "pattern": "^(\\S+)\\s+(.*)$",
+        "ci": "false"
+      }
+    },
+    {
+      "id": "ri",
+      "type": "action.reactid",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "react to id",
+      "params": {
+        "target": "{channel}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 900,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "reacted to that message"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rx",
+      "toPin": 0
+    },
+    {
+      "from": "c",
+      "fromPin": 1,
+      "to": "rx",
+      "toPin": 1
+    },
+    {
+      "from": "rx",
+      "fromPin": 0,
+      "to": "ri",
+      "toPin": 0
+    },
+    {
+      "from": "rx",
+      "fromPin": 2,
+      "to": "ri",
+      "toPin": 1
+    },
+    {
+      "from": "rx",
+      "fromPin": 3,
+      "to": "ri",
+      "toPin": 2
+    },
+    {
+      "from": "ri",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

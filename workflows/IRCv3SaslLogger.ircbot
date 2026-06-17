@@ -1,0 +1,49 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 SASL Login Logger",
+  "description": "Logs RPL_LOGGEDIN (900) so you can confirm SASL authentication succeeded and see which account the server logged the bot in as.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "sasl",
+    "account",
+    "900"
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "event.numeric",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on 900",
+      "params": {
+        "which": "900 RPL_LOGGEDIN"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log login",
+      "params": {
+        "text": "logged in (SASL): {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "n",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

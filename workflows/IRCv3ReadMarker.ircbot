@@ -1,0 +1,67 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Read Marker",
+  "description": "Verify draft/read-marker. Type !markread and the bot sends MARKREAD for the current channel (timestamp=now). Check your server stores the marker and echoes it to the user's other clients.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "read-marker"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!markread",
+      "params": {
+        "prefix": "!",
+        "command": "markread",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rw",
+      "type": "irc.raw",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "MARKREAD",
+      "params": {
+        "line": "MARKREAD {channel}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "sent MARKREAD for {channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rw",
+      "toPin": 0
+    },
+    {
+      "from": "rw",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

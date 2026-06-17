@@ -1,0 +1,68 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 CTCP Action",
+  "description": "Verify CTCP ACTION (/me). Type !me <text> and the bot emits a CTCP ACTION to the channel. Check your client renders it as an action line, not a normal message.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "ctcp",
+    "action"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!me",
+      "params": {
+        "prefix": "!",
+        "command": "me",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "a",
+      "type": "irc.action",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "CTCP ACTION",
+      "params": {
+        "text": "{args}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "sent a CTCP ACTION: {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "a",
+      "toPin": 0
+    },
+    {
+      "from": "a",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

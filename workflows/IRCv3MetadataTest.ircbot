@@ -1,0 +1,69 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Metadata",
+  "description": "Verify draft/metadata-2. Type !setmeta <value> and the bot sets its own 'status' metadata key to that value (METADATA * SET status). Check the server stores it and notifies subscribers.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "metadata"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!setmeta",
+      "params": {
+        "prefix": "!",
+        "command": "setmeta",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "m",
+      "type": "action.metadata",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "METADATA * status",
+      "params": {
+        "target": "*",
+        "key": "status",
+        "value": "{args}"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "set self metadata status={args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "m",
+      "toPin": 0
+    },
+    {
+      "from": "m",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Chat History Variants",
+  "description": "Exercise CHATHISTORY sub-commands beyond LATEST. !histlatest requests the latest 20 for this channel; !histbefore <msgid> requests 20 messages before a given message id. Verify your server answers LATEST and BEFORE (draft/chathistory).",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "chathistory",
+    "history"
+  ],
+  "nodes": [
+    {
+      "id": "cl",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!histlatest",
+      "params": {
+        "prefix": "!",
+        "command": "histlatest",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rl",
+      "type": "irc.raw",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "LATEST",
+      "params": {
+        "line": "CHATHISTORY LATEST {channel} * 20"
+      }
+    },
+    {
+      "id": "r1",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "requested CHATHISTORY LATEST for {channel}"
+      }
+    },
+    {
+      "id": "cb",
+      "type": "event.command",
+      "x": 0,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!histbefore",
+      "params": {
+        "prefix": "!",
+        "command": "histbefore",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rb",
+      "type": "irc.raw",
+      "x": 300,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "BEFORE",
+      "params": {
+        "line": "CHATHISTORY BEFORE {channel} msgid={args} 20"
+      }
+    },
+    {
+      "id": "r2",
+      "type": "action.reply",
+      "x": 600,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "requested CHATHISTORY BEFORE {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cl",
+      "fromPin": 0,
+      "to": "rl",
+      "toPin": 0
+    },
+    {
+      "from": "rl",
+      "fromPin": 0,
+      "to": "r1",
+      "toPin": 0
+    },
+    {
+      "from": "cb",
+      "fromPin": 0,
+      "to": "rb",
+      "toPin": 0
+    },
+    {
+      "from": "rb",
+      "fromPin": 0,
+      "to": "r2",
+      "toPin": 0
+    }
+  ]
+}

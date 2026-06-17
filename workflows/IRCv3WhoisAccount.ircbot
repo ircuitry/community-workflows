@@ -1,0 +1,99 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 WHOIS Account",
+  "description": "Verify account discovery. Type !whois <nick> and the bot sends a WHOIS; when the server answers RPL_WHOISACCOUNT (330) it logs which account that nick is logged in as. Tests account-tag's WHOIS counterpart.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "whois",
+    "account",
+    "330"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!whois",
+      "params": {
+        "prefix": "!",
+        "command": "whois",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rw",
+      "type": "irc.raw",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "WHOIS {args}",
+      "params": {
+        "line": "WHOIS {args}"
+      }
+    },
+    {
+      "id": "rr",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "looking up {args}..."
+      }
+    },
+    {
+      "id": "n",
+      "type": "event.numeric",
+      "x": 0,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on 330",
+      "params": {
+        "which": "330 RPL_WHOISACCOUNT"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 300,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log account",
+      "params": {
+        "text": "WHOISACCOUNT: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rw",
+      "toPin": 0
+    },
+    {
+      "from": "rw",
+      "fromPin": 0,
+      "to": "rr",
+      "toPin": 0
+    },
+    {
+      "from": "n",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

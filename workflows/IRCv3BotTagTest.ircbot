@@ -1,0 +1,84 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Bot Tag Test",
+  "description": "Verify the bot message-tag (+B / draft/bot). Type !ambot and the bot tells you whether YOUR messages carry the bot tag - so a client/bot dev can confirm a peer correctly advertises itself as automated.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "bot-mode",
+    "message-tags"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!ambot",
+      "params": {
+        "prefix": "!",
+        "command": "ambot",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "b",
+      "type": "filter.isBot",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "are you a bot?",
+      "params": {}
+    },
+    {
+      "id": "rb",
+      "type": "action.reply",
+      "x": 600,
+      "y": -90,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "is bot",
+      "params": {
+        "message": "you carry the bot tag (+B / 'bot' message-tag)"
+      }
+    },
+    {
+      "id": "rh",
+      "type": "action.reply",
+      "x": 600,
+      "y": 90,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "human",
+      "params": {
+        "message": "you are not flagged as a bot"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "b",
+      "toPin": 0
+    },
+    {
+      "from": "b",
+      "fromPin": 0,
+      "to": "rb",
+      "toPin": 0
+    },
+    {
+      "from": "b",
+      "fromPin": 1,
+      "to": "rh",
+      "toPin": 0
+    }
+  ]
+}

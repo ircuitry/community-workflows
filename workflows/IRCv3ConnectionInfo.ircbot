@@ -1,0 +1,168 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Connection Info",
+  "description": "Report what the bot knows about this connection. !network shows the NETWORK name from RPL_ISUPPORT (005), !mynick the current nick, !mychannels the channels it has joined.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "isupport",
+    "state"
+  ],
+  "nodes": [
+    {
+      "id": "cn",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!network",
+      "params": {
+        "prefix": "!",
+        "command": "network",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "me1",
+      "type": "irc.me",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "network",
+      "params": {
+        "field": "network"
+      }
+    },
+    {
+      "id": "r1",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "network: "
+      }
+    },
+    {
+      "id": "ck",
+      "type": "event.command",
+      "x": 0,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!mynick",
+      "params": {
+        "prefix": "!",
+        "command": "mynick",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "me2",
+      "type": "irc.me",
+      "x": 300,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "nick",
+      "params": {
+        "field": "nick"
+      }
+    },
+    {
+      "id": "r2",
+      "type": "action.reply",
+      "x": 600,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "my nick: "
+      }
+    },
+    {
+      "id": "cc",
+      "type": "event.command",
+      "x": 0,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!mychannels",
+      "params": {
+        "prefix": "!",
+        "command": "mychannels",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "me3",
+      "type": "irc.me",
+      "x": 300,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "channels",
+      "params": {
+        "field": "channels"
+      }
+    },
+    {
+      "id": "r3",
+      "type": "action.reply",
+      "x": 600,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "my channels: "
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cn",
+      "fromPin": 0,
+      "to": "r1",
+      "toPin": 0
+    },
+    {
+      "from": "me1",
+      "fromPin": 0,
+      "to": "r1",
+      "toPin": 1
+    },
+    {
+      "from": "ck",
+      "fromPin": 0,
+      "to": "r2",
+      "toPin": 0
+    },
+    {
+      "from": "me2",
+      "fromPin": 0,
+      "to": "r2",
+      "toPin": 1
+    },
+    {
+      "from": "cc",
+      "fromPin": 0,
+      "to": "r3",
+      "toPin": 0
+    },
+    {
+      "from": "me3",
+      "fromPin": 0,
+      "to": "r3",
+      "toPin": 1
+    }
+  ]
+}

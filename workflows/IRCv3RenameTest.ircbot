@@ -1,0 +1,69 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Channel Rename",
+  "description": "Verify draft/channel-rename. Type !rename <newname> and the bot asks the server to RENAME the current channel. Watch for the RENAME broadcast and that non-ops are refused.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "channel-rename"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!rename",
+      "params": {
+        "prefix": "!",
+        "command": "rename",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rn",
+      "type": "action.rename",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "RENAME",
+      "params": {
+        "channel": "{channel}",
+        "newname": "{args}",
+        "reason": "IRCv3 channel-rename test"
+      }
+    },
+    {
+      "id": "r",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "requested RENAME of {channel} -> {args}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rn",
+      "toPin": 0
+    },
+    {
+      "from": "rn",
+      "fromPin": 0,
+      "to": "r",
+      "toPin": 0
+    }
+  ]
+}

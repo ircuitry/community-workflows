@@ -1,0 +1,104 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Echo Message",
+  "description": "Verify the echo-message capability. Type !echo <text> and the bot says it to the channel; if echo-message is enabled the server sends the bot its OWN line back, which the bot logs as 'echo received'. No log means echo-message is off or unsupported.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "echo-message"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!echo",
+      "params": {
+        "prefix": "!",
+        "command": "echo",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "say",
+      "type": "action.say",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say it",
+      "params": {
+        "channel": "{channel}",
+        "message": "{args}"
+      }
+    },
+    {
+      "id": "m",
+      "type": "event.message",
+      "x": 0,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on message",
+      "params": {}
+    },
+    {
+      "id": "if",
+      "type": "logic.if",
+      "x": 300,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "from me?",
+      "params": {
+        "op": "=",
+        "b": "{botnick}",
+        "ci": "true"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 600,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log echo",
+      "params": {
+        "text": "echo-message received my own line: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "say",
+      "toPin": 0
+    },
+    {
+      "from": "m",
+      "fromPin": 0,
+      "to": "if",
+      "toPin": 0
+    },
+    {
+      "from": "m",
+      "fromPin": 2,
+      "to": "if",
+      "toPin": 1
+    },
+    {
+      "from": "if",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

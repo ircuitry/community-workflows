@@ -1,0 +1,48 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 ISUPPORT Logger",
+  "description": "Logs every RPL_ISUPPORT (005) line to the bot's console as the server sends them at registration. Verify your server advertises the tokens (CHANTYPES, PREFIX, CHATHISTORY, NETWORK, etc.) you expect.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "isupport",
+    "005"
+  ],
+  "nodes": [
+    {
+      "id": "n",
+      "type": "event.numeric",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "on 005",
+      "params": {
+        "which": "005 RPL_ISUPPORT"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log isupport",
+      "params": {
+        "text": "ISUPPORT: {message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "n",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Formatting & Colors",
+  "description": "Exercise IRC formatting codes so a client dev can check rendering. !rainbow <text> sends mIRC-coloured text, !bold <text> sends bold, !strip <text> echoes the text with all formatting removed. All go to the current channel.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "colors",
+    "formatting"
+  ],
+  "nodes": [
+    {
+      "id": "cr",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!rainbow",
+      "params": {
+        "prefix": "!",
+        "command": "rainbow",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cor",
+      "type": "irc.color",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "rainbow",
+      "params": {
+        "op": "rainbow"
+      }
+    },
+    {
+      "id": "sr",
+      "type": "action.say",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say",
+      "params": {
+        "channel": "{channel}"
+      }
+    },
+    {
+      "id": "cb",
+      "type": "event.command",
+      "x": 0,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!bold",
+      "params": {
+        "prefix": "!",
+        "command": "bold",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cob",
+      "type": "irc.color",
+      "x": 300,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "bold",
+      "params": {
+        "op": "bold"
+      }
+    },
+    {
+      "id": "sb",
+      "type": "action.say",
+      "x": 600,
+      "y": 180,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say",
+      "params": {
+        "channel": "{channel}"
+      }
+    },
+    {
+      "id": "cs",
+      "type": "event.command",
+      "x": 0,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!strip",
+      "params": {
+        "prefix": "!",
+        "command": "strip",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cos",
+      "type": "irc.color",
+      "x": 300,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "strip",
+      "params": {
+        "op": "strip"
+      }
+    },
+    {
+      "id": "ss",
+      "type": "action.say",
+      "x": 600,
+      "y": 360,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "say",
+      "params": {
+        "channel": "{channel}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "cr",
+      "fromPin": 0,
+      "to": "sr",
+      "toPin": 0
+    },
+    {
+      "from": "cr",
+      "fromPin": 1,
+      "to": "cor",
+      "toPin": 0
+    },
+    {
+      "from": "cor",
+      "fromPin": 0,
+      "to": "sr",
+      "toPin": 2
+    },
+    {
+      "from": "cb",
+      "fromPin": 0,
+      "to": "sb",
+      "toPin": 0
+    },
+    {
+      "from": "cb",
+      "fromPin": 1,
+      "to": "cob",
+      "toPin": 0
+    },
+    {
+      "from": "cob",
+      "fromPin": 0,
+      "to": "sb",
+      "toPin": 2
+    },
+    {
+      "from": "cs",
+      "fromPin": 0,
+      "to": "ss",
+      "toPin": 0
+    },
+    {
+      "from": "cs",
+      "fromPin": 1,
+      "to": "cos",
+      "toPin": 0
+    },
+    {
+      "from": "cos",
+      "fromPin": 0,
+      "to": "ss",
+      "toPin": 2
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Raw + Numeric Debugger",
+  "description": "A protocol bench. !raw <line> sends ANY raw IRC line to the server (e.g. !raw WHO #chan, !raw CAP LS 302), and every numeric reply the server sends is logged to the bot's console as '<= NNN NAME :text'. The single most useful bot to keep running while you debug a server or client.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "raw",
+    "numerics",
+    "debug"
+  ],
+  "nodes": [
+    {
+      "id": "c",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!raw",
+      "params": {
+        "prefix": "!",
+        "command": "raw",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "rw",
+      "type": "irc.raw",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "send raw {args}",
+      "params": {
+        "line": "{args}"
+      }
+    },
+    {
+      "id": "rr",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "sent raw: {args}"
+      }
+    },
+    {
+      "id": "n",
+      "type": "event.numeric",
+      "x": 0,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "any numeric",
+      "params": {
+        "which": "(any numeric)"
+      }
+    },
+    {
+      "id": "lg",
+      "type": "action.log",
+      "x": 300,
+      "y": 250,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "log numeric",
+      "params": {
+        "text": "<= {numeric} {numname} :{message}"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "c",
+      "fromPin": 0,
+      "to": "rw",
+      "toPin": 0
+    },
+    {
+      "from": "rw",
+      "fromPin": 0,
+      "to": "rr",
+      "toPin": 0
+    },
+    {
+      "from": "n",
+      "fromPin": 0,
+      "to": "lg",
+      "toPin": 0
+    }
+  ]
+}

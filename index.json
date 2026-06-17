@@ -1,5 +1,5 @@
 {
-  "count": 242,
+  "count": 258,
   "workflows": [
     {
       "name": "Random Advice",
@@ -18720,6 +18720,111 @@
       }
     },
     {
+      "name": "IRCv3 Bot Tag Test",
+      "description": "Verify the bot message-tag (+B / draft/bot). Type !ambot and the bot tells you whether YOUR messages carry the bot tag - so a client/bot dev can confirm a peer correctly advertises itself as automated.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "bot-mode",
+        "message-tags"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "filter.isBot"
+      ],
+      "file": "workflows/IRCv3BotTagTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Bot Tag Test",
+        "description": "Verify the bot message-tag (+B / draft/bot). Type !ambot and the bot tells you whether YOUR messages carry the bot tag - so a client/bot dev can confirm a peer correctly advertises itself as automated.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "bot-mode",
+          "message-tags"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!ambot",
+            "params": {
+              "prefix": "!",
+              "command": "ambot",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "b",
+            "type": "filter.isBot",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "are you a bot?",
+            "params": {}
+          },
+          {
+            "id": "rb",
+            "type": "action.reply",
+            "x": 600,
+            "y": -90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "is bot",
+            "params": {
+              "message": "you carry the bot tag (+B / 'bot' message-tag)"
+            }
+          },
+          {
+            "id": "rh",
+            "type": "action.reply",
+            "x": 600,
+            "y": 90,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "human",
+            "params": {
+              "message": "you are not flagged as a bot"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "b",
+            "toPin": 0
+          },
+          {
+            "from": "b",
+            "fromPin": 0,
+            "to": "rb",
+            "toPin": 0
+          },
+          {
+            "from": "b",
+            "fromPin": 1,
+            "to": "rh",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "IRCv3 Cap List",
       "description": "See the IRCv3 capabilities negotiated on this connection. Type !caps and the bot replies with the list of enabled caps (from CAP LS / ACK). Handy for confirming your server advertises and your client/bot negotiated what you expect.",
       "author": "ircuitry",
@@ -18803,6 +18908,202 @@
             "from": "me",
             "fromPin": 0,
             "to": "r",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Channel Probe",
+      "description": "Read channel state the server gave us. !topic shows the channel topic, !names lists the members (exercises multi-prefix and userhost-in-names), !count shows the member count. Run in any channel the bot is in.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "names",
+        "multi-prefix",
+        "userhost-in-names",
+        "topic"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.channel"
+      ],
+      "file": "workflows/IRCv3ChannelProbe.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Channel Probe",
+        "description": "Read channel state the server gave us. !topic shows the channel topic, !names lists the members (exercises multi-prefix and userhost-in-names), !count shows the member count. Run in any channel the bot is in.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "names",
+          "multi-prefix",
+          "userhost-in-names",
+          "topic"
+        ],
+        "nodes": [
+          {
+            "id": "ct",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!topic",
+            "params": {
+              "prefix": "!",
+              "command": "topic",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "cht",
+            "type": "irc.channel",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "topic",
+            "params": {
+              "channel": "{channel}",
+              "field": "topic"
+            }
+          },
+          {
+            "id": "rt",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "topic of {channel}: "
+            }
+          },
+          {
+            "id": "cn",
+            "type": "event.command",
+            "x": 0,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!names",
+            "params": {
+              "prefix": "!",
+              "command": "names",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "chn",
+            "type": "irc.channel",
+            "x": 300,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "members",
+            "params": {
+              "channel": "{channel}",
+              "field": "members"
+            }
+          },
+          {
+            "id": "rn",
+            "type": "action.reply",
+            "x": 600,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "members of {channel}: "
+            }
+          },
+          {
+            "id": "cc",
+            "type": "event.command",
+            "x": 0,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!count",
+            "params": {
+              "prefix": "!",
+              "command": "count",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "chc",
+            "type": "irc.channel",
+            "x": 300,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "count",
+            "params": {
+              "channel": "{channel}",
+              "field": "count"
+            }
+          },
+          {
+            "id": "rc",
+            "type": "action.reply",
+            "x": 600,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "{channel} member count: "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "ct",
+            "fromPin": 0,
+            "to": "rt",
+            "toPin": 0
+          },
+          {
+            "from": "cht",
+            "fromPin": 0,
+            "to": "rt",
+            "toPin": 1
+          },
+          {
+            "from": "cn",
+            "fromPin": 0,
+            "to": "rn",
+            "toPin": 0
+          },
+          {
+            "from": "chn",
+            "fromPin": 0,
+            "to": "rn",
+            "toPin": 1
+          },
+          {
+            "from": "cc",
+            "fromPin": 0,
+            "to": "rc",
+            "toPin": 0
+          },
+          {
+            "from": "chc",
+            "fromPin": 0,
+            "to": "rc",
             "toPin": 1
           }
         ]
@@ -18901,6 +19202,913 @@
             "fromPin": 1,
             "to": "r",
             "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Chat History Variants",
+      "description": "Exercise CHATHISTORY sub-commands beyond LATEST. !histlatest requests the latest 20 for this channel; !histbefore <msgid> requests 20 messages before a given message id. Verify your server answers LATEST and BEFORE (draft/chathistory).",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "chathistory",
+        "history"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.raw"
+      ],
+      "file": "workflows/IRCv3ChatHistoryVariants.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Chat History Variants",
+        "description": "Exercise CHATHISTORY sub-commands beyond LATEST. !histlatest requests the latest 20 for this channel; !histbefore <msgid> requests 20 messages before a given message id. Verify your server answers LATEST and BEFORE (draft/chathistory).",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "chathistory",
+          "history"
+        ],
+        "nodes": [
+          {
+            "id": "cl",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!histlatest",
+            "params": {
+              "prefix": "!",
+              "command": "histlatest",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rl",
+            "type": "irc.raw",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "LATEST",
+            "params": {
+              "line": "CHATHISTORY LATEST {channel} * 20"
+            }
+          },
+          {
+            "id": "r1",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "requested CHATHISTORY LATEST for {channel}"
+            }
+          },
+          {
+            "id": "cb",
+            "type": "event.command",
+            "x": 0,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!histbefore",
+            "params": {
+              "prefix": "!",
+              "command": "histbefore",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rb",
+            "type": "irc.raw",
+            "x": 300,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "BEFORE",
+            "params": {
+              "line": "CHATHISTORY BEFORE {channel} msgid={args} 20"
+            }
+          },
+          {
+            "id": "r2",
+            "type": "action.reply",
+            "x": 600,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "requested CHATHISTORY BEFORE {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cl",
+            "fromPin": 0,
+            "to": "rl",
+            "toPin": 0
+          },
+          {
+            "from": "rl",
+            "fromPin": 0,
+            "to": "r1",
+            "toPin": 0
+          },
+          {
+            "from": "cb",
+            "fromPin": 0,
+            "to": "rb",
+            "toPin": 0
+          },
+          {
+            "from": "rb",
+            "fromPin": 0,
+            "to": "r2",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Connection Info",
+      "description": "Report what the bot knows about this connection. !network shows the NETWORK name from RPL_ISUPPORT (005), !mynick the current nick, !mychannels the channels it has joined.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "isupport",
+        "state"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.me"
+      ],
+      "file": "workflows/IRCv3ConnectionInfo.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Connection Info",
+        "description": "Report what the bot knows about this connection. !network shows the NETWORK name from RPL_ISUPPORT (005), !mynick the current nick, !mychannels the channels it has joined.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "isupport",
+          "state"
+        ],
+        "nodes": [
+          {
+            "id": "cn",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!network",
+            "params": {
+              "prefix": "!",
+              "command": "network",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "me1",
+            "type": "irc.me",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "network",
+            "params": {
+              "field": "network"
+            }
+          },
+          {
+            "id": "r1",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "network: "
+            }
+          },
+          {
+            "id": "ck",
+            "type": "event.command",
+            "x": 0,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!mynick",
+            "params": {
+              "prefix": "!",
+              "command": "mynick",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "me2",
+            "type": "irc.me",
+            "x": 300,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "nick",
+            "params": {
+              "field": "nick"
+            }
+          },
+          {
+            "id": "r2",
+            "type": "action.reply",
+            "x": 600,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "my nick: "
+            }
+          },
+          {
+            "id": "cc",
+            "type": "event.command",
+            "x": 0,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!mychannels",
+            "params": {
+              "prefix": "!",
+              "command": "mychannels",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "me3",
+            "type": "irc.me",
+            "x": 300,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "channels",
+            "params": {
+              "field": "channels"
+            }
+          },
+          {
+            "id": "r3",
+            "type": "action.reply",
+            "x": 600,
+            "y": 400,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "my channels: "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cn",
+            "fromPin": 0,
+            "to": "r1",
+            "toPin": 0
+          },
+          {
+            "from": "me1",
+            "fromPin": 0,
+            "to": "r1",
+            "toPin": 1
+          },
+          {
+            "from": "ck",
+            "fromPin": 0,
+            "to": "r2",
+            "toPin": 0
+          },
+          {
+            "from": "me2",
+            "fromPin": 0,
+            "to": "r2",
+            "toPin": 1
+          },
+          {
+            "from": "cc",
+            "fromPin": 0,
+            "to": "r3",
+            "toPin": 0
+          },
+          {
+            "from": "me3",
+            "fromPin": 0,
+            "to": "r3",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 CTCP Action",
+      "description": "Verify CTCP ACTION (/me). Type !me <text> and the bot emits a CTCP ACTION to the channel. Check your client renders it as an action line, not a normal message.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "ctcp",
+        "action"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.action"
+      ],
+      "file": "workflows/IRCv3CtcpAction.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 CTCP Action",
+        "description": "Verify CTCP ACTION (/me). Type !me <text> and the bot emits a CTCP ACTION to the channel. Check your client renders it as an action line, not a normal message.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "ctcp",
+          "action"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!me",
+            "params": {
+              "prefix": "!",
+              "command": "me",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "a",
+            "type": "irc.action",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "CTCP ACTION",
+            "params": {
+              "text": "{args}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "sent a CTCP ACTION: {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "a",
+            "toPin": 0
+          },
+          {
+            "from": "a",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Echo Message",
+      "description": "Verify the echo-message capability. Type !echo <text> and the bot says it to the channel; if echo-message is enabled the server sends the bot its OWN line back, which the bot logs as 'echo received'. No log means echo-message is off or unsupported.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "echo-message"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.log",
+        "action.say",
+        "event.command",
+        "event.message",
+        "logic.if"
+      ],
+      "file": "workflows/IRCv3EchoMessage.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Echo Message",
+        "description": "Verify the echo-message capability. Type !echo <text> and the bot says it to the channel; if echo-message is enabled the server sends the bot its OWN line back, which the bot logs as 'echo received'. No log means echo-message is off or unsupported.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "echo-message"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!echo",
+            "params": {
+              "prefix": "!",
+              "command": "echo",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "say it",
+            "params": {
+              "channel": "{channel}",
+              "message": "{args}"
+            }
+          },
+          {
+            "id": "m",
+            "type": "event.message",
+            "x": 0,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on message",
+            "params": {}
+          },
+          {
+            "id": "if",
+            "type": "logic.if",
+            "x": 300,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "from me?",
+            "params": {
+              "op": "=",
+              "b": "{botnick}",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 600,
+            "y": 200,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log echo",
+            "params": {
+              "text": "echo-message received my own line: {message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "m",
+            "fromPin": 0,
+            "to": "if",
+            "toPin": 0
+          },
+          {
+            "from": "m",
+            "fromPin": 2,
+            "to": "if",
+            "toPin": 1
+          },
+          {
+            "from": "if",
+            "fromPin": 0,
+            "to": "lg",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Formatting & Colors",
+      "description": "Exercise IRC formatting codes so a client dev can check rendering. !rainbow <text> sends mIRC-coloured text, !bold <text> sends bold, !strip <text> echoes the text with all formatting removed. All go to the current channel.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "colors",
+        "formatting"
+      ],
+      "nodeCount": 9,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.say",
+        "event.command",
+        "irc.color"
+      ],
+      "file": "workflows/IRCv3Formatting.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Formatting & Colors",
+        "description": "Exercise IRC formatting codes so a client dev can check rendering. !rainbow <text> sends mIRC-coloured text, !bold <text> sends bold, !strip <text> echoes the text with all formatting removed. All go to the current channel.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "colors",
+          "formatting"
+        ],
+        "nodes": [
+          {
+            "id": "cr",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!rainbow",
+            "params": {
+              "prefix": "!",
+              "command": "rainbow",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "cor",
+            "type": "irc.color",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "rainbow",
+            "params": {
+              "op": "rainbow"
+            }
+          },
+          {
+            "id": "sr",
+            "type": "action.say",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "say",
+            "params": {
+              "channel": "{channel}"
+            }
+          },
+          {
+            "id": "cb",
+            "type": "event.command",
+            "x": 0,
+            "y": 180,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!bold",
+            "params": {
+              "prefix": "!",
+              "command": "bold",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "cob",
+            "type": "irc.color",
+            "x": 300,
+            "y": 180,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "bold",
+            "params": {
+              "op": "bold"
+            }
+          },
+          {
+            "id": "sb",
+            "type": "action.say",
+            "x": 600,
+            "y": 180,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "say",
+            "params": {
+              "channel": "{channel}"
+            }
+          },
+          {
+            "id": "cs",
+            "type": "event.command",
+            "x": 0,
+            "y": 360,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!strip",
+            "params": {
+              "prefix": "!",
+              "command": "strip",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "cos",
+            "type": "irc.color",
+            "x": 300,
+            "y": 360,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "strip",
+            "params": {
+              "op": "strip"
+            }
+          },
+          {
+            "id": "ss",
+            "type": "action.say",
+            "x": 600,
+            "y": 360,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "say",
+            "params": {
+              "channel": "{channel}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cr",
+            "fromPin": 0,
+            "to": "sr",
+            "toPin": 0
+          },
+          {
+            "from": "cr",
+            "fromPin": 1,
+            "to": "cor",
+            "toPin": 0
+          },
+          {
+            "from": "cor",
+            "fromPin": 0,
+            "to": "sr",
+            "toPin": 2
+          },
+          {
+            "from": "cb",
+            "fromPin": 0,
+            "to": "sb",
+            "toPin": 0
+          },
+          {
+            "from": "cb",
+            "fromPin": 1,
+            "to": "cob",
+            "toPin": 0
+          },
+          {
+            "from": "cob",
+            "fromPin": 0,
+            "to": "sb",
+            "toPin": 2
+          },
+          {
+            "from": "cs",
+            "fromPin": 0,
+            "to": "ss",
+            "toPin": 0
+          },
+          {
+            "from": "cs",
+            "fromPin": 1,
+            "to": "cos",
+            "toPin": 0
+          },
+          {
+            "from": "cos",
+            "fromPin": 0,
+            "to": "ss",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 ISUPPORT Logger",
+      "description": "Logs every RPL_ISUPPORT (005) line to the bot's console as the server sends them at registration. Verify your server advertises the tokens (CHANTYPES, PREFIX, CHATHISTORY, NETWORK, etc.) you expect.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "isupport",
+        "005"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "action.log",
+        "event.numeric"
+      ],
+      "file": "workflows/IRCv3IsupportLogger.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 ISUPPORT Logger",
+        "description": "Logs every RPL_ISUPPORT (005) line to the bot's console as the server sends them at registration. Verify your server advertises the tokens (CHANTYPES, PREFIX, CHATHISTORY, NETWORK, etc.) you expect.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "isupport",
+          "005"
+        ],
+        "nodes": [
+          {
+            "id": "n",
+            "type": "event.numeric",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on 005",
+            "params": {
+              "which": "005 RPL_ISUPPORT"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log isupport",
+            "params": {
+              "text": "ISUPPORT: {message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "n",
+            "fromPin": 0,
+            "to": "lg",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Metadata",
+      "description": "Verify draft/metadata-2. Type !setmeta <value> and the bot sets its own 'status' metadata key to that value (METADATA * SET status). Check the server stores it and notifies subscribers.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "metadata"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.metadata",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3MetadataTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Metadata",
+        "description": "Verify draft/metadata-2. Type !setmeta <value> and the bot sets its own 'status' metadata key to that value (METADATA * SET status). Check the server stores it and notifies subscribers.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "metadata"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!setmeta",
+            "params": {
+              "prefix": "!",
+              "command": "setmeta",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "m",
+            "type": "action.metadata",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "METADATA * status",
+            "params": {
+              "target": "*",
+              "key": "status",
+              "value": "{args}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "set self metadata status={args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "m",
+            "toPin": 0
+          },
+          {
+            "from": "m",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
           }
         ]
       }
@@ -19039,6 +20247,74 @@
             "from": "mu",
             "fromPin": 0,
             "to": "r2",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 MOTD Logger",
+      "description": "Logs the message of the day (RPL_MOTD, 372) to the bot's console. A quick check that MOTD delivery works end to end.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "motd",
+        "372"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "action.log",
+        "event.numeric"
+      ],
+      "file": "workflows/IRCv3MotdLogger.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 MOTD Logger",
+        "description": "Logs the message of the day (RPL_MOTD, 372) to the bot's console. A quick check that MOTD delivery works end to end.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "motd",
+          "372"
+        ],
+        "nodes": [
+          {
+            "id": "n",
+            "type": "event.numeric",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on 372",
+            "params": {
+              "which": "372 RPL_MOTD"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log motd",
+            "params": {
+              "text": "MOTD: {message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "n",
+            "fromPin": 0,
+            "to": "lg",
             "toPin": 0
           }
         ]
@@ -19325,6 +20601,258 @@
       }
     },
     {
+      "name": "IRCv3 Raw + Numeric Debugger",
+      "description": "A protocol bench. !raw <line> sends ANY raw IRC line to the server (e.g. !raw WHO #chan, !raw CAP LS 302), and every numeric reply the server sends is logged to the bot's console as '<= NNN NAME :text'. The single most useful bot to keep running while you debug a server or client.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "raw",
+        "numerics",
+        "debug"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.log",
+        "action.reply",
+        "event.command",
+        "event.numeric",
+        "irc.raw"
+      ],
+      "file": "workflows/IRCv3RawDebugger.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Raw + Numeric Debugger",
+        "description": "A protocol bench. !raw <line> sends ANY raw IRC line to the server (e.g. !raw WHO #chan, !raw CAP LS 302), and every numeric reply the server sends is logged to the bot's console as '<= NNN NAME :text'. The single most useful bot to keep running while you debug a server or client.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "raw",
+          "numerics",
+          "debug"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!raw",
+            "params": {
+              "prefix": "!",
+              "command": "raw",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rw",
+            "type": "irc.raw",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "send raw {args}",
+            "params": {
+              "line": "{args}"
+            }
+          },
+          {
+            "id": "rr",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "sent raw: {args}"
+            }
+          },
+          {
+            "id": "n",
+            "type": "event.numeric",
+            "x": 0,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "any numeric",
+            "params": {
+              "which": "(any numeric)"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 300,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log numeric",
+            "params": {
+              "text": "<= {numeric} {numname} :{message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rw",
+            "toPin": 0
+          },
+          {
+            "from": "rw",
+            "fromPin": 0,
+            "to": "rr",
+            "toPin": 0
+          },
+          {
+            "from": "n",
+            "fromPin": 0,
+            "to": "lg",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 React to Message",
+      "description": "Verify reacting to a SPECIFIC message. Type !reactid <msgid> <emoji> and the bot sends +draft/react with +reply set to that msgid. Lets you check reactions land on an arbitrary (older) message, not just the latest.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "react",
+        "reply",
+        "message-ids"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 6,
+      "nodeTypes": [
+        "action.reactid",
+        "action.reply",
+        "event.command",
+        "logic.regex"
+      ],
+      "file": "workflows/IRCv3ReactToMsgid.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 React to Message",
+        "description": "Verify reacting to a SPECIFIC message. Type !reactid <msgid> <emoji> and the bot sends +draft/react with +reply set to that msgid. Lets you check reactions land on an arbitrary (older) message, not just the latest.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "react",
+          "reply",
+          "message-ids"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!reactid",
+            "params": {
+              "prefix": "!",
+              "command": "reactid",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rx",
+            "type": "logic.regex",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "split id + emoji",
+            "params": {
+              "pattern": "^(\\S+)\\s+(.*)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "ri",
+            "type": "action.reactid",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "react to id",
+            "params": {
+              "target": "{channel}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 900,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "reacted to that message"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rx",
+            "toPin": 0
+          },
+          {
+            "from": "c",
+            "fromPin": 1,
+            "to": "rx",
+            "toPin": 1
+          },
+          {
+            "from": "rx",
+            "fromPin": 0,
+            "to": "ri",
+            "toPin": 0
+          },
+          {
+            "from": "rx",
+            "fromPin": 2,
+            "to": "ri",
+            "toPin": 1
+          },
+          {
+            "from": "rx",
+            "fromPin": 3,
+            "to": "ri",
+            "toPin": 2
+          },
+          {
+            "from": "ri",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "IRCv3 Reaction Test",
       "description": "Verify message reactions (+draft/react). Type !react <emoji> and the bot reacts to your command message with a TAGMSG carrying +draft/react and +reply to your msgid. Check your client renders the reaction against the right message.",
       "author": "ircuitry",
@@ -19416,6 +20944,93 @@
       }
     },
     {
+      "name": "IRCv3 Read Marker",
+      "description": "Verify draft/read-marker. Type !markread and the bot sends MARKREAD for the current channel (timestamp=now). Check your server stores the marker and echoes it to the user's other clients.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "read-marker"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "irc.raw"
+      ],
+      "file": "workflows/IRCv3ReadMarker.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Read Marker",
+        "description": "Verify draft/read-marker. Type !markread and the bot sends MARKREAD for the current channel (timestamp=now). Check your server stores the marker and echoes it to the user's other clients.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "read-marker"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!markread",
+            "params": {
+              "prefix": "!",
+              "command": "markread",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rw",
+            "type": "irc.raw",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "MARKREAD",
+            "params": {
+              "line": "MARKREAD {channel}"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "sent MARKREAD for {channel}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rw",
+            "toPin": 0
+          },
+          {
+            "from": "rw",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "IRCv3 Redaction Test",
       "description": "Verify message redaction (draft/message-redaction). Copy a message id from your client, type !redact <msgid>, and the bot sends a REDACT for that id in this channel. Check your client hides/strikes the message and that your server enforces who may redact.",
       "author": "ircuitry",
@@ -19499,6 +21114,95 @@
           },
           {
             "from": "rd",
+            "fromPin": 0,
+            "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 Channel Rename",
+      "description": "Verify draft/channel-rename. Type !rename <newname> and the bot asks the server to RENAME the current channel. Watch for the RENAME broadcast and that non-ops are refused.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "channel-rename"
+      ],
+      "nodeCount": 3,
+      "connectionCount": 2,
+      "nodeTypes": [
+        "action.rename",
+        "action.reply",
+        "event.command"
+      ],
+      "file": "workflows/IRCv3RenameTest.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 Channel Rename",
+        "description": "Verify draft/channel-rename. Type !rename <newname> and the bot asks the server to RENAME the current channel. Watch for the RENAME broadcast and that non-ops are refused.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "channel-rename"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!rename",
+            "params": {
+              "prefix": "!",
+              "command": "rename",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rn",
+            "type": "action.rename",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "RENAME",
+            "params": {
+              "channel": "{channel}",
+              "newname": "{args}",
+              "reason": "IRCv3 channel-rename test"
+            }
+          },
+          {
+            "id": "r",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "requested RENAME of {channel} -> {args}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rn",
+            "toPin": 0
+          },
+          {
+            "from": "rn",
             "fromPin": 0,
             "to": "r",
             "toPin": 0
@@ -19606,6 +21310,76 @@
             "from": "p",
             "fromPin": 0,
             "to": "pr",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 SASL Login Logger",
+      "description": "Logs RPL_LOGGEDIN (900) so you can confirm SASL authentication succeeded and see which account the server logged the bot in as.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "sasl",
+        "account",
+        "900"
+      ],
+      "nodeCount": 2,
+      "connectionCount": 1,
+      "nodeTypes": [
+        "action.log",
+        "event.numeric"
+      ],
+      "file": "workflows/IRCv3SaslLogger.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 SASL Login Logger",
+        "description": "Logs RPL_LOGGEDIN (900) so you can confirm SASL authentication succeeded and see which account the server logged the bot in as.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "sasl",
+          "account",
+          "900"
+        ],
+        "nodes": [
+          {
+            "id": "n",
+            "type": "event.numeric",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on 900",
+            "params": {
+              "which": "900 RPL_LOGGEDIN"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log login",
+            "params": {
+              "text": "logged in (SASL): {message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "n",
+            "fromPin": 0,
+            "to": "lg",
             "toPin": 0
           }
         ]
@@ -20050,6 +21824,129 @@
             "from": "c",
             "fromPin": 0,
             "to": "r",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "IRCv3 WHOIS Account",
+      "description": "Verify account discovery. Type !whois <nick> and the bot sends a WHOIS; when the server answers RPL_WHOISACCOUNT (330) it logs which account that nick is logged in as. Tests account-tag's WHOIS counterpart.",
+      "author": "ircuitry",
+      "category": "Testing",
+      "tags": [
+        "ircv3",
+        "testing",
+        "developer",
+        "whois",
+        "account",
+        "330"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "action.log",
+        "action.reply",
+        "event.command",
+        "event.numeric",
+        "irc.raw"
+      ],
+      "file": "workflows/IRCv3WhoisAccount.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "IRCv3 WHOIS Account",
+        "description": "Verify account discovery. Type !whois <nick> and the bot sends a WHOIS; when the server answers RPL_WHOISACCOUNT (330) it logs which account that nick is logged in as. Tests account-tag's WHOIS counterpart.",
+        "author": "ircuitry",
+        "category": "Testing",
+        "tags": [
+          "ircv3",
+          "testing",
+          "developer",
+          "whois",
+          "account",
+          "330"
+        ],
+        "nodes": [
+          {
+            "id": "c",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "!whois",
+            "params": {
+              "prefix": "!",
+              "command": "whois",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "rw",
+            "type": "irc.raw",
+            "x": 300,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "WHOIS {args}",
+            "params": {
+              "line": "WHOIS {args}"
+            }
+          },
+          {
+            "id": "rr",
+            "type": "action.reply",
+            "x": 600,
+            "y": 0,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "reply",
+            "params": {
+              "message": "looking up {args}..."
+            }
+          },
+          {
+            "id": "n",
+            "type": "event.numeric",
+            "x": 0,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "on 330",
+            "params": {
+              "which": "330 RPL_WHOISACCOUNT"
+            }
+          },
+          {
+            "id": "lg",
+            "type": "action.log",
+            "x": 300,
+            "y": 250,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "log account",
+            "params": {
+              "text": "WHOISACCOUNT: {message}"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "c",
+            "fromPin": 0,
+            "to": "rw",
+            "toPin": 0
+          },
+          {
+            "from": "rw",
+            "fromPin": 0,
+            "to": "rr",
+            "toPin": 0
+          },
+          {
+            "from": "n",
+            "fromPin": 0,
+            "to": "lg",
             "toPin": 0
           }
         ]

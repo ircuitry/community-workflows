@@ -1,0 +1,173 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "IRCv3 Channel Probe",
+  "description": "Read channel state the server gave us. !topic shows the channel topic, !names lists the members (exercises multi-prefix and userhost-in-names), !count shows the member count. Run in any channel the bot is in.",
+  "author": "ircuitry",
+  "category": "Testing",
+  "tags": [
+    "ircv3",
+    "testing",
+    "developer",
+    "names",
+    "multi-prefix",
+    "userhost-in-names",
+    "topic"
+  ],
+  "nodes": [
+    {
+      "id": "ct",
+      "type": "event.command",
+      "x": 0,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!topic",
+      "params": {
+        "prefix": "!",
+        "command": "topic",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "cht",
+      "type": "irc.channel",
+      "x": 300,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "topic",
+      "params": {
+        "channel": "{channel}",
+        "field": "topic"
+      }
+    },
+    {
+      "id": "rt",
+      "type": "action.reply",
+      "x": 600,
+      "y": 0,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "topic of {channel}: "
+      }
+    },
+    {
+      "id": "cn",
+      "type": "event.command",
+      "x": 0,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!names",
+      "params": {
+        "prefix": "!",
+        "command": "names",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "chn",
+      "type": "irc.channel",
+      "x": 300,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "members",
+      "params": {
+        "channel": "{channel}",
+        "field": "members"
+      }
+    },
+    {
+      "id": "rn",
+      "type": "action.reply",
+      "x": 600,
+      "y": 200,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "members of {channel}: "
+      }
+    },
+    {
+      "id": "cc",
+      "type": "event.command",
+      "x": 0,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "!count",
+      "params": {
+        "prefix": "!",
+        "command": "count",
+        "contexts": "public, private, pm"
+      }
+    },
+    {
+      "id": "chc",
+      "type": "irc.channel",
+      "x": 300,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "count",
+      "params": {
+        "channel": "{channel}",
+        "field": "count"
+      }
+    },
+    {
+      "id": "rc",
+      "type": "action.reply",
+      "x": 600,
+      "y": 400,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "reply",
+      "params": {
+        "message": "{channel} member count: "
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "ct",
+      "fromPin": 0,
+      "to": "rt",
+      "toPin": 0
+    },
+    {
+      "from": "cht",
+      "fromPin": 0,
+      "to": "rt",
+      "toPin": 1
+    },
+    {
+      "from": "cn",
+      "fromPin": 0,
+      "to": "rn",
+      "toPin": 0
+    },
+    {
+      "from": "chn",
+      "fromPin": 0,
+      "to": "rn",
+      "toPin": 1
+    },
+    {
+      "from": "cc",
+      "fromPin": 0,
+      "to": "rc",
+      "toPin": 0
+    },
+    {
+      "from": "chc",
+      "fromPin": 0,
+      "to": "rc",
+      "toPin": 1
+    }
+  ]
+}
