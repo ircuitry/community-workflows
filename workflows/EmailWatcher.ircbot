@@ -1,0 +1,20 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "EmailWatcher",
+  "description": "Checks an IMAP inbox every few minutes and announces new mail (sender + subject) to a channel. Fill in the IMAP host/user and store the password as the secret 'imap_pass'. Set the announce channel.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["email", "imap", "notify", "mail"],
+  "nodes": [
+    { "id": "timer", "type": "event.timer", "x": 0, "y": 0, "title": "every 5 min", "params": { "seconds": "300" } },
+    { "id": "fetch", "type": "mail.fetch", "x": 240, "y": 0, "title": "fetch unseen", "params": { "host": "imap.example.com", "port": "993", "user": "you@example.com", "pass": "{{secret.imap_pass}}", "max": "10", "markseen": "true" } },
+    { "id": "each", "type": "logic.forEach", "x": 480, "y": 0, "title": "per message", "params": { "sep": "json", "var": "item" } },
+    { "id": "say", "type": "action.say", "x": 720, "y": 0, "title": "announce", "params": { "channel": "#your-channel", "message": "New mail from {item.from}: {item.subject}", "server": "" } }
+  ],
+  "connections": [
+    { "from": "timer", "fromPin": 0, "to": "fetch", "toPin": 0 },
+    { "from": "fetch", "fromPin": 0, "to": "each", "toPin": 0 },
+    { "from": "fetch", "fromPin": 2, "to": "each", "toPin": 1 },
+    { "from": "each", "fromPin": 0, "to": "say", "toPin": 0 }
+  ]
+}

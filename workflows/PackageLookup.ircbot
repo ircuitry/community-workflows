@@ -1,0 +1,46 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "PackageLookup",
+  "description": "Look up software packages: !npm <pkg> shows the latest npm version and description, !pypi <pkg> does the same from PyPI.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["dev", "npm", "pypi", "web"],
+  "nodes": [
+    { "id": "npmCmd", "type": "event.command", "x": 0, "y": 0, "title": "!npm <pkg>", "params": { "prefix": "!", "command": "npm", "contexts": "public, private, pm" } },
+    { "id": "npmUrl", "type": "data.format", "x": 220, "y": 80, "title": "registry url", "params": { "template": "https://registry.npmjs.org/{a}/latest" } },
+    { "id": "npmHttp", "type": "net.http", "x": 440, "y": 0, "title": "fetch", "params": { "method": "GET", "url": "https://", "send": "body", "headers": "", "body": "", "timeout": "15" } },
+    { "id": "npmVer", "type": "data.json", "x": 660, "y": 80, "title": "version", "params": { "path": "version" } },
+    { "id": "npmDesc", "type": "data.json", "x": 660, "y": 160, "title": "description", "params": { "path": "description" } },
+    { "id": "npmFmt", "type": "data.format", "x": 880, "y": 80, "title": "format", "params": { "template": "v{a} - {b}" } },
+    { "id": "npmRep", "type": "action.reply", "x": 1100, "y": 0, "title": "answer", "params": { "message": "", "server": "" } },
+
+    { "id": "pyCmd", "type": "event.command", "x": 0, "y": 300, "title": "!pypi <pkg>", "params": { "prefix": "!", "command": "pypi", "contexts": "public, private, pm" } },
+    { "id": "pyUrl", "type": "data.format", "x": 220, "y": 380, "title": "pypi url", "params": { "template": "https://pypi.org/pypi/{a}/json" } },
+    { "id": "pyHttp", "type": "net.http", "x": 440, "y": 300, "title": "fetch", "params": { "method": "GET", "url": "https://", "send": "body", "headers": "", "body": "", "timeout": "15" } },
+    { "id": "pyVer", "type": "data.json", "x": 660, "y": 380, "title": "version", "params": { "path": "info.version" } },
+    { "id": "pySum", "type": "data.json", "x": 660, "y": 460, "title": "summary", "params": { "path": "info.summary" } },
+    { "id": "pyFmt", "type": "data.format", "x": 880, "y": 380, "title": "format", "params": { "template": "v{a} - {b}" } },
+    { "id": "pyRep", "type": "action.reply", "x": 1100, "y": 300, "title": "answer", "params": { "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "npmCmd", "fromPin": 1, "to": "npmUrl", "toPin": 0 },
+    { "from": "npmUrl", "fromPin": 0, "to": "npmHttp", "toPin": 1 },
+    { "from": "npmCmd", "fromPin": 0, "to": "npmHttp", "toPin": 0 },
+    { "from": "npmHttp", "fromPin": 1, "to": "npmVer", "toPin": 0 },
+    { "from": "npmHttp", "fromPin": 1, "to": "npmDesc", "toPin": 0 },
+    { "from": "npmVer", "fromPin": 0, "to": "npmFmt", "toPin": 0 },
+    { "from": "npmDesc", "fromPin": 0, "to": "npmFmt", "toPin": 1 },
+    { "from": "npmHttp", "fromPin": 0, "to": "npmRep", "toPin": 0 },
+    { "from": "npmFmt", "fromPin": 0, "to": "npmRep", "toPin": 1 },
+
+    { "from": "pyCmd", "fromPin": 1, "to": "pyUrl", "toPin": 0 },
+    { "from": "pyUrl", "fromPin": 0, "to": "pyHttp", "toPin": 1 },
+    { "from": "pyCmd", "fromPin": 0, "to": "pyHttp", "toPin": 0 },
+    { "from": "pyHttp", "fromPin": 1, "to": "pyVer", "toPin": 0 },
+    { "from": "pyHttp", "fromPin": 1, "to": "pySum", "toPin": 0 },
+    { "from": "pyVer", "fromPin": 0, "to": "pyFmt", "toPin": 0 },
+    { "from": "pySum", "fromPin": 0, "to": "pyFmt", "toPin": 1 },
+    { "from": "pyHttp", "fromPin": 0, "to": "pyRep", "toPin": 0 },
+    { "from": "pyFmt", "fromPin": 0, "to": "pyRep", "toPin": 1 }
+  ]
+}

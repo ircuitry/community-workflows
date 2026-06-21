@@ -1,0 +1,23 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ChannelLogger",
+  "description": "Logs the channel to a timestamped text file under ~/ircuitry/files/logs - messages, joins and parts. A simple Scribe-style public logger.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["logging", "logger", "scribe", "file"],
+  "nodes": [
+    { "id": "msg", "type": "event.message", "x": 0, "y": 0, "title": "on message", "params": { "channel": "" } },
+    { "id": "wMsg", "type": "file.write", "x": 240, "y": 0, "title": "append line", "params": { "path": "logs/{channel}.log", "mode": "append", "text": "[{datetime}] <{nick}> {message}" } },
+
+    { "id": "joinEv", "type": "event.join", "x": 0, "y": 140, "title": "on join", "params": {} },
+    { "id": "wJoin", "type": "file.write", "x": 240, "y": 140, "title": "append join", "params": { "path": "logs/{channel}.log", "mode": "append", "text": "[{datetime}] *** {nick} joined" } },
+
+    { "id": "partEv", "type": "event.part", "x": 0, "y": 280, "title": "on part", "params": {} },
+    { "id": "wPart", "type": "file.write", "x": 240, "y": 280, "title": "append part", "params": { "path": "logs/{channel}.log", "mode": "append", "text": "[{datetime}] *** {nick} left" } }
+  ],
+  "connections": [
+    { "from": "msg", "fromPin": 0, "to": "wMsg", "toPin": 0 },
+    { "from": "joinEv", "fromPin": 0, "to": "wJoin", "toPin": 0 },
+    { "from": "partEv", "fromPin": 0, "to": "wPart", "toPin": 0 }
+  ]
+}

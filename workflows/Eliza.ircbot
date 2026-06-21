@@ -1,0 +1,25 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Eliza",
+  "description": "The classic Rogerian chatbot. Say !eliza <something on your mind> and it reflects your statement back or offers a therapist-style prompt. No AI, just patterns.",
+  "author": "ircuitry",
+  "category": "Games",
+  "tags": ["eliza", "chatbot", "fun", "classic"],
+  "nodes": [
+    { "id": "cmd", "type": "event.command", "x": 0, "y": 0, "title": "!eliza <text>", "params": { "prefix": "!", "command": "eliza", "contexts": "public, private, pm" } },
+    { "id": "re", "type": "logic.regex", "x": 240, "y": 0, "title": "match 'i ...'", "params": { "pattern": "^\\s*i\\s+(.+?)[.!?]*$", "ci": "true" } },
+    { "id": "setS", "type": "data.setvar", "x": 460, "y": 0, "title": "phrase -> {s}", "params": { "name": "s", "value": "" } },
+    { "id": "repMatch", "type": "action.reply", "x": 680, "y": 0, "title": "reflect", "params": { "message": "Why do you say you {s}?", "server": "" } },
+    { "id": "rand", "type": "data.random", "x": 240, "y": 160, "title": "rogerian prompts", "params": { "options": "How does that make you feel?\nTell me more about that.\nWhy do you say that?\nWhat do you think it means?\nI see. Please, go on.\nAnd how does that affect you?\nCan you elaborate on that?\nWhat would it mean to you if it changed?" } },
+    { "id": "repRand", "type": "action.reply", "x": 460, "y": 160, "title": "prompt", "params": { "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "cmd", "fromPin": 0, "to": "re", "toPin": 0 },
+    { "from": "cmd", "fromPin": 1, "to": "re", "toPin": 1 },
+    { "from": "re", "fromPin": 0, "to": "setS", "toPin": 0 },
+    { "from": "re", "fromPin": 2, "to": "setS", "toPin": 1 },
+    { "from": "setS", "fromPin": 0, "to": "repMatch", "toPin": 0 },
+    { "from": "re", "fromPin": 1, "to": "repRand", "toPin": 0 },
+    { "from": "rand", "fromPin": 0, "to": "repRand", "toPin": 1 }
+  ]
+}

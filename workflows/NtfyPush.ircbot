@@ -1,0 +1,25 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "NtfyPush",
+  "description": "Push alerts to your phone via ntfy.sh. !page <message> sends a note, and you also get pushed whenever the bot's nick is mentioned. Store your topic as the secret 'ntfy_topic' (subscribe to it in the ntfy app).",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["ntfy", "push", "notify", "pager", "web"],
+  "nodes": [
+    { "id": "pageCmd", "type": "event.command", "x": 0, "y": 0, "title": "!page <message>", "params": { "prefix": "!", "command": "page", "contexts": "public, private, pm" } },
+    { "id": "pageHttp", "type": "net.http", "x": 240, "y": 0, "title": "push", "params": { "method": "POST", "url": "https://ntfy.sh/{{secret.ntfy_topic}}", "send": "body", "headers": "", "body": "{args}", "timeout": "15" } },
+    { "id": "pageRep", "type": "action.reply", "x": 480, "y": 0, "title": "confirm", "params": { "message": "Pushed to your phone.", "server": "" } },
+
+    { "id": "msg", "type": "event.message", "x": 0, "y": 180, "title": "any chat line", "params": { "channel": "" } },
+    { "id": "mine", "type": "filter.contains", "x": 240, "y": 180, "title": "mentions me?", "params": { "needle": "{me}", "ci": "true" } },
+    { "id": "hlHttp", "type": "net.http", "x": 480, "y": 180, "title": "push mention", "params": { "method": "POST", "url": "https://ntfy.sh/{{secret.ntfy_topic}}", "send": "body", "headers": "Title: Mentioned in {channel}", "body": "{nick}: {message}", "timeout": "15" } }
+  ],
+  "connections": [
+    { "from": "pageCmd", "fromPin": 0, "to": "pageHttp", "toPin": 0 },
+    { "from": "pageHttp", "fromPin": 0, "to": "pageRep", "toPin": 0 },
+
+    { "from": "msg", "fromPin": 0, "to": "mine", "toPin": 0 },
+    { "from": "msg", "fromPin": 1, "to": "mine", "toPin": 1 },
+    { "from": "mine", "fromPin": 0, "to": "hlHttp", "toPin": 0 }
+  ]
+}

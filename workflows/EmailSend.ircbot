@@ -1,0 +1,30 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "EmailSend",
+  "description": "Send an email from chat: !email <to-address> <message>. Fill in your SMTP host/user and store the password as the secret 'smtp_pass'.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["email", "smtp", "mail"],
+  "nodes": [
+    { "id": "cmd", "type": "event.command", "x": 0, "y": 0, "title": "!email to msg", "params": { "prefix": "!", "command": "email", "contexts": "public, private, pm" } },
+    { "id": "re", "type": "logic.regex", "x": 220, "y": 0, "title": "split to / message", "params": { "pattern": "^(\\S+)\\s+(.+)$", "ci": "false" } },
+    { "id": "setTo", "type": "data.setvar", "x": 440, "y": 0, "title": "to -> {to}", "params": { "name": "to", "value": "" } },
+    { "id": "setBody", "type": "data.setvar", "x": 640, "y": 0, "title": "body -> {body}", "params": { "name": "body", "value": "" } },
+    { "id": "send", "type": "mail.send", "x": 840, "y": 0, "title": "send mail", "params": { "host": "smtp.example.com", "port": "587", "user": "you@example.com", "pass": "{{secret.smtp_pass}}", "from": "", "to": "{to}", "subject": "IRC message from {nick}", "body": "{body}" } },
+    { "id": "ok", "type": "action.reply", "x": 1060, "y": 0, "title": "ok", "params": { "message": "Email sent to {to}.", "server": "" } },
+    { "id": "fail", "type": "action.reply", "x": 1060, "y": 100, "title": "failed", "params": { "message": "Sorry, that email failed to send.", "server": "" } },
+    { "id": "bad", "type": "action.reply", "x": 440, "y": 120, "title": "usage", "params": { "message": "Usage: !email <to-address> <message>", "server": "" } }
+  ],
+  "connections": [
+    { "from": "cmd", "fromPin": 0, "to": "re", "toPin": 0 },
+    { "from": "cmd", "fromPin": 1, "to": "re", "toPin": 1 },
+    { "from": "re", "fromPin": 0, "to": "setTo", "toPin": 0 },
+    { "from": "re", "fromPin": 2, "to": "setTo", "toPin": 1 },
+    { "from": "setTo", "fromPin": 0, "to": "setBody", "toPin": 0 },
+    { "from": "re", "fromPin": 3, "to": "setBody", "toPin": 1 },
+    { "from": "setBody", "fromPin": 0, "to": "send", "toPin": 0 },
+    { "from": "send", "fromPin": 0, "to": "ok", "toPin": 0 },
+    { "from": "send", "fromPin": 1, "to": "fail", "toPin": 0 },
+    { "from": "re", "fromPin": 1, "to": "bad", "toPin": 0 }
+  ]
+}

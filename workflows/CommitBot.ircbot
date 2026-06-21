@@ -1,0 +1,28 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "CommitBot",
+  "description": "Announces GitHub pushes to a channel (CIA/KGB style). Point a GitHub repo webhook (push event, JSON) at this bot's hosted URL: http://host:port/hook/<path>. Set the path below to a long secret and set the announce channel.",
+  "author": "ircuitry",
+  "category": "Utility",
+  "tags": ["github", "webhook", "commit", "notify", "dev"],
+  "nodes": [
+    { "id": "wh", "type": "event.webhook", "x": 0, "y": 0, "title": "on push webhook", "params": { "path": "change-me-to-a-long-secret-path" } },
+    { "id": "jRepo", "type": "data.json", "x": 240, "y": 80, "title": "repo", "params": { "path": "repository.full_name" } },
+    { "id": "jPusher", "type": "data.json", "x": 240, "y": 160, "title": "pusher", "params": { "path": "pusher.name" } },
+    { "id": "jMsg", "type": "data.json", "x": 240, "y": 240, "title": "commit message", "params": { "path": "head_commit.message" } },
+    { "id": "f1", "type": "data.format", "x": 460, "y": 80, "title": "header", "params": { "template": "[{a}] {b} pushed:" } },
+    { "id": "f2", "type": "data.format", "x": 680, "y": 80, "title": "full line", "params": { "template": "{a} {b}" } },
+    { "id": "say", "type": "action.say", "x": 900, "y": 0, "title": "announce", "params": { "channel": "#your-channel", "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "wh", "fromPin": 1, "to": "jRepo", "toPin": 0 },
+    { "from": "wh", "fromPin": 1, "to": "jPusher", "toPin": 0 },
+    { "from": "wh", "fromPin": 1, "to": "jMsg", "toPin": 0 },
+    { "from": "jRepo", "fromPin": 0, "to": "f1", "toPin": 0 },
+    { "from": "jPusher", "fromPin": 0, "to": "f1", "toPin": 1 },
+    { "from": "f1", "fromPin": 0, "to": "f2", "toPin": 0 },
+    { "from": "jMsg", "fromPin": 0, "to": "f2", "toPin": 1 },
+    { "from": "wh", "fromPin": 0, "to": "say", "toPin": 0 },
+    { "from": "f2", "fromPin": 0, "to": "say", "toPin": 2 }
+  ]
+}
