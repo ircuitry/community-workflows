@@ -48,7 +48,7 @@
       "params": {
         "table": "kudos",
         "key": "{time}-{nick}",
-        "value": "{1}|{2}|from {nick}"
+        "value": "{cap1_parse}|{cap2_parse}|from {nick}"
       }
     },
     {
@@ -61,7 +61,7 @@
       "title": "announce kudos",
       "params": {
         "channel": "",
-        "message": "Kudos to {1}: {2} (from {nick})",
+        "message": "Kudos to {cap1_parse}: {cap2_parse} (from {nick})",
         "server": ""
       }
     },
@@ -119,6 +119,32 @@
         "message": "",
         "server": ""
       }
+    },
+    {
+      "id": "cap1_parse",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_parse",
+        "value": ""
+      }
+    },
+    {
+      "id": "cap2_parse",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 280,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 2",
+      "params": {
+        "name": "cap2_parse",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -133,12 +159,6 @@
       "fromPin": 1,
       "to": "parse",
       "toPin": 1
-    },
-    {
-      "from": "parse",
-      "fromPin": 0,
-      "to": "store",
-      "toPin": 0
     },
     {
       "from": "store",
@@ -175,6 +195,36 @@
       "fromPin": 2,
       "to": "listReply",
       "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 2,
+      "to": "cap1_parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "cap1_parse",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 3,
+      "to": "cap2_parse",
+      "toPin": 1
+    },
+    {
+      "from": "cap1_parse",
+      "fromPin": 0,
+      "to": "cap2_parse",
+      "toPin": 0
+    },
+    {
+      "from": "cap2_parse",
+      "fromPin": 0,
+      "to": "store",
+      "toPin": 0
     }
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "NowPlaying",
+  "description": "Shows what a Last.fm user is listening to: !np <lastfm-username>. Store your Last.fm API key as the encrypted secret 'lastfm_key'.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["lastfm", "music", "nowplaying", "web"],
+  "nodes": [
+    { "id": "cmd", "type": "event.command", "x": 0, "y": 0, "title": "!np <user>", "params": { "prefix": "!", "command": "np", "contexts": "public, private, pm" } },
+    { "id": "url", "type": "data.format", "x": 220, "y": 80, "title": "build url", "params": { "template": "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={a}&api_key={{secret.lastfm_key}}&format=json&limit=1" } },
+    { "id": "http", "type": "net.http", "x": 440, "y": 0, "title": "fetch", "params": { "method": "GET", "url": "https://", "send": "body", "headers": "", "body": "", "timeout": "15" } },
+    { "id": "jArtist", "type": "data.json", "x": 660, "y": 80, "title": "artist", "params": { "path": "recenttracks.track.0.artist.#text" } },
+    { "id": "jName", "type": "data.json", "x": 660, "y": 160, "title": "track", "params": { "path": "recenttracks.track.0.name" } },
+    { "id": "fmt", "type": "data.format", "x": 880, "y": 80, "title": "format", "params": { "template": "Now playing: {a} - {b}" } },
+    { "id": "rep", "type": "action.reply", "x": 1100, "y": 0, "title": "answer", "params": { "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "cmd", "fromPin": 1, "to": "url", "toPin": 0 },
+    { "from": "url", "fromPin": 0, "to": "http", "toPin": 1 },
+    { "from": "cmd", "fromPin": 0, "to": "http", "toPin": 0 },
+    { "from": "http", "fromPin": 1, "to": "jArtist", "toPin": 0 },
+    { "from": "http", "fromPin": 1, "to": "jName", "toPin": 0 },
+    { "from": "jArtist", "fromPin": 0, "to": "fmt", "toPin": 0 },
+    { "from": "jName", "fromPin": 0, "to": "fmt", "toPin": 1 },
+    { "from": "http", "fromPin": 0, "to": "rep", "toPin": 0 },
+    { "from": "fmt", "fromPin": 0, "to": "rep", "toPin": 1 }
+  ]
+}

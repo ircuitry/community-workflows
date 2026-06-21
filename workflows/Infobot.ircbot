@@ -1,0 +1,45 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "Infobot",
+  "description": "A classic factoid bot: teach it with !learn <key> = <value>, look facts up with !whatis <key>, and remove them with !forget <key>. Facts persist on disk.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["factoid", "infobot", "memory", "db"],
+  "nodes": [
+    { "id": "learnCmd", "type": "event.command", "x": 0, "y": 0, "title": "!learn key = value", "params": { "prefix": "!", "command": "learn", "contexts": "public, private, pm" } },
+    { "id": "learnRe", "type": "logic.regex", "x": 220, "y": 0, "title": "split key = value", "params": { "pattern": "^(.+?)\\s*=\\s*(.+)$", "ci": "false" } },
+    { "id": "setK", "type": "data.setvar", "x": 420, "y": 0, "title": "key -> {k}", "params": { "name": "k", "value": "" } },
+    { "id": "setV", "type": "data.setvar", "x": 620, "y": 0, "title": "value -> {v}", "params": { "name": "v", "value": "" } },
+    { "id": "learnSet", "type": "db.set", "x": 820, "y": 0, "title": "store fact", "params": { "table": "facts", "key": "{k}", "value": "{v}" } },
+    { "id": "learnRep", "type": "action.reply", "x": 1020, "y": 0, "title": "confirm", "params": { "message": "Got it: {k} is {v}", "server": "" } },
+    { "id": "learnBad", "type": "action.reply", "x": 420, "y": 120, "title": "usage", "params": { "message": "Usage: !learn <key> = <value>", "server": "" } },
+
+    { "id": "whatCmd", "type": "event.command", "x": 0, "y": 240, "title": "!whatis key", "params": { "prefix": "!", "command": "whatis", "contexts": "public, private, pm" } },
+    { "id": "whatGet", "type": "db.get", "x": 240, "y": 320, "title": "look up fact", "params": { "table": "facts", "mode": "value", "key": "{args}", "default": "(I don't know that one)", "find": "" } },
+    { "id": "whatFmt", "type": "data.format", "x": 480, "y": 320, "title": "format", "params": { "template": "{b}: {a}" } },
+    { "id": "whatRep", "type": "action.reply", "x": 720, "y": 240, "title": "answer", "params": { "message": "", "server": "" } },
+
+    { "id": "forgetCmd", "type": "event.command", "x": 0, "y": 460, "title": "!forget key", "params": { "prefix": "!", "command": "forget", "contexts": "public, private, pm" } },
+    { "id": "forgetSet", "type": "db.set", "x": 240, "y": 460, "title": "delete fact", "params": { "table": "facts", "key": "{args}", "value": "" } },
+    { "id": "forgetRep", "type": "action.reply", "x": 480, "y": 460, "title": "confirm", "params": { "message": "Forgotten: {args}", "server": "" } }
+  ],
+  "connections": [
+    { "from": "learnCmd", "fromPin": 0, "to": "learnRe", "toPin": 0 },
+    { "from": "learnCmd", "fromPin": 1, "to": "learnRe", "toPin": 1 },
+    { "from": "learnRe", "fromPin": 0, "to": "setK", "toPin": 0 },
+    { "from": "learnRe", "fromPin": 2, "to": "setK", "toPin": 1 },
+    { "from": "setK", "fromPin": 0, "to": "setV", "toPin": 0 },
+    { "from": "learnRe", "fromPin": 3, "to": "setV", "toPin": 1 },
+    { "from": "setV", "fromPin": 0, "to": "learnSet", "toPin": 0 },
+    { "from": "learnSet", "fromPin": 0, "to": "learnRep", "toPin": 0 },
+    { "from": "learnRe", "fromPin": 1, "to": "learnBad", "toPin": 0 },
+
+    { "from": "whatCmd", "fromPin": 0, "to": "whatRep", "toPin": 0 },
+    { "from": "whatGet", "fromPin": 0, "to": "whatFmt", "toPin": 0 },
+    { "from": "whatCmd", "fromPin": 1, "to": "whatFmt", "toPin": 1 },
+    { "from": "whatFmt", "fromPin": 0, "to": "whatRep", "toPin": 1 },
+
+    { "from": "forgetCmd", "fromPin": 0, "to": "forgetSet", "toPin": 0 },
+    { "from": "forgetSet", "fromPin": 0, "to": "forgetRep", "toPin": 0 }
+  ]
+}

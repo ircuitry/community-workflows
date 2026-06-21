@@ -1,0 +1,23 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "RelayToDiscord",
+  "description": "Mirrors every channel message to a Discord channel through an incoming webhook. Store the webhook URL as the secret 'discord_webhook'. One-way (IRC -> Discord). Needs a build with the data.encode json op.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["relay", "bridge", "discord", "webhook"],
+  "nodes": [
+    { "id": "msg", "type": "event.message", "x": 0, "y": 0, "title": "any chat line", "params": { "channel": "" } },
+    { "id": "line", "type": "data.format", "x": 220, "y": 80, "title": "format line", "params": { "template": "<{nick}> {message}" } },
+    { "id": "esc", "type": "data.encode", "x": 440, "y": 80, "title": "json-escape", "params": { "op": "json", "mode": "encode" } },
+    { "id": "body", "type": "data.format", "x": 660, "y": 80, "title": "json body", "params": { "template": "{\"content\":\"{a}\"}" } },
+    { "id": "stash", "type": "data.setvar", "x": 220, "y": 0, "title": "body -> var", "params": { "name": "relay_body", "value": "" } },
+    { "id": "http", "type": "net.http", "x": 440, "y": 0, "title": "post to webhook", "params": { "method": "POST", "url": "{{secret.discord_webhook}}", "send": "body", "headers": "Content-Type: application/json", "body": "{relay_body}", "timeout": "15" } }
+  ],
+  "connections": [
+    { "from": "msg", "fromPin": 0, "to": "stash", "toPin": 0 },
+    { "from": "line", "fromPin": 0, "to": "esc", "toPin": 0 },
+    { "from": "esc", "fromPin": 0, "to": "body", "toPin": 0 },
+    { "from": "body", "fromPin": 0, "to": "stash", "toPin": 1 },
+    { "from": "stash", "fromPin": 0, "to": "http", "toPin": 0 }
+  ]
+}

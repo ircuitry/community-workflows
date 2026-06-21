@@ -46,7 +46,7 @@
       "params": {
         "table": "karma",
         "mode": "value",
-        "key": "{1}",
+        "key": "{cap1_incRegex}",
         "default": "0",
         "find": ""
       }
@@ -75,7 +75,7 @@
       "title": "save karma",
       "params": {
         "table": "karma",
-        "key": "{1}",
+        "key": "{cap1_incRegex}",
         "value": ""
       }
     },
@@ -103,7 +103,7 @@
       "params": {
         "table": "karma",
         "mode": "value",
-        "key": "{1}",
+        "key": "{cap1_decRegex}",
         "default": "0",
         "find": ""
       }
@@ -132,7 +132,7 @@
       "title": "save karma",
       "params": {
         "table": "karma",
-        "key": "{1}",
+        "key": "{cap1_decRegex}",
         "value": ""
       }
     },
@@ -190,6 +190,32 @@
         "message": "",
         "server": ""
       }
+    },
+    {
+      "id": "cap1_incRegex",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_incRegex",
+        "value": ""
+      }
+    },
+    {
+      "id": "cap1_decRegex",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 540,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_decRegex",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -204,12 +230,6 @@
       "fromPin": 1,
       "to": "incRegex",
       "toPin": 1
-    },
-    {
-      "from": "incRegex",
-      "fromPin": 0,
-      "to": "incSet",
-      "toPin": 0
     },
     {
       "from": "incGet",
@@ -234,12 +254,6 @@
       "fromPin": 1,
       "to": "decRegex",
       "toPin": 1
-    },
-    {
-      "from": "decRegex",
-      "fromPin": 0,
-      "to": "decSet",
-      "toPin": 0
     },
     {
       "from": "decGet",
@@ -276,6 +290,42 @@
       "fromPin": 0,
       "to": "lookupRep",
       "toPin": 1
+    },
+    {
+      "from": "incRegex",
+      "fromPin": 2,
+      "to": "cap1_incRegex",
+      "toPin": 1
+    },
+    {
+      "from": "incRegex",
+      "fromPin": 0,
+      "to": "cap1_incRegex",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_incRegex",
+      "fromPin": 0,
+      "to": "incSet",
+      "toPin": 0
+    },
+    {
+      "from": "decRegex",
+      "fromPin": 2,
+      "to": "cap1_decRegex",
+      "toPin": 1
+    },
+    {
+      "from": "decRegex",
+      "fromPin": 0,
+      "to": "cap1_decRegex",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_decRegex",
+      "fromPin": 0,
+      "to": "decSet",
+      "toPin": 0
     }
   ]
 }

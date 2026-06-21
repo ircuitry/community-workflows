@@ -47,7 +47,7 @@
       "title": "save tell",
       "params": {
         "table": "tells",
-        "key": "{1}",
+        "key": "{cap1_parse}",
         "value": ""
       }
     },
@@ -154,6 +154,19 @@
         "key": "{nick}",
         "value": ""
       }
+    },
+    {
+      "id": "cap1_parse",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_parse",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -168,12 +181,6 @@
       "fromPin": 1,
       "to": "parse",
       "toPin": 1
-    },
-    {
-      "from": "parse",
-      "fromPin": 0,
-      "to": "store",
-      "toPin": 0
     },
     {
       "from": "parse",
@@ -227,6 +234,24 @@
       "from": "deliverRep",
       "fromPin": 0,
       "to": "clear",
+      "toPin": 0
+    },
+    {
+      "from": "parse",
+      "fromPin": 2,
+      "to": "cap1_parse",
+      "toPin": 1
+    },
+    {
+      "from": "parse",
+      "fromPin": 0,
+      "to": "cap1_parse",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_parse",
+      "fromPin": 0,
+      "to": "store",
       "toPin": 0
     }
   ]

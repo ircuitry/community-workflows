@@ -47,7 +47,7 @@
       "title": "save term",
       "params": {
         "table": "glossary",
-        "key": "{1}",
+        "key": "{cap1_defRegex}",
         "value": ""
       }
     },
@@ -118,6 +118,19 @@
         "message": "",
         "server": ""
       }
+    },
+    {
+      "id": "cap1_defRegex",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_defRegex",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -132,12 +145,6 @@
       "fromPin": 1,
       "to": "defRegex",
       "toPin": 1
-    },
-    {
-      "from": "defRegex",
-      "fromPin": 0,
-      "to": "defSet",
-      "toPin": 0
     },
     {
       "from": "defRegex",
@@ -174,6 +181,24 @@
       "fromPin": 0,
       "to": "termReply",
       "toPin": 1
+    },
+    {
+      "from": "defRegex",
+      "fromPin": 2,
+      "to": "cap1_defRegex",
+      "toPin": 1
+    },
+    {
+      "from": "defRegex",
+      "fromPin": 0,
+      "to": "cap1_defRegex",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_defRegex",
+      "fromPin": 0,
+      "to": "defSet",
+      "toPin": 0
     }
   ]
 }

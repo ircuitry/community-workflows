@@ -1,0 +1,29 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ChannelStats",
+  "description": "Counts how many messages each person sends and reports it with !stats <nick> (a pisg-style chatter counter). Counts persist on disk.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["stats", "statistics", "db", "social"],
+  "nodes": [
+    { "id": "msg", "type": "event.message", "x": 0, "y": 0, "title": "any chat line", "params": { "channel": "" } },
+    { "id": "get", "type": "db.get", "x": 240, "y": 80, "title": "current count", "params": { "table": "stats", "mode": "value", "key": "{nick}", "default": "0", "find": "" } },
+    { "id": "add", "type": "data.math", "x": 460, "y": 80, "title": "+1", "params": { "op": "+", "a": "0", "b": "1" } },
+    { "id": "set", "type": "db.set", "x": 240, "y": 0, "title": "save count", "params": { "table": "stats", "key": "{nick}", "value": "" } },
+
+    { "id": "cmd", "type": "event.command", "x": 0, "y": 220, "title": "!stats <nick>", "params": { "prefix": "!", "command": "stats", "contexts": "public, private, pm" } },
+    { "id": "look", "type": "db.get", "x": 240, "y": 300, "title": "look up count", "params": { "table": "stats", "mode": "value", "key": "{args}", "default": "0", "find": "" } },
+    { "id": "fmt", "type": "data.format", "x": 460, "y": 300, "title": "format", "params": { "template": "{b} has sent {a} messages." } },
+    { "id": "rep", "type": "action.reply", "x": 700, "y": 220, "title": "answer", "params": { "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "msg", "fromPin": 0, "to": "set", "toPin": 0 },
+    { "from": "get", "fromPin": 0, "to": "add", "toPin": 0 },
+    { "from": "add", "fromPin": 0, "to": "set", "toPin": 1 },
+
+    { "from": "cmd", "fromPin": 0, "to": "rep", "toPin": 0 },
+    { "from": "look", "fromPin": 0, "to": "fmt", "toPin": 0 },
+    { "from": "cmd", "fromPin": 1, "to": "fmt", "toPin": 1 },
+    { "from": "fmt", "fromPin": 0, "to": "rep", "toPin": 1 }
+  ]
+}

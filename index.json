@@ -1,5 +1,5 @@
 {
-  "count": 258,
+  "count": 272,
   "workflows": [
     {
       "name": "Random Advice",
@@ -11745,6 +11745,526 @@
       }
     },
     {
+      "name": "ChannelLogger",
+      "description": "Logs the channel to a timestamped text file under ~/ircuitry/files/logs - messages, joins and parts. A simple Scribe-style public logger.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "logging",
+        "logger",
+        "scribe",
+        "file"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 3,
+      "nodeTypes": [
+        "event.join",
+        "event.message",
+        "event.part",
+        "file.write"
+      ],
+      "file": "workflows/ChannelLogger.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "ChannelLogger",
+        "description": "Logs the channel to a timestamped text file under ~/ircuitry/files/logs - messages, joins and parts. A simple Scribe-style public logger.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "logging",
+          "logger",
+          "scribe",
+          "file"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "title": "on message",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "wMsg",
+            "type": "file.write",
+            "x": 240,
+            "y": 0,
+            "title": "append line",
+            "params": {
+              "path": "logs/{channel}.log",
+              "mode": "append",
+              "text": "[{datetime}] <{nick}> {message}"
+            }
+          },
+          {
+            "id": "joinEv",
+            "type": "event.join",
+            "x": 0,
+            "y": 140,
+            "title": "on join",
+            "params": {}
+          },
+          {
+            "id": "wJoin",
+            "type": "file.write",
+            "x": 240,
+            "y": 140,
+            "title": "append join",
+            "params": {
+              "path": "logs/{channel}.log",
+              "mode": "append",
+              "text": "[{datetime}] *** {nick} joined"
+            }
+          },
+          {
+            "id": "partEv",
+            "type": "event.part",
+            "x": 0,
+            "y": 280,
+            "title": "on part",
+            "params": {}
+          },
+          {
+            "id": "wPart",
+            "type": "file.write",
+            "x": 240,
+            "y": 280,
+            "title": "append part",
+            "params": {
+              "path": "logs/{channel}.log",
+              "mode": "append",
+              "text": "[{datetime}] *** {nick} left"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "wMsg",
+            "toPin": 0
+          },
+          {
+            "from": "joinEv",
+            "fromPin": 0,
+            "to": "wJoin",
+            "toPin": 0
+          },
+          {
+            "from": "partEv",
+            "fromPin": 0,
+            "to": "wPart",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelNews",
+      "description": "A channel bulletin: !setnews <text> stores an announcement, !news shows it, and anyone who joins is quietly PM'd the current bulletin. Persists on disk.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "news",
+        "bulletin",
+        "announce",
+        "db"
+      ],
+      "nodeCount": 11,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.reply",
+        "action.say",
+        "data.format",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.join",
+        "logic.if"
+      ],
+      "file": "workflows/ChannelNews.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "ChannelNews",
+        "description": "A channel bulletin: !setnews <text> stores an announcement, !news shows it, and anyone who joins is quietly PM'd the current bulletin. Persists on disk.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "news",
+          "bulletin",
+          "announce",
+          "db"
+        ],
+        "nodes": [
+          {
+            "id": "setCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!setnews <text>",
+            "params": {
+              "prefix": "!",
+              "command": "setnews",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "setSet",
+            "type": "db.set",
+            "x": 240,
+            "y": 0,
+            "title": "store bulletin",
+            "params": {
+              "table": "news",
+              "key": "bulletin",
+              "value": "{args}"
+            }
+          },
+          {
+            "id": "setRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 0,
+            "title": "confirm",
+            "params": {
+              "message": "News updated.",
+              "server": ""
+            }
+          },
+          {
+            "id": "newsCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 160,
+            "title": "!news",
+            "params": {
+              "prefix": "!",
+              "command": "news",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "newsGet",
+            "type": "db.get",
+            "x": 240,
+            "y": 240,
+            "title": "read bulletin",
+            "params": {
+              "table": "news",
+              "mode": "value",
+              "key": "bulletin",
+              "default": "No news right now.",
+              "find": ""
+            }
+          },
+          {
+            "id": "newsRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 160,
+            "title": "show",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "joinEv",
+            "type": "event.join",
+            "x": 0,
+            "y": 380,
+            "title": "on join",
+            "params": {}
+          },
+          {
+            "id": "jGet",
+            "type": "db.get",
+            "x": 240,
+            "y": 460,
+            "title": "read bulletin",
+            "params": {
+              "table": "news",
+              "mode": "value",
+              "key": "bulletin",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "jIf",
+            "type": "logic.if",
+            "x": 460,
+            "y": 380,
+            "title": "bulletin set?",
+            "params": {
+              "op": "≠",
+              "b": "",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "jFmt",
+            "type": "data.format",
+            "x": 680,
+            "y": 460,
+            "title": "format",
+            "params": {
+              "template": "[News] {a}"
+            }
+          },
+          {
+            "id": "jSay",
+            "type": "action.say",
+            "x": 900,
+            "y": 380,
+            "title": "PM the joiner",
+            "params": {
+              "channel": "{nick}",
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "setCmd",
+            "fromPin": 0,
+            "to": "setSet",
+            "toPin": 0
+          },
+          {
+            "from": "setSet",
+            "fromPin": 0,
+            "to": "setRep",
+            "toPin": 0
+          },
+          {
+            "from": "newsCmd",
+            "fromPin": 0,
+            "to": "newsRep",
+            "toPin": 0
+          },
+          {
+            "from": "newsGet",
+            "fromPin": 0,
+            "to": "newsRep",
+            "toPin": 1
+          },
+          {
+            "from": "joinEv",
+            "fromPin": 0,
+            "to": "jIf",
+            "toPin": 0
+          },
+          {
+            "from": "jGet",
+            "fromPin": 0,
+            "to": "jIf",
+            "toPin": 1
+          },
+          {
+            "from": "jGet",
+            "fromPin": 0,
+            "to": "jFmt",
+            "toPin": 0
+          },
+          {
+            "from": "jIf",
+            "fromPin": 0,
+            "to": "jSay",
+            "toPin": 0
+          },
+          {
+            "from": "jFmt",
+            "fromPin": 0,
+            "to": "jSay",
+            "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChannelStats",
+      "description": "Counts how many messages each person sends and reports it with !stats <nick> (a pisg-style chatter counter). Counts persist on disk.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "stats",
+        "statistics",
+        "db",
+        "social"
+      ],
+      "nodeCount": 8,
+      "connectionCount": 7,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.math",
+        "db.get",
+        "db.set",
+        "event.command",
+        "event.message"
+      ],
+      "file": "workflows/ChannelStats.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "ChannelStats",
+        "description": "Counts how many messages each person sends and reports it with !stats <nick> (a pisg-style chatter counter). Counts persist on disk.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "stats",
+          "statistics",
+          "db",
+          "social"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "title": "any chat line",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "get",
+            "type": "db.get",
+            "x": 240,
+            "y": 80,
+            "title": "current count",
+            "params": {
+              "table": "stats",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "add",
+            "type": "data.math",
+            "x": 460,
+            "y": 80,
+            "title": "+1",
+            "params": {
+              "op": "+",
+              "a": "0",
+              "b": "1"
+            }
+          },
+          {
+            "id": "set",
+            "type": "db.set",
+            "x": 240,
+            "y": 0,
+            "title": "save count",
+            "params": {
+              "table": "stats",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 220,
+            "title": "!stats <nick>",
+            "params": {
+              "prefix": "!",
+              "command": "stats",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "look",
+            "type": "db.get",
+            "x": 240,
+            "y": 300,
+            "title": "look up count",
+            "params": {
+              "table": "stats",
+              "mode": "value",
+              "key": "{args}",
+              "default": "0",
+              "find": ""
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 460,
+            "y": 300,
+            "title": "format",
+            "params": {
+              "template": "{b} has sent {a} messages."
+            }
+          },
+          {
+            "id": "rep",
+            "type": "action.reply",
+            "x": 700,
+            "y": 220,
+            "title": "answer",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "set",
+            "toPin": 0
+          },
+          {
+            "from": "get",
+            "fromPin": 0,
+            "to": "add",
+            "toPin": 0
+          },
+          {
+            "from": "add",
+            "fromPin": 0,
+            "to": "set",
+            "toPin": 1
+          },
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "rep",
+            "toPin": 0
+          },
+          {
+            "from": "look",
+            "fromPin": 0,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "fmt",
+            "toPin": 1
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "rep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
       "name": "Choose",
       "description": "Picks one option at random from a pipe-separated list, e.g. !choose pizza | tacos | sushi.",
       "author": "ircuitry",
@@ -12234,6 +12754,172 @@
             "fromPin": 0,
             "to": "reply",
             "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "CommitBot",
+      "description": "Announces GitHub pushes to a channel (CIA/KGB style). Point a GitHub repo webhook (push event, JSON) at this bot's hosted URL: http://host:port/hook/<path>. Set the path below to a long secret and set the announce channel.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "github",
+        "webhook",
+        "commit",
+        "notify",
+        "dev"
+      ],
+      "nodeCount": 7,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.say",
+        "data.format",
+        "data.json",
+        "event.webhook"
+      ],
+      "file": "workflows/CommitBot.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "CommitBot",
+        "description": "Announces GitHub pushes to a channel (CIA/KGB style). Point a GitHub repo webhook (push event, JSON) at this bot's hosted URL: http://host:port/hook/<path>. Set the path below to a long secret and set the announce channel.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "github",
+          "webhook",
+          "commit",
+          "notify",
+          "dev"
+        ],
+        "nodes": [
+          {
+            "id": "wh",
+            "type": "event.webhook",
+            "x": 0,
+            "y": 0,
+            "title": "on push webhook",
+            "params": {
+              "path": "change-me-to-a-long-secret-path"
+            }
+          },
+          {
+            "id": "jRepo",
+            "type": "data.json",
+            "x": 240,
+            "y": 80,
+            "title": "repo",
+            "params": {
+              "path": "repository.full_name"
+            }
+          },
+          {
+            "id": "jPusher",
+            "type": "data.json",
+            "x": 240,
+            "y": 160,
+            "title": "pusher",
+            "params": {
+              "path": "pusher.name"
+            }
+          },
+          {
+            "id": "jMsg",
+            "type": "data.json",
+            "x": 240,
+            "y": 240,
+            "title": "commit message",
+            "params": {
+              "path": "head_commit.message"
+            }
+          },
+          {
+            "id": "f1",
+            "type": "data.format",
+            "x": 460,
+            "y": 80,
+            "title": "header",
+            "params": {
+              "template": "[{a}] {b} pushed:"
+            }
+          },
+          {
+            "id": "f2",
+            "type": "data.format",
+            "x": 680,
+            "y": 80,
+            "title": "full line",
+            "params": {
+              "template": "{a} {b}"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 900,
+            "y": 0,
+            "title": "announce",
+            "params": {
+              "channel": "#your-channel",
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "wh",
+            "fromPin": 1,
+            "to": "jRepo",
+            "toPin": 0
+          },
+          {
+            "from": "wh",
+            "fromPin": 1,
+            "to": "jPusher",
+            "toPin": 0
+          },
+          {
+            "from": "wh",
+            "fromPin": 1,
+            "to": "jMsg",
+            "toPin": 0
+          },
+          {
+            "from": "jRepo",
+            "fromPin": 0,
+            "to": "f1",
+            "toPin": 0
+          },
+          {
+            "from": "jPusher",
+            "fromPin": 0,
+            "to": "f1",
+            "toPin": 1
+          },
+          {
+            "from": "f1",
+            "fromPin": 0,
+            "to": "f2",
+            "toPin": 0
+          },
+          {
+            "from": "jMsg",
+            "fromPin": 0,
+            "to": "f2",
+            "toPin": 1
+          },
+          {
+            "from": "wh",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          },
+          {
+            "from": "f2",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 2
           }
         ]
       }
@@ -15227,6 +15913,455 @@
       }
     },
     {
+      "name": "Eliza",
+      "description": "The classic Rogerian chatbot. Say !eliza <something on your mind> and it reflects your statement back or offers a therapist-style prompt. No AI, just patterns.",
+      "author": "ircuitry",
+      "category": "Games",
+      "tags": [
+        "eliza",
+        "chatbot",
+        "fun",
+        "classic"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 7,
+      "nodeTypes": [
+        "action.reply",
+        "data.random",
+        "data.setvar",
+        "event.command",
+        "logic.regex"
+      ],
+      "file": "workflows/Eliza.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Eliza",
+        "description": "The classic Rogerian chatbot. Say !eliza <something on your mind> and it reflects your statement back or offers a therapist-style prompt. No AI, just patterns.",
+        "author": "ircuitry",
+        "category": "Games",
+        "tags": [
+          "eliza",
+          "chatbot",
+          "fun",
+          "classic"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!eliza <text>",
+            "params": {
+              "prefix": "!",
+              "command": "eliza",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "re",
+            "type": "logic.regex",
+            "x": 240,
+            "y": 0,
+            "title": "match 'i ...'",
+            "params": {
+              "pattern": "^\\s*i\\s+(.+?)[.!?]*$",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "setS",
+            "type": "data.setvar",
+            "x": 460,
+            "y": 0,
+            "title": "phrase -> {s}",
+            "params": {
+              "name": "s",
+              "value": ""
+            }
+          },
+          {
+            "id": "repMatch",
+            "type": "action.reply",
+            "x": 680,
+            "y": 0,
+            "title": "reflect",
+            "params": {
+              "message": "Why do you say you {s}?",
+              "server": ""
+            }
+          },
+          {
+            "id": "rand",
+            "type": "data.random",
+            "x": 240,
+            "y": 160,
+            "title": "rogerian prompts",
+            "params": {
+              "options": "How does that make you feel?\nTell me more about that.\nWhy do you say that?\nWhat do you think it means?\nI see. Please, go on.\nAnd how does that affect you?\nCan you elaborate on that?\nWhat would it mean to you if it changed?"
+            }
+          },
+          {
+            "id": "repRand",
+            "type": "action.reply",
+            "x": 460,
+            "y": 160,
+            "title": "prompt",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "re",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "re",
+            "toPin": 1
+          },
+          {
+            "from": "re",
+            "fromPin": 0,
+            "to": "setS",
+            "toPin": 0
+          },
+          {
+            "from": "re",
+            "fromPin": 2,
+            "to": "setS",
+            "toPin": 1
+          },
+          {
+            "from": "setS",
+            "fromPin": 0,
+            "to": "repMatch",
+            "toPin": 0
+          },
+          {
+            "from": "re",
+            "fromPin": 1,
+            "to": "repRand",
+            "toPin": 0
+          },
+          {
+            "from": "rand",
+            "fromPin": 0,
+            "to": "repRand",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "EmailSend",
+      "description": "Send an email from chat: !email <to-address> <message>. Fill in your SMTP host/user and store the password as the secret 'smtp_pass'.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "email",
+        "smtp",
+        "mail"
+      ],
+      "nodeCount": 8,
+      "connectionCount": 10,
+      "nodeTypes": [
+        "action.reply",
+        "data.setvar",
+        "event.command",
+        "logic.regex",
+        "mail.send"
+      ],
+      "file": "workflows/EmailSend.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "EmailSend",
+        "description": "Send an email from chat: !email <to-address> <message>. Fill in your SMTP host/user and store the password as the secret 'smtp_pass'.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "email",
+          "smtp",
+          "mail"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!email to msg",
+            "params": {
+              "prefix": "!",
+              "command": "email",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "re",
+            "type": "logic.regex",
+            "x": 220,
+            "y": 0,
+            "title": "split to / message",
+            "params": {
+              "pattern": "^(\\S+)\\s+(.+)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "setTo",
+            "type": "data.setvar",
+            "x": 440,
+            "y": 0,
+            "title": "to -> {to}",
+            "params": {
+              "name": "to",
+              "value": ""
+            }
+          },
+          {
+            "id": "setBody",
+            "type": "data.setvar",
+            "x": 640,
+            "y": 0,
+            "title": "body -> {body}",
+            "params": {
+              "name": "body",
+              "value": ""
+            }
+          },
+          {
+            "id": "send",
+            "type": "mail.send",
+            "x": 840,
+            "y": 0,
+            "title": "send mail",
+            "params": {
+              "host": "smtp.example.com",
+              "port": "587",
+              "user": "you@example.com",
+              "pass": "{{secret.smtp_pass}}",
+              "from": "",
+              "to": "{to}",
+              "subject": "IRC message from {nick}",
+              "body": "{body}"
+            }
+          },
+          {
+            "id": "ok",
+            "type": "action.reply",
+            "x": 1060,
+            "y": 0,
+            "title": "ok",
+            "params": {
+              "message": "Email sent to {to}.",
+              "server": ""
+            }
+          },
+          {
+            "id": "fail",
+            "type": "action.reply",
+            "x": 1060,
+            "y": 100,
+            "title": "failed",
+            "params": {
+              "message": "Sorry, that email failed to send.",
+              "server": ""
+            }
+          },
+          {
+            "id": "bad",
+            "type": "action.reply",
+            "x": 440,
+            "y": 120,
+            "title": "usage",
+            "params": {
+              "message": "Usage: !email <to-address> <message>",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "re",
+            "toPin": 0
+          },
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "re",
+            "toPin": 1
+          },
+          {
+            "from": "re",
+            "fromPin": 0,
+            "to": "setTo",
+            "toPin": 0
+          },
+          {
+            "from": "re",
+            "fromPin": 2,
+            "to": "setTo",
+            "toPin": 1
+          },
+          {
+            "from": "setTo",
+            "fromPin": 0,
+            "to": "setBody",
+            "toPin": 0
+          },
+          {
+            "from": "re",
+            "fromPin": 3,
+            "to": "setBody",
+            "toPin": 1
+          },
+          {
+            "from": "setBody",
+            "fromPin": 0,
+            "to": "send",
+            "toPin": 0
+          },
+          {
+            "from": "send",
+            "fromPin": 0,
+            "to": "ok",
+            "toPin": 0
+          },
+          {
+            "from": "send",
+            "fromPin": 1,
+            "to": "fail",
+            "toPin": 0
+          },
+          {
+            "from": "re",
+            "fromPin": 1,
+            "to": "bad",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "EmailWatcher",
+      "description": "Checks an IMAP inbox every few minutes and announces new mail (sender + subject) to a channel. Fill in the IMAP host/user and store the password as the secret 'imap_pass'. Set the announce channel.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "email",
+        "imap",
+        "notify",
+        "mail"
+      ],
+      "nodeCount": 4,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "action.say",
+        "event.timer",
+        "logic.forEach",
+        "mail.fetch"
+      ],
+      "file": "workflows/EmailWatcher.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "EmailWatcher",
+        "description": "Checks an IMAP inbox every few minutes and announces new mail (sender + subject) to a channel. Fill in the IMAP host/user and store the password as the secret 'imap_pass'. Set the announce channel.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "email",
+          "imap",
+          "notify",
+          "mail"
+        ],
+        "nodes": [
+          {
+            "id": "timer",
+            "type": "event.timer",
+            "x": 0,
+            "y": 0,
+            "title": "every 5 min",
+            "params": {
+              "seconds": "300"
+            }
+          },
+          {
+            "id": "fetch",
+            "type": "mail.fetch",
+            "x": 240,
+            "y": 0,
+            "title": "fetch unseen",
+            "params": {
+              "host": "imap.example.com",
+              "port": "993",
+              "user": "you@example.com",
+              "pass": "{{secret.imap_pass}}",
+              "max": "10",
+              "markseen": "true"
+            }
+          },
+          {
+            "id": "each",
+            "type": "logic.forEach",
+            "x": 480,
+            "y": 0,
+            "title": "per message",
+            "params": {
+              "sep": "json",
+              "var": "item"
+            }
+          },
+          {
+            "id": "say",
+            "type": "action.say",
+            "x": 720,
+            "y": 0,
+            "title": "announce",
+            "params": {
+              "channel": "#your-channel",
+              "message": "New mail from {item.from}: {item.subject}",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "timer",
+            "fromPin": 0,
+            "to": "fetch",
+            "toPin": 0
+          },
+          {
+            "from": "fetch",
+            "fromPin": 0,
+            "to": "each",
+            "toPin": 0
+          },
+          {
+            "from": "fetch",
+            "fromPin": 2,
+            "to": "each",
+            "toPin": 1
+          },
+          {
+            "from": "each",
+            "fromPin": 0,
+            "to": "say",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "Emoji Reaction Race",
       "description": "Run !race in an ops context to pick a random target emoji, then the first person to type it within the round wins the reaction race.",
       "author": "ircuitry",
@@ -17047,11 +18182,12 @@
         "db",
         "lookup"
       ],
-      "nodeCount": 8,
-      "connectionCount": 9,
+      "nodeCount": 9,
+      "connectionCount": 11,
       "nodeTypes": [
         "action.reply",
         "data.format",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -17107,7 +18243,7 @@
             "title": "save term",
             "params": {
               "table": "glossary",
-              "key": "{1}",
+              "key": "{cap1_defRegex}",
               "value": ""
             }
           },
@@ -17178,6 +18314,19 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_defRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_defRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -17192,12 +18341,6 @@
             "fromPin": 1,
             "to": "defRegex",
             "toPin": 1
-          },
-          {
-            "from": "defRegex",
-            "fromPin": 0,
-            "to": "defSet",
-            "toPin": 0
           },
           {
             "from": "defRegex",
@@ -17234,6 +18377,24 @@
             "fromPin": 0,
             "to": "termReply",
             "toPin": 1
+          },
+          {
+            "from": "defRegex",
+            "fromPin": 2,
+            "to": "cap1_defRegex",
+            "toPin": 1
+          },
+          {
+            "from": "defRegex",
+            "fromPin": 0,
+            "to": "cap1_defRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_defRegex",
+            "fromPin": 0,
+            "to": "defSet",
+            "toPin": 0
           }
         ]
       }
@@ -22076,6 +23237,298 @@
       }
     },
     {
+      "name": "Infobot",
+      "description": "A classic factoid bot: teach it with !learn <key> = <value>, look facts up with !whatis <key>, and remove them with !forget <key>. Facts persist on disk.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "factoid",
+        "infobot",
+        "memory",
+        "db"
+      ],
+      "nodeCount": 14,
+      "connectionCount": 15,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.setvar",
+        "db.get",
+        "db.set",
+        "event.command",
+        "logic.regex"
+      ],
+      "file": "workflows/Infobot.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "Infobot",
+        "description": "A classic factoid bot: teach it with !learn <key> = <value>, look facts up with !whatis <key>, and remove them with !forget <key>. Facts persist on disk.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "factoid",
+          "infobot",
+          "memory",
+          "db"
+        ],
+        "nodes": [
+          {
+            "id": "learnCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!learn key = value",
+            "params": {
+              "prefix": "!",
+              "command": "learn",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "learnRe",
+            "type": "logic.regex",
+            "x": 220,
+            "y": 0,
+            "title": "split key = value",
+            "params": {
+              "pattern": "^(.+?)\\s*=\\s*(.+)$",
+              "ci": "false"
+            }
+          },
+          {
+            "id": "setK",
+            "type": "data.setvar",
+            "x": 420,
+            "y": 0,
+            "title": "key -> {k}",
+            "params": {
+              "name": "k",
+              "value": ""
+            }
+          },
+          {
+            "id": "setV",
+            "type": "data.setvar",
+            "x": 620,
+            "y": 0,
+            "title": "value -> {v}",
+            "params": {
+              "name": "v",
+              "value": ""
+            }
+          },
+          {
+            "id": "learnSet",
+            "type": "db.set",
+            "x": 820,
+            "y": 0,
+            "title": "store fact",
+            "params": {
+              "table": "facts",
+              "key": "{k}",
+              "value": "{v}"
+            }
+          },
+          {
+            "id": "learnRep",
+            "type": "action.reply",
+            "x": 1020,
+            "y": 0,
+            "title": "confirm",
+            "params": {
+              "message": "Got it: {k} is {v}",
+              "server": ""
+            }
+          },
+          {
+            "id": "learnBad",
+            "type": "action.reply",
+            "x": 420,
+            "y": 120,
+            "title": "usage",
+            "params": {
+              "message": "Usage: !learn <key> = <value>",
+              "server": ""
+            }
+          },
+          {
+            "id": "whatCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 240,
+            "title": "!whatis key",
+            "params": {
+              "prefix": "!",
+              "command": "whatis",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "whatGet",
+            "type": "db.get",
+            "x": 240,
+            "y": 320,
+            "title": "look up fact",
+            "params": {
+              "table": "facts",
+              "mode": "value",
+              "key": "{args}",
+              "default": "(I don't know that one)",
+              "find": ""
+            }
+          },
+          {
+            "id": "whatFmt",
+            "type": "data.format",
+            "x": 480,
+            "y": 320,
+            "title": "format",
+            "params": {
+              "template": "{b}: {a}"
+            }
+          },
+          {
+            "id": "whatRep",
+            "type": "action.reply",
+            "x": 720,
+            "y": 240,
+            "title": "answer",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "forgetCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 460,
+            "title": "!forget key",
+            "params": {
+              "prefix": "!",
+              "command": "forget",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "forgetSet",
+            "type": "db.set",
+            "x": 240,
+            "y": 460,
+            "title": "delete fact",
+            "params": {
+              "table": "facts",
+              "key": "{args}",
+              "value": ""
+            }
+          },
+          {
+            "id": "forgetRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 460,
+            "title": "confirm",
+            "params": {
+              "message": "Forgotten: {args}",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "learnCmd",
+            "fromPin": 0,
+            "to": "learnRe",
+            "toPin": 0
+          },
+          {
+            "from": "learnCmd",
+            "fromPin": 1,
+            "to": "learnRe",
+            "toPin": 1
+          },
+          {
+            "from": "learnRe",
+            "fromPin": 0,
+            "to": "setK",
+            "toPin": 0
+          },
+          {
+            "from": "learnRe",
+            "fromPin": 2,
+            "to": "setK",
+            "toPin": 1
+          },
+          {
+            "from": "setK",
+            "fromPin": 0,
+            "to": "setV",
+            "toPin": 0
+          },
+          {
+            "from": "learnRe",
+            "fromPin": 3,
+            "to": "setV",
+            "toPin": 1
+          },
+          {
+            "from": "setV",
+            "fromPin": 0,
+            "to": "learnSet",
+            "toPin": 0
+          },
+          {
+            "from": "learnSet",
+            "fromPin": 0,
+            "to": "learnRep",
+            "toPin": 0
+          },
+          {
+            "from": "learnRe",
+            "fromPin": 1,
+            "to": "learnBad",
+            "toPin": 0
+          },
+          {
+            "from": "whatCmd",
+            "fromPin": 0,
+            "to": "whatRep",
+            "toPin": 0
+          },
+          {
+            "from": "whatGet",
+            "fromPin": 0,
+            "to": "whatFmt",
+            "toPin": 0
+          },
+          {
+            "from": "whatCmd",
+            "fromPin": 1,
+            "to": "whatFmt",
+            "toPin": 1
+          },
+          {
+            "from": "whatFmt",
+            "fromPin": 0,
+            "to": "whatRep",
+            "toPin": 1
+          },
+          {
+            "from": "forgetCmd",
+            "fromPin": 0,
+            "to": "forgetSet",
+            "toPin": 0
+          },
+          {
+            "from": "forgetSet",
+            "fromPin": 0,
+            "to": "forgetRep",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "Intro Card (!intro)",
       "description": "Store a personal self-intro with !intro <text> and recall yours or someone else's with !intro or !whois <nick>.",
       "author": "ircuitry",
@@ -22751,12 +24204,13 @@
         "db",
         "social"
       ],
-      "nodeCount": 13,
-      "connectionCount": 14,
+      "nodeCount": 15,
+      "connectionCount": 18,
       "nodeTypes": [
         "action.reply",
         "data.format",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -22812,7 +24266,7 @@
             "params": {
               "table": "karma",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_incRegex}",
               "default": "0",
               "find": ""
             }
@@ -22841,7 +24295,7 @@
             "title": "save karma",
             "params": {
               "table": "karma",
-              "key": "{1}",
+              "key": "{cap1_incRegex}",
               "value": ""
             }
           },
@@ -22869,7 +24323,7 @@
             "params": {
               "table": "karma",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_decRegex}",
               "default": "0",
               "find": ""
             }
@@ -22898,7 +24352,7 @@
             "title": "save karma",
             "params": {
               "table": "karma",
-              "key": "{1}",
+              "key": "{cap1_decRegex}",
               "value": ""
             }
           },
@@ -22956,6 +24410,32 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_incRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_incRegex",
+              "value": ""
+            }
+          },
+          {
+            "id": "cap1_decRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 540,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_decRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -22970,12 +24450,6 @@
             "fromPin": 1,
             "to": "incRegex",
             "toPin": 1
-          },
-          {
-            "from": "incRegex",
-            "fromPin": 0,
-            "to": "incSet",
-            "toPin": 0
           },
           {
             "from": "incGet",
@@ -23000,12 +24474,6 @@
             "fromPin": 1,
             "to": "decRegex",
             "toPin": 1
-          },
-          {
-            "from": "decRegex",
-            "fromPin": 0,
-            "to": "decSet",
-            "toPin": 0
           },
           {
             "from": "decGet",
@@ -23042,6 +24510,42 @@
             "fromPin": 0,
             "to": "lookupRep",
             "toPin": 1
+          },
+          {
+            "from": "incRegex",
+            "fromPin": 2,
+            "to": "cap1_incRegex",
+            "toPin": 1
+          },
+          {
+            "from": "incRegex",
+            "fromPin": 0,
+            "to": "cap1_incRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_incRegex",
+            "fromPin": 0,
+            "to": "incSet",
+            "toPin": 0
+          },
+          {
+            "from": "decRegex",
+            "fromPin": 2,
+            "to": "cap1_decRegex",
+            "toPin": 1
+          },
+          {
+            "from": "decRegex",
+            "fromPin": 0,
+            "to": "cap1_decRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_decRegex",
+            "fromPin": 0,
+            "to": "decSet",
+            "toPin": 0
           }
         ]
       }
@@ -23056,11 +24560,12 @@
         "kudos",
         "db"
       ],
-      "nodeCount": 8,
-      "connectionCount": 9,
+      "nodeCount": 10,
+      "connectionCount": 13,
       "nodeTypes": [
         "action.reply",
         "action.say",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -23118,7 +24623,7 @@
             "params": {
               "table": "kudos",
               "key": "{time}-{nick}",
-              "value": "{1}|{2}|from {nick}"
+              "value": "{cap1_parse}|{cap2_parse}|from {nick}"
             }
           },
           {
@@ -23131,7 +24636,7 @@
             "title": "announce kudos",
             "params": {
               "channel": "",
-              "message": "Kudos to {1}: {2} (from {nick})",
+              "message": "Kudos to {cap1_parse}: {cap2_parse} (from {nick})",
               "server": ""
             }
           },
@@ -23189,6 +24694,32 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_parse",
+              "value": ""
+            }
+          },
+          {
+            "id": "cap2_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 280,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_parse",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -23203,12 +24734,6 @@
             "fromPin": 1,
             "to": "parse",
             "toPin": 1
-          },
-          {
-            "from": "parse",
-            "fromPin": 0,
-            "to": "store",
-            "toPin": 0
           },
           {
             "from": "store",
@@ -23245,6 +24770,36 @@
             "fromPin": 2,
             "to": "listReply",
             "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 2,
+            "to": "cap1_parse",
+            "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 0,
+            "to": "cap1_parse",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 3,
+            "to": "cap2_parse",
+            "toPin": 1
+          },
+          {
+            "from": "cap1_parse",
+            "fromPin": 0,
+            "to": "cap2_parse",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_parse",
+            "fromPin": 0,
+            "to": "store",
+            "toPin": 0
           }
         ]
       }
@@ -23645,12 +25200,13 @@
         "links",
         "regex"
       ],
-      "nodeCount": 7,
-      "connectionCount": 8,
+      "nodeCount": 8,
+      "connectionCount": 10,
       "nodeTypes": [
         "action.redact",
         "action.reply",
         "data.gettag",
+        "data.setvar",
         "db.get",
         "event.message",
         "logic.if",
@@ -23705,7 +25261,7 @@
             "params": {
               "table": "allowed_domains",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_urlRegex}",
               "default": "NO",
               "find": ""
             }
@@ -23763,6 +25319,19 @@
               "message": "Only approved links allowed, {nick}.",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_urlRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_urlRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -23777,12 +25346,6 @@
             "fromPin": 1,
             "to": "urlRegex",
             "toPin": 1
-          },
-          {
-            "from": "urlRegex",
-            "fromPin": 0,
-            "to": "check",
-            "toPin": 0
           },
           {
             "from": "lookup",
@@ -23812,6 +25375,24 @@
             "from": "redact",
             "fromPin": 0,
             "to": "warn",
+            "toPin": 0
+          },
+          {
+            "from": "urlRegex",
+            "fromPin": 2,
+            "to": "cap1_urlRegex",
+            "toPin": 1
+          },
+          {
+            "from": "urlRegex",
+            "fromPin": 0,
+            "to": "cap1_urlRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_urlRegex",
+            "fromPin": 0,
+            "to": "check",
             "toPin": 0
           }
         ]
@@ -26516,6 +28097,322 @@
       }
     },
     {
+      "name": "NowPlaying",
+      "description": "Shows what a Last.fm user is listening to: !np <lastfm-username>. Store your Last.fm API key as the encrypted secret 'lastfm_key'.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "lastfm",
+        "music",
+        "nowplaying",
+        "web"
+      ],
+      "nodeCount": 7,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.json",
+        "event.command",
+        "net.http"
+      ],
+      "file": "workflows/NowPlaying.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "NowPlaying",
+        "description": "Shows what a Last.fm user is listening to: !np <lastfm-username>. Store your Last.fm API key as the encrypted secret 'lastfm_key'.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "lastfm",
+          "music",
+          "nowplaying",
+          "web"
+        ],
+        "nodes": [
+          {
+            "id": "cmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!np <user>",
+            "params": {
+              "prefix": "!",
+              "command": "np",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "url",
+            "type": "data.format",
+            "x": 220,
+            "y": 80,
+            "title": "build url",
+            "params": {
+              "template": "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={a}&api_key={{secret.lastfm_key}}&format=json&limit=1"
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 440,
+            "y": 0,
+            "title": "fetch",
+            "params": {
+              "method": "GET",
+              "url": "https://",
+              "send": "body",
+              "headers": "",
+              "body": "",
+              "timeout": "15"
+            }
+          },
+          {
+            "id": "jArtist",
+            "type": "data.json",
+            "x": 660,
+            "y": 80,
+            "title": "artist",
+            "params": {
+              "path": "recenttracks.track.0.artist.#text"
+            }
+          },
+          {
+            "id": "jName",
+            "type": "data.json",
+            "x": 660,
+            "y": 160,
+            "title": "track",
+            "params": {
+              "path": "recenttracks.track.0.name"
+            }
+          },
+          {
+            "id": "fmt",
+            "type": "data.format",
+            "x": 880,
+            "y": 80,
+            "title": "format",
+            "params": {
+              "template": "Now playing: {a} - {b}"
+            }
+          },
+          {
+            "id": "rep",
+            "type": "action.reply",
+            "x": 1100,
+            "y": 0,
+            "title": "answer",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "cmd",
+            "fromPin": 1,
+            "to": "url",
+            "toPin": 0
+          },
+          {
+            "from": "url",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 1
+          },
+          {
+            "from": "cmd",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "jArtist",
+            "toPin": 0
+          },
+          {
+            "from": "http",
+            "fromPin": 1,
+            "to": "jName",
+            "toPin": 0
+          },
+          {
+            "from": "jArtist",
+            "fromPin": 0,
+            "to": "fmt",
+            "toPin": 0
+          },
+          {
+            "from": "jName",
+            "fromPin": 0,
+            "to": "fmt",
+            "toPin": 1
+          },
+          {
+            "from": "http",
+            "fromPin": 0,
+            "to": "rep",
+            "toPin": 0
+          },
+          {
+            "from": "fmt",
+            "fromPin": 0,
+            "to": "rep",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "NtfyPush",
+      "description": "Push alerts to your phone via ntfy.sh. !page <message> sends a note, and you also get pushed whenever the bot's nick is mentioned. Store your topic as the secret 'ntfy_topic' (subscribe to it in the ntfy app).",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "ntfy",
+        "push",
+        "notify",
+        "pager",
+        "web"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "action.reply",
+        "event.command",
+        "event.message",
+        "filter.contains",
+        "net.http"
+      ],
+      "file": "workflows/NtfyPush.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "NtfyPush",
+        "description": "Push alerts to your phone via ntfy.sh. !page <message> sends a note, and you also get pushed whenever the bot's nick is mentioned. Store your topic as the secret 'ntfy_topic' (subscribe to it in the ntfy app).",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "ntfy",
+          "push",
+          "notify",
+          "pager",
+          "web"
+        ],
+        "nodes": [
+          {
+            "id": "pageCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!page <message>",
+            "params": {
+              "prefix": "!",
+              "command": "page",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "pageHttp",
+            "type": "net.http",
+            "x": 240,
+            "y": 0,
+            "title": "push",
+            "params": {
+              "method": "POST",
+              "url": "https://ntfy.sh/{{secret.ntfy_topic}}",
+              "send": "body",
+              "headers": "",
+              "body": "{args}",
+              "timeout": "15"
+            }
+          },
+          {
+            "id": "pageRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 0,
+            "title": "confirm",
+            "params": {
+              "message": "Pushed to your phone.",
+              "server": ""
+            }
+          },
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 180,
+            "title": "any chat line",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "mine",
+            "type": "filter.contains",
+            "x": 240,
+            "y": 180,
+            "title": "mentions me?",
+            "params": {
+              "needle": "{me}",
+              "ci": "true"
+            }
+          },
+          {
+            "id": "hlHttp",
+            "type": "net.http",
+            "x": 480,
+            "y": 180,
+            "title": "push mention",
+            "params": {
+              "method": "POST",
+              "url": "https://ntfy.sh/{{secret.ntfy_topic}}",
+              "send": "body",
+              "headers": "Title: Mentioned in {channel}",
+              "body": "{nick}: {message}",
+              "timeout": "15"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "pageCmd",
+            "fromPin": 0,
+            "to": "pageHttp",
+            "toPin": 0
+          },
+          {
+            "from": "pageHttp",
+            "fromPin": 0,
+            "to": "pageRep",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "mine",
+            "toPin": 0
+          },
+          {
+            "from": "msg",
+            "fromPin": 1,
+            "to": "mine",
+            "toPin": 1
+          },
+          {
+            "from": "mine",
+            "fromPin": 0,
+            "to": "hlHttp",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
       "name": "Number Trivia",
       "description": "Fetch a fun fact about any number with !numfact <n>, or a random number fact when no number is given, via the free numbersapi.com API.",
       "author": "ircuitry",
@@ -27028,6 +28925,309 @@
             "fromPin": 0,
             "to": "say",
             "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "PackageLookup",
+      "description": "Look up software packages: !npm <pkg> shows the latest npm version and description, !pypi <pkg> does the same from PyPI.",
+      "author": "ircuitry",
+      "category": "Utility",
+      "tags": [
+        "dev",
+        "npm",
+        "pypi",
+        "web"
+      ],
+      "nodeCount": 14,
+      "connectionCount": 18,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "data.json",
+        "event.command",
+        "net.http"
+      ],
+      "file": "workflows/PackageLookup.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "PackageLookup",
+        "description": "Look up software packages: !npm <pkg> shows the latest npm version and description, !pypi <pkg> does the same from PyPI.",
+        "author": "ircuitry",
+        "category": "Utility",
+        "tags": [
+          "dev",
+          "npm",
+          "pypi",
+          "web"
+        ],
+        "nodes": [
+          {
+            "id": "npmCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!npm <pkg>",
+            "params": {
+              "prefix": "!",
+              "command": "npm",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "npmUrl",
+            "type": "data.format",
+            "x": 220,
+            "y": 80,
+            "title": "registry url",
+            "params": {
+              "template": "https://registry.npmjs.org/{a}/latest"
+            }
+          },
+          {
+            "id": "npmHttp",
+            "type": "net.http",
+            "x": 440,
+            "y": 0,
+            "title": "fetch",
+            "params": {
+              "method": "GET",
+              "url": "https://",
+              "send": "body",
+              "headers": "",
+              "body": "",
+              "timeout": "15"
+            }
+          },
+          {
+            "id": "npmVer",
+            "type": "data.json",
+            "x": 660,
+            "y": 80,
+            "title": "version",
+            "params": {
+              "path": "version"
+            }
+          },
+          {
+            "id": "npmDesc",
+            "type": "data.json",
+            "x": 660,
+            "y": 160,
+            "title": "description",
+            "params": {
+              "path": "description"
+            }
+          },
+          {
+            "id": "npmFmt",
+            "type": "data.format",
+            "x": 880,
+            "y": 80,
+            "title": "format",
+            "params": {
+              "template": "v{a} - {b}"
+            }
+          },
+          {
+            "id": "npmRep",
+            "type": "action.reply",
+            "x": 1100,
+            "y": 0,
+            "title": "answer",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "pyCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 300,
+            "title": "!pypi <pkg>",
+            "params": {
+              "prefix": "!",
+              "command": "pypi",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "pyUrl",
+            "type": "data.format",
+            "x": 220,
+            "y": 380,
+            "title": "pypi url",
+            "params": {
+              "template": "https://pypi.org/pypi/{a}/json"
+            }
+          },
+          {
+            "id": "pyHttp",
+            "type": "net.http",
+            "x": 440,
+            "y": 300,
+            "title": "fetch",
+            "params": {
+              "method": "GET",
+              "url": "https://",
+              "send": "body",
+              "headers": "",
+              "body": "",
+              "timeout": "15"
+            }
+          },
+          {
+            "id": "pyVer",
+            "type": "data.json",
+            "x": 660,
+            "y": 380,
+            "title": "version",
+            "params": {
+              "path": "info.version"
+            }
+          },
+          {
+            "id": "pySum",
+            "type": "data.json",
+            "x": 660,
+            "y": 460,
+            "title": "summary",
+            "params": {
+              "path": "info.summary"
+            }
+          },
+          {
+            "id": "pyFmt",
+            "type": "data.format",
+            "x": 880,
+            "y": 380,
+            "title": "format",
+            "params": {
+              "template": "v{a} - {b}"
+            }
+          },
+          {
+            "id": "pyRep",
+            "type": "action.reply",
+            "x": 1100,
+            "y": 300,
+            "title": "answer",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "npmCmd",
+            "fromPin": 1,
+            "to": "npmUrl",
+            "toPin": 0
+          },
+          {
+            "from": "npmUrl",
+            "fromPin": 0,
+            "to": "npmHttp",
+            "toPin": 1
+          },
+          {
+            "from": "npmCmd",
+            "fromPin": 0,
+            "to": "npmHttp",
+            "toPin": 0
+          },
+          {
+            "from": "npmHttp",
+            "fromPin": 1,
+            "to": "npmVer",
+            "toPin": 0
+          },
+          {
+            "from": "npmHttp",
+            "fromPin": 1,
+            "to": "npmDesc",
+            "toPin": 0
+          },
+          {
+            "from": "npmVer",
+            "fromPin": 0,
+            "to": "npmFmt",
+            "toPin": 0
+          },
+          {
+            "from": "npmDesc",
+            "fromPin": 0,
+            "to": "npmFmt",
+            "toPin": 1
+          },
+          {
+            "from": "npmHttp",
+            "fromPin": 0,
+            "to": "npmRep",
+            "toPin": 0
+          },
+          {
+            "from": "npmFmt",
+            "fromPin": 0,
+            "to": "npmRep",
+            "toPin": 1
+          },
+          {
+            "from": "pyCmd",
+            "fromPin": 1,
+            "to": "pyUrl",
+            "toPin": 0
+          },
+          {
+            "from": "pyUrl",
+            "fromPin": 0,
+            "to": "pyHttp",
+            "toPin": 1
+          },
+          {
+            "from": "pyCmd",
+            "fromPin": 0,
+            "to": "pyHttp",
+            "toPin": 0
+          },
+          {
+            "from": "pyHttp",
+            "fromPin": 1,
+            "to": "pyVer",
+            "toPin": 0
+          },
+          {
+            "from": "pyHttp",
+            "fromPin": 1,
+            "to": "pySum",
+            "toPin": 0
+          },
+          {
+            "from": "pyVer",
+            "fromPin": 0,
+            "to": "pyFmt",
+            "toPin": 0
+          },
+          {
+            "from": "pySum",
+            "fromPin": 0,
+            "to": "pyFmt",
+            "toPin": 1
+          },
+          {
+            "from": "pyHttp",
+            "fromPin": 0,
+            "to": "pyRep",
+            "toPin": 0
+          },
+          {
+            "from": "pyFmt",
+            "fromPin": 0,
+            "to": "pyRep",
+            "toPin": 1
           }
         ]
       }
@@ -30003,6 +32203,258 @@
       }
     },
     {
+      "name": "RelayToDiscord",
+      "description": "Mirrors every channel message to a Discord channel through an incoming webhook. Store the webhook URL as the secret 'discord_webhook'. One-way (IRC -> Discord). Needs a build with the data.encode json op.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "relay",
+        "bridge",
+        "discord",
+        "webhook"
+      ],
+      "nodeCount": 6,
+      "connectionCount": 5,
+      "nodeTypes": [
+        "data.encode",
+        "data.format",
+        "data.setvar",
+        "event.message",
+        "net.http"
+      ],
+      "file": "workflows/RelayToDiscord.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "RelayToDiscord",
+        "description": "Mirrors every channel message to a Discord channel through an incoming webhook. Store the webhook URL as the secret 'discord_webhook'. One-way (IRC -> Discord). Needs a build with the data.encode json op.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "relay",
+          "bridge",
+          "discord",
+          "webhook"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "title": "any chat line",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "line",
+            "type": "data.format",
+            "x": 220,
+            "y": 80,
+            "title": "format line",
+            "params": {
+              "template": "<{nick}> {message}"
+            }
+          },
+          {
+            "id": "esc",
+            "type": "data.encode",
+            "x": 440,
+            "y": 80,
+            "title": "json-escape",
+            "params": {
+              "op": "json",
+              "mode": "encode"
+            }
+          },
+          {
+            "id": "body",
+            "type": "data.format",
+            "x": 660,
+            "y": 80,
+            "title": "json body",
+            "params": {
+              "template": "{\"content\":\"{a}\"}"
+            }
+          },
+          {
+            "id": "stash",
+            "type": "data.setvar",
+            "x": 220,
+            "y": 0,
+            "title": "body -> var",
+            "params": {
+              "name": "relay_body",
+              "value": ""
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 440,
+            "y": 0,
+            "title": "post to webhook",
+            "params": {
+              "method": "POST",
+              "url": "{{secret.discord_webhook}}",
+              "send": "body",
+              "headers": "Content-Type: application/json",
+              "body": "{relay_body}",
+              "timeout": "15"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "stash",
+            "toPin": 0
+          },
+          {
+            "from": "line",
+            "fromPin": 0,
+            "to": "esc",
+            "toPin": 0
+          },
+          {
+            "from": "esc",
+            "fromPin": 0,
+            "to": "body",
+            "toPin": 0
+          },
+          {
+            "from": "body",
+            "fromPin": 0,
+            "to": "stash",
+            "toPin": 1
+          },
+          {
+            "from": "stash",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "RelayToTelegram",
+      "description": "Mirrors every channel message to a Telegram chat via a bot. Store your bot token as 'telegram_token' and the target chat id as 'telegram_chat'. One-way (IRC -> Telegram).",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "relay",
+        "bridge",
+        "telegram"
+      ],
+      "nodeCount": 5,
+      "connectionCount": 4,
+      "nodeTypes": [
+        "data.encode",
+        "data.format",
+        "event.message",
+        "net.http"
+      ],
+      "file": "workflows/RelayToTelegram.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "RelayToTelegram",
+        "description": "Mirrors every channel message to a Telegram chat via a bot. Store your bot token as 'telegram_token' and the target chat id as 'telegram_chat'. One-way (IRC -> Telegram).",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "relay",
+          "bridge",
+          "telegram"
+        ],
+        "nodes": [
+          {
+            "id": "msg",
+            "type": "event.message",
+            "x": 0,
+            "y": 0,
+            "title": "any chat line",
+            "params": {
+              "channel": ""
+            }
+          },
+          {
+            "id": "line",
+            "type": "data.format",
+            "x": 220,
+            "y": 80,
+            "title": "format line",
+            "params": {
+              "template": "<{nick}> {message}"
+            }
+          },
+          {
+            "id": "enc",
+            "type": "data.encode",
+            "x": 440,
+            "y": 80,
+            "title": "url-encode",
+            "params": {
+              "op": "url",
+              "mode": "encode"
+            }
+          },
+          {
+            "id": "url",
+            "type": "data.format",
+            "x": 660,
+            "y": 80,
+            "title": "telegram url",
+            "params": {
+              "template": "https://api.telegram.org/bot{{secret.telegram_token}}/sendMessage?chat_id={{secret.telegram_chat}}&text={a}"
+            }
+          },
+          {
+            "id": "http",
+            "type": "net.http",
+            "x": 440,
+            "y": 0,
+            "title": "send",
+            "params": {
+              "method": "GET",
+              "url": "https://",
+              "send": "body",
+              "headers": "",
+              "body": "",
+              "timeout": "15"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "msg",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 0
+          },
+          {
+            "from": "line",
+            "fromPin": 0,
+            "to": "enc",
+            "toPin": 0
+          },
+          {
+            "from": "enc",
+            "fromPin": 0,
+            "to": "url",
+            "toPin": 0
+          },
+          {
+            "from": "url",
+            "fromPin": 0,
+            "to": "http",
+            "toPin": 1
+          }
+        ]
+      }
+    },
+    {
       "name": "Remind Me",
       "description": "Say !remindme <message> and the bot confirms, waits a short delay, then pings you back with your reminder.",
       "author": "ircuitry",
@@ -30745,12 +33197,13 @@
         "db",
         "social"
       ],
-      "nodeCount": 11,
-      "connectionCount": 13,
+      "nodeCount": 12,
+      "connectionCount": 15,
       "nodeTypes": [
         "action.reply",
         "data.format",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -30806,7 +33259,7 @@
             "params": {
               "table": "rep",
               "mode": "value",
-              "key": "{2}",
+              "key": "{cap2_thankRegex}",
               "default": "0",
               "find": ""
             }
@@ -30835,7 +33288,7 @@
             "title": "save rep",
             "params": {
               "table": "rep",
-              "key": "{2}",
+              "key": "{cap2_thankRegex}",
               "value": ""
             }
           },
@@ -30918,6 +33371,19 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap2_thankRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_thankRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -30932,12 +33398,6 @@
             "fromPin": 1,
             "to": "thankRegex",
             "toPin": 1
-          },
-          {
-            "from": "thankRegex",
-            "fromPin": 0,
-            "to": "repSet",
-            "toPin": 0
           },
           {
             "from": "repGet",
@@ -30998,6 +33458,24 @@
             "fromPin": 0,
             "to": "lookupRep",
             "toPin": 1
+          },
+          {
+            "from": "thankRegex",
+            "fromPin": 3,
+            "to": "cap2_thankRegex",
+            "toPin": 1
+          },
+          {
+            "from": "thankRegex",
+            "fromPin": 0,
+            "to": "cap2_thankRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_thankRegex",
+            "fromPin": 0,
+            "to": "repSet",
+            "toPin": 0
           }
         ]
       }
@@ -31508,10 +33986,11 @@
         "web",
         "schedule"
       ],
-      "nodeCount": 4,
-      "connectionCount": 5,
+      "nodeCount": 5,
+      "connectionCount": 7,
       "nodeTypes": [
         "action.say",
+        "data.setvar",
         "event.schedule",
         "logic.regex",
         "net.http"
@@ -31584,8 +34063,21 @@
             "title": "post headline",
             "params": {
               "channel": "#news",
-              "message": "📰 {1}",
+              "message": "📰 {cap1_regex}",
               "server": ""
+            }
+          },
+          {
+            "id": "cap1_regex",
+            "type": "data.setvar",
+            "x": 712,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_regex",
+              "value": ""
             }
           }
         ],
@@ -31610,15 +34102,27 @@
           },
           {
             "from": "regex",
-            "fromPin": 0,
+            "fromPin": 2,
             "to": "say",
-            "toPin": 0
+            "toPin": 2
           },
           {
             "from": "regex",
             "fromPin": 2,
+            "to": "cap1_regex",
+            "toPin": 1
+          },
+          {
+            "from": "regex",
+            "fromPin": 0,
+            "to": "cap1_regex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_regex",
+            "fromPin": 0,
             "to": "say",
-            "toPin": 2
+            "toPin": 0
           }
         ]
       }
@@ -34389,11 +36893,12 @@
         "db",
         "social"
       ],
-      "nodeCount": 11,
-      "connectionCount": 12,
+      "nodeCount": 12,
+      "connectionCount": 14,
       "nodeTypes": [
         "action.reply",
         "data.format",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -34451,7 +36956,7 @@
             "title": "save tell",
             "params": {
               "table": "tells",
-              "key": "{1}",
+              "key": "{cap1_parse}",
               "value": ""
             }
           },
@@ -34558,6 +37063,19 @@
               "key": "{nick}",
               "value": ""
             }
+          },
+          {
+            "id": "cap1_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_parse",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -34572,12 +37090,6 @@
             "fromPin": 1,
             "to": "parse",
             "toPin": 1
-          },
-          {
-            "from": "parse",
-            "fromPin": 0,
-            "to": "store",
-            "toPin": 0
           },
           {
             "from": "parse",
@@ -34631,6 +37143,24 @@
             "from": "deliverRep",
             "fromPin": 0,
             "to": "clear",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 2,
+            "to": "cap1_parse",
+            "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 0,
+            "to": "cap1_parse",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_parse",
+            "fromPin": 0,
+            "to": "store",
             "toPin": 0
           }
         ]
@@ -34894,6 +37424,230 @@
             "fromPin": 1,
             "to": "say",
             "toPin": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "TodoList",
+      "description": "A personal to-do list per nick: !todo <item> adds, !todos shows your list, !todoclear empties it. Lists persist on disk.",
+      "author": "ircuitry",
+      "category": "Community",
+      "tags": [
+        "todo",
+        "tasks",
+        "db",
+        "productivity"
+      ],
+      "nodeCount": 11,
+      "connectionCount": 9,
+      "nodeTypes": [
+        "action.reply",
+        "data.format",
+        "db.get",
+        "db.set",
+        "event.command"
+      ],
+      "file": "workflows/TodoList.ircbot",
+      "workflow": {
+        "format": "ircuitry.workflow.v1",
+        "name": "TodoList",
+        "description": "A personal to-do list per nick: !todo <item> adds, !todos shows your list, !todoclear empties it. Lists persist on disk.",
+        "author": "ircuitry",
+        "category": "Community",
+        "tags": [
+          "todo",
+          "tasks",
+          "db",
+          "productivity"
+        ],
+        "nodes": [
+          {
+            "id": "addCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 0,
+            "title": "!todo <item>",
+            "params": {
+              "prefix": "!",
+              "command": "todo",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "addGet",
+            "type": "db.get",
+            "x": 240,
+            "y": 80,
+            "title": "current list",
+            "params": {
+              "table": "todo",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "",
+              "find": ""
+            }
+          },
+          {
+            "id": "addFmt",
+            "type": "data.format",
+            "x": 460,
+            "y": 80,
+            "title": "append item",
+            "params": {
+              "template": "{a}\n- {b}"
+            }
+          },
+          {
+            "id": "addSet",
+            "type": "db.set",
+            "x": 240,
+            "y": 0,
+            "title": "save list",
+            "params": {
+              "table": "todo",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "addRep",
+            "type": "action.reply",
+            "x": 700,
+            "y": 0,
+            "title": "confirm",
+            "params": {
+              "message": "Added to your list: {args}",
+              "server": ""
+            }
+          },
+          {
+            "id": "listCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 220,
+            "title": "!todos",
+            "params": {
+              "prefix": "!",
+              "command": "todos",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "listGet",
+            "type": "db.get",
+            "x": 240,
+            "y": 300,
+            "title": "read list",
+            "params": {
+              "table": "todo",
+              "mode": "value",
+              "key": "{nick}",
+              "default": "(your to-do list is empty)",
+              "find": ""
+            }
+          },
+          {
+            "id": "listRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 220,
+            "title": "show",
+            "params": {
+              "message": "",
+              "server": ""
+            }
+          },
+          {
+            "id": "clrCmd",
+            "type": "event.command",
+            "x": 0,
+            "y": 440,
+            "title": "!todoclear",
+            "params": {
+              "prefix": "!",
+              "command": "todoclear",
+              "contexts": "public, private, pm"
+            }
+          },
+          {
+            "id": "clrSet",
+            "type": "db.set",
+            "x": 240,
+            "y": 440,
+            "title": "empty list",
+            "params": {
+              "table": "todo",
+              "key": "{nick}",
+              "value": ""
+            }
+          },
+          {
+            "id": "clrRep",
+            "type": "action.reply",
+            "x": 480,
+            "y": 440,
+            "title": "confirm",
+            "params": {
+              "message": "Cleared your to-do list.",
+              "server": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": "addCmd",
+            "fromPin": 0,
+            "to": "addSet",
+            "toPin": 0
+          },
+          {
+            "from": "addGet",
+            "fromPin": 0,
+            "to": "addFmt",
+            "toPin": 0
+          },
+          {
+            "from": "addCmd",
+            "fromPin": 1,
+            "to": "addFmt",
+            "toPin": 1
+          },
+          {
+            "from": "addFmt",
+            "fromPin": 0,
+            "to": "addSet",
+            "toPin": 1
+          },
+          {
+            "from": "addSet",
+            "fromPin": 0,
+            "to": "addRep",
+            "toPin": 0
+          },
+          {
+            "from": "listCmd",
+            "fromPin": 0,
+            "to": "listRep",
+            "toPin": 0
+          },
+          {
+            "from": "listGet",
+            "fromPin": 0,
+            "to": "listRep",
+            "toPin": 1
+          },
+          {
+            "from": "clrCmd",
+            "fromPin": 0,
+            "to": "clrSet",
+            "toPin": 0
+          },
+          {
+            "from": "clrSet",
+            "fromPin": 0,
+            "to": "clrRep",
+            "toPin": 0
           }
         ]
       }
@@ -37828,12 +40582,13 @@
         "quotes",
         "db"
       ],
-      "nodeCount": 13,
-      "connectionCount": 14,
+      "nodeCount": 14,
+      "connectionCount": 16,
       "nodeTypes": [
         "action.reply",
         "action.say",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -37920,7 +40675,7 @@
             "title": "ask the channel",
             "params": {
               "channel": "",
-              "message": "Who said: \"{2}\"?",
+              "message": "Who said: \"{cap2_splitQuote}\"?",
               "server": ""
             }
           },
@@ -38037,6 +40792,19 @@
               "message": "Nope, that's not who said it. Try again with !whoanswer <name>.",
               "server": ""
             }
+          },
+          {
+            "id": "cap2_splitQuote",
+            "type": "data.setvar",
+            "x": 712,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_splitQuote",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -38051,12 +40819,6 @@
             "fromPin": 0,
             "to": "splitQuote",
             "toPin": 1
-          },
-          {
-            "from": "splitQuote",
-            "fromPin": 0,
-            "to": "storeAnswer",
-            "toPin": 0
           },
           {
             "from": "splitQuote",
@@ -38122,6 +40884,24 @@
             "from": "checkAnswer",
             "fromPin": 1,
             "to": "wrongSay",
+            "toPin": 0
+          },
+          {
+            "from": "splitQuote",
+            "fromPin": 3,
+            "to": "cap2_splitQuote",
+            "toPin": 1
+          },
+          {
+            "from": "splitQuote",
+            "fromPin": 0,
+            "to": "cap2_splitQuote",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_splitQuote",
+            "fromPin": 0,
+            "to": "storeAnswer",
             "toPin": 0
           }
         ]

@@ -1,0 +1,36 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "ChannelNews",
+  "description": "A channel bulletin: !setnews <text> stores an announcement, !news shows it, and anyone who joins is quietly PM'd the current bulletin. Persists on disk.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["news", "bulletin", "announce", "db"],
+  "nodes": [
+    { "id": "setCmd", "type": "event.command", "x": 0, "y": 0, "title": "!setnews <text>", "params": { "prefix": "!", "command": "setnews", "contexts": "public, private, pm" } },
+    { "id": "setSet", "type": "db.set", "x": 240, "y": 0, "title": "store bulletin", "params": { "table": "news", "key": "bulletin", "value": "{args}" } },
+    { "id": "setRep", "type": "action.reply", "x": 480, "y": 0, "title": "confirm", "params": { "message": "News updated.", "server": "" } },
+
+    { "id": "newsCmd", "type": "event.command", "x": 0, "y": 160, "title": "!news", "params": { "prefix": "!", "command": "news", "contexts": "public, private, pm" } },
+    { "id": "newsGet", "type": "db.get", "x": 240, "y": 240, "title": "read bulletin", "params": { "table": "news", "mode": "value", "key": "bulletin", "default": "No news right now.", "find": "" } },
+    { "id": "newsRep", "type": "action.reply", "x": 480, "y": 160, "title": "show", "params": { "message": "", "server": "" } },
+
+    { "id": "joinEv", "type": "event.join", "x": 0, "y": 380, "title": "on join", "params": {} },
+    { "id": "jGet", "type": "db.get", "x": 240, "y": 460, "title": "read bulletin", "params": { "table": "news", "mode": "value", "key": "bulletin", "default": "", "find": "" } },
+    { "id": "jIf", "type": "logic.if", "x": 460, "y": 380, "title": "bulletin set?", "params": { "op": "≠", "b": "", "ci": "false" } },
+    { "id": "jFmt", "type": "data.format", "x": 680, "y": 460, "title": "format", "params": { "template": "[News] {a}" } },
+    { "id": "jSay", "type": "action.say", "x": 900, "y": 380, "title": "PM the joiner", "params": { "channel": "{nick}", "message": "", "server": "" } }
+  ],
+  "connections": [
+    { "from": "setCmd", "fromPin": 0, "to": "setSet", "toPin": 0 },
+    { "from": "setSet", "fromPin": 0, "to": "setRep", "toPin": 0 },
+
+    { "from": "newsCmd", "fromPin": 0, "to": "newsRep", "toPin": 0 },
+    { "from": "newsGet", "fromPin": 0, "to": "newsRep", "toPin": 1 },
+
+    { "from": "joinEv", "fromPin": 0, "to": "jIf", "toPin": 0 },
+    { "from": "jGet", "fromPin": 0, "to": "jIf", "toPin": 1 },
+    { "from": "jGet", "fromPin": 0, "to": "jFmt", "toPin": 0 },
+    { "from": "jIf", "fromPin": 0, "to": "jSay", "toPin": 0 },
+    { "from": "jFmt", "fromPin": 0, "to": "jSay", "toPin": 2 }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "TodoList",
+  "description": "A personal to-do list per nick: !todo <item> adds, !todos shows your list, !todoclear empties it. Lists persist on disk.",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["todo", "tasks", "db", "productivity"],
+  "nodes": [
+    { "id": "addCmd", "type": "event.command", "x": 0, "y": 0, "title": "!todo <item>", "params": { "prefix": "!", "command": "todo", "contexts": "public, private, pm" } },
+    { "id": "addGet", "type": "db.get", "x": 240, "y": 80, "title": "current list", "params": { "table": "todo", "mode": "value", "key": "{nick}", "default": "", "find": "" } },
+    { "id": "addFmt", "type": "data.format", "x": 460, "y": 80, "title": "append item", "params": { "template": "{a}\n- {b}" } },
+    { "id": "addSet", "type": "db.set", "x": 240, "y": 0, "title": "save list", "params": { "table": "todo", "key": "{nick}", "value": "" } },
+    { "id": "addRep", "type": "action.reply", "x": 700, "y": 0, "title": "confirm", "params": { "message": "Added to your list: {args}", "server": "" } },
+
+    { "id": "listCmd", "type": "event.command", "x": 0, "y": 220, "title": "!todos", "params": { "prefix": "!", "command": "todos", "contexts": "public, private, pm" } },
+    { "id": "listGet", "type": "db.get", "x": 240, "y": 300, "title": "read list", "params": { "table": "todo", "mode": "value", "key": "{nick}", "default": "(your to-do list is empty)", "find": "" } },
+    { "id": "listRep", "type": "action.reply", "x": 480, "y": 220, "title": "show", "params": { "message": "", "server": "" } },
+
+    { "id": "clrCmd", "type": "event.command", "x": 0, "y": 440, "title": "!todoclear", "params": { "prefix": "!", "command": "todoclear", "contexts": "public, private, pm" } },
+    { "id": "clrSet", "type": "db.set", "x": 240, "y": 440, "title": "empty list", "params": { "table": "todo", "key": "{nick}", "value": "" } },
+    { "id": "clrRep", "type": "action.reply", "x": 480, "y": 440, "title": "confirm", "params": { "message": "Cleared your to-do list.", "server": "" } }
+  ],
+  "connections": [
+    { "from": "addCmd", "fromPin": 0, "to": "addSet", "toPin": 0 },
+    { "from": "addGet", "fromPin": 0, "to": "addFmt", "toPin": 0 },
+    { "from": "addCmd", "fromPin": 1, "to": "addFmt", "toPin": 1 },
+    { "from": "addFmt", "fromPin": 0, "to": "addSet", "toPin": 1 },
+    { "from": "addSet", "fromPin": 0, "to": "addRep", "toPin": 0 },
+
+    { "from": "listCmd", "fromPin": 0, "to": "listRep", "toPin": 0 },
+    { "from": "listGet", "fromPin": 0, "to": "listRep", "toPin": 1 },
+
+    { "from": "clrCmd", "fromPin": 0, "to": "clrSet", "toPin": 0 },
+    { "from": "clrSet", "fromPin": 0, "to": "clrRep", "toPin": 0 }
+  ]
+}

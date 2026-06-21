@@ -1,0 +1,21 @@
+{
+  "format": "ircuitry.workflow.v1",
+  "name": "RelayToTelegram",
+  "description": "Mirrors every channel message to a Telegram chat via a bot. Store your bot token as 'telegram_token' and the target chat id as 'telegram_chat'. One-way (IRC -> Telegram).",
+  "author": "ircuitry",
+  "category": "Community",
+  "tags": ["relay", "bridge", "telegram"],
+  "nodes": [
+    { "id": "msg", "type": "event.message", "x": 0, "y": 0, "title": "any chat line", "params": { "channel": "" } },
+    { "id": "line", "type": "data.format", "x": 220, "y": 80, "title": "format line", "params": { "template": "<{nick}> {message}" } },
+    { "id": "enc", "type": "data.encode", "x": 440, "y": 80, "title": "url-encode", "params": { "op": "url", "mode": "encode" } },
+    { "id": "url", "type": "data.format", "x": 660, "y": 80, "title": "telegram url", "params": { "template": "https://api.telegram.org/bot{{secret.telegram_token}}/sendMessage?chat_id={{secret.telegram_chat}}&text={a}" } },
+    { "id": "http", "type": "net.http", "x": 440, "y": 0, "title": "send", "params": { "method": "GET", "url": "https://", "send": "body", "headers": "", "body": "", "timeout": "15" } }
+  ],
+  "connections": [
+    { "from": "msg", "fromPin": 0, "to": "http", "toPin": 0 },
+    { "from": "line", "fromPin": 0, "to": "enc", "toPin": 0 },
+    { "from": "enc", "fromPin": 0, "to": "url", "toPin": 0 },
+    { "from": "url", "fromPin": 0, "to": "http", "toPin": 1 }
+  ]
+}
