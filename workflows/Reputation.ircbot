@@ -46,7 +46,7 @@
       "params": {
         "table": "rep",
         "mode": "value",
-        "key": "{2}",
+        "key": "{cap2_thankRegex}",
         "default": "0",
         "find": ""
       }
@@ -75,7 +75,7 @@
       "title": "save rep",
       "params": {
         "table": "rep",
-        "key": "{2}",
+        "key": "{cap2_thankRegex}",
         "value": ""
       }
     },
@@ -158,6 +158,19 @@
         "message": "",
         "server": ""
       }
+    },
+    {
+      "id": "cap2_thankRegex",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 2",
+      "params": {
+        "name": "cap2_thankRegex",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -172,12 +185,6 @@
       "fromPin": 1,
       "to": "thankRegex",
       "toPin": 1
-    },
-    {
-      "from": "thankRegex",
-      "fromPin": 0,
-      "to": "repSet",
-      "toPin": 0
     },
     {
       "from": "repGet",
@@ -238,6 +245,24 @@
       "fromPin": 0,
       "to": "lookupRep",
       "toPin": 1
+    },
+    {
+      "from": "thankRegex",
+      "fromPin": 3,
+      "to": "cap2_thankRegex",
+      "toPin": 1
+    },
+    {
+      "from": "thankRegex",
+      "fromPin": 0,
+      "to": "cap2_thankRegex",
+      "toPin": 0
+    },
+    {
+      "from": "cap2_thankRegex",
+      "fromPin": 0,
+      "to": "repSet",
+      "toPin": 0
     }
   ]
 }

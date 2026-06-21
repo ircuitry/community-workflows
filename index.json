@@ -18182,11 +18182,12 @@
         "db",
         "lookup"
       ],
-      "nodeCount": 8,
-      "connectionCount": 9,
+      "nodeCount": 9,
+      "connectionCount": 11,
       "nodeTypes": [
         "action.reply",
         "data.format",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -18242,7 +18243,7 @@
             "title": "save term",
             "params": {
               "table": "glossary",
-              "key": "{1}",
+              "key": "{cap1_defRegex}",
               "value": ""
             }
           },
@@ -18313,6 +18314,19 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_defRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_defRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -18327,12 +18341,6 @@
             "fromPin": 1,
             "to": "defRegex",
             "toPin": 1
-          },
-          {
-            "from": "defRegex",
-            "fromPin": 0,
-            "to": "defSet",
-            "toPin": 0
           },
           {
             "from": "defRegex",
@@ -18369,6 +18377,24 @@
             "fromPin": 0,
             "to": "termReply",
             "toPin": 1
+          },
+          {
+            "from": "defRegex",
+            "fromPin": 2,
+            "to": "cap1_defRegex",
+            "toPin": 1
+          },
+          {
+            "from": "defRegex",
+            "fromPin": 0,
+            "to": "cap1_defRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_defRegex",
+            "fromPin": 0,
+            "to": "defSet",
+            "toPin": 0
           }
         ]
       }
@@ -24178,12 +24204,13 @@
         "db",
         "social"
       ],
-      "nodeCount": 13,
-      "connectionCount": 14,
+      "nodeCount": 15,
+      "connectionCount": 18,
       "nodeTypes": [
         "action.reply",
         "data.format",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -24239,7 +24266,7 @@
             "params": {
               "table": "karma",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_incRegex}",
               "default": "0",
               "find": ""
             }
@@ -24268,7 +24295,7 @@
             "title": "save karma",
             "params": {
               "table": "karma",
-              "key": "{1}",
+              "key": "{cap1_incRegex}",
               "value": ""
             }
           },
@@ -24296,7 +24323,7 @@
             "params": {
               "table": "karma",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_decRegex}",
               "default": "0",
               "find": ""
             }
@@ -24325,7 +24352,7 @@
             "title": "save karma",
             "params": {
               "table": "karma",
-              "key": "{1}",
+              "key": "{cap1_decRegex}",
               "value": ""
             }
           },
@@ -24383,6 +24410,32 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_incRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_incRegex",
+              "value": ""
+            }
+          },
+          {
+            "id": "cap1_decRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 540,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_decRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -24397,12 +24450,6 @@
             "fromPin": 1,
             "to": "incRegex",
             "toPin": 1
-          },
-          {
-            "from": "incRegex",
-            "fromPin": 0,
-            "to": "incSet",
-            "toPin": 0
           },
           {
             "from": "incGet",
@@ -24427,12 +24474,6 @@
             "fromPin": 1,
             "to": "decRegex",
             "toPin": 1
-          },
-          {
-            "from": "decRegex",
-            "fromPin": 0,
-            "to": "decSet",
-            "toPin": 0
           },
           {
             "from": "decGet",
@@ -24469,6 +24510,42 @@
             "fromPin": 0,
             "to": "lookupRep",
             "toPin": 1
+          },
+          {
+            "from": "incRegex",
+            "fromPin": 2,
+            "to": "cap1_incRegex",
+            "toPin": 1
+          },
+          {
+            "from": "incRegex",
+            "fromPin": 0,
+            "to": "cap1_incRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_incRegex",
+            "fromPin": 0,
+            "to": "incSet",
+            "toPin": 0
+          },
+          {
+            "from": "decRegex",
+            "fromPin": 2,
+            "to": "cap1_decRegex",
+            "toPin": 1
+          },
+          {
+            "from": "decRegex",
+            "fromPin": 0,
+            "to": "cap1_decRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_decRegex",
+            "fromPin": 0,
+            "to": "decSet",
+            "toPin": 0
           }
         ]
       }
@@ -24483,11 +24560,12 @@
         "kudos",
         "db"
       ],
-      "nodeCount": 8,
-      "connectionCount": 9,
+      "nodeCount": 10,
+      "connectionCount": 13,
       "nodeTypes": [
         "action.reply",
         "action.say",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -24545,7 +24623,7 @@
             "params": {
               "table": "kudos",
               "key": "{time}-{nick}",
-              "value": "{1}|{2}|from {nick}"
+              "value": "{cap1_parse}|{cap2_parse}|from {nick}"
             }
           },
           {
@@ -24558,7 +24636,7 @@
             "title": "announce kudos",
             "params": {
               "channel": "",
-              "message": "Kudos to {1}: {2} (from {nick})",
+              "message": "Kudos to {cap1_parse}: {cap2_parse} (from {nick})",
               "server": ""
             }
           },
@@ -24616,6 +24694,32 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_parse",
+              "value": ""
+            }
+          },
+          {
+            "id": "cap2_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 280,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_parse",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -24630,12 +24734,6 @@
             "fromPin": 1,
             "to": "parse",
             "toPin": 1
-          },
-          {
-            "from": "parse",
-            "fromPin": 0,
-            "to": "store",
-            "toPin": 0
           },
           {
             "from": "store",
@@ -24672,6 +24770,36 @@
             "fromPin": 2,
             "to": "listReply",
             "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 2,
+            "to": "cap1_parse",
+            "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 0,
+            "to": "cap1_parse",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 3,
+            "to": "cap2_parse",
+            "toPin": 1
+          },
+          {
+            "from": "cap1_parse",
+            "fromPin": 0,
+            "to": "cap2_parse",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_parse",
+            "fromPin": 0,
+            "to": "store",
+            "toPin": 0
           }
         ]
       }
@@ -25072,12 +25200,13 @@
         "links",
         "regex"
       ],
-      "nodeCount": 7,
-      "connectionCount": 8,
+      "nodeCount": 8,
+      "connectionCount": 10,
       "nodeTypes": [
         "action.redact",
         "action.reply",
         "data.gettag",
+        "data.setvar",
         "db.get",
         "event.message",
         "logic.if",
@@ -25132,7 +25261,7 @@
             "params": {
               "table": "allowed_domains",
               "mode": "value",
-              "key": "{1}",
+              "key": "{cap1_urlRegex}",
               "default": "NO",
               "find": ""
             }
@@ -25190,6 +25319,19 @@
               "message": "Only approved links allowed, {nick}.",
               "server": ""
             }
+          },
+          {
+            "id": "cap1_urlRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_urlRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -25204,12 +25346,6 @@
             "fromPin": 1,
             "to": "urlRegex",
             "toPin": 1
-          },
-          {
-            "from": "urlRegex",
-            "fromPin": 0,
-            "to": "check",
-            "toPin": 0
           },
           {
             "from": "lookup",
@@ -25239,6 +25375,24 @@
             "from": "redact",
             "fromPin": 0,
             "to": "warn",
+            "toPin": 0
+          },
+          {
+            "from": "urlRegex",
+            "fromPin": 2,
+            "to": "cap1_urlRegex",
+            "toPin": 1
+          },
+          {
+            "from": "urlRegex",
+            "fromPin": 0,
+            "to": "cap1_urlRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_urlRegex",
+            "fromPin": 0,
+            "to": "check",
             "toPin": 0
           }
         ]
@@ -33043,12 +33197,13 @@
         "db",
         "social"
       ],
-      "nodeCount": 11,
-      "connectionCount": 13,
+      "nodeCount": 12,
+      "connectionCount": 15,
       "nodeTypes": [
         "action.reply",
         "data.format",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -33104,7 +33259,7 @@
             "params": {
               "table": "rep",
               "mode": "value",
-              "key": "{2}",
+              "key": "{cap2_thankRegex}",
               "default": "0",
               "find": ""
             }
@@ -33133,7 +33288,7 @@
             "title": "save rep",
             "params": {
               "table": "rep",
-              "key": "{2}",
+              "key": "{cap2_thankRegex}",
               "value": ""
             }
           },
@@ -33216,6 +33371,19 @@
               "message": "",
               "server": ""
             }
+          },
+          {
+            "id": "cap2_thankRegex",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_thankRegex",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -33230,12 +33398,6 @@
             "fromPin": 1,
             "to": "thankRegex",
             "toPin": 1
-          },
-          {
-            "from": "thankRegex",
-            "fromPin": 0,
-            "to": "repSet",
-            "toPin": 0
           },
           {
             "from": "repGet",
@@ -33296,6 +33458,24 @@
             "fromPin": 0,
             "to": "lookupRep",
             "toPin": 1
+          },
+          {
+            "from": "thankRegex",
+            "fromPin": 3,
+            "to": "cap2_thankRegex",
+            "toPin": 1
+          },
+          {
+            "from": "thankRegex",
+            "fromPin": 0,
+            "to": "cap2_thankRegex",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_thankRegex",
+            "fromPin": 0,
+            "to": "repSet",
+            "toPin": 0
           }
         ]
       }
@@ -33806,10 +33986,11 @@
         "web",
         "schedule"
       ],
-      "nodeCount": 4,
-      "connectionCount": 5,
+      "nodeCount": 5,
+      "connectionCount": 7,
       "nodeTypes": [
         "action.say",
+        "data.setvar",
         "event.schedule",
         "logic.regex",
         "net.http"
@@ -33882,8 +34063,21 @@
             "title": "post headline",
             "params": {
               "channel": "#news",
-              "message": "📰 {1}",
+              "message": "📰 {cap1_regex}",
               "server": ""
+            }
+          },
+          {
+            "id": "cap1_regex",
+            "type": "data.setvar",
+            "x": 712,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_regex",
+              "value": ""
             }
           }
         ],
@@ -33908,15 +34102,27 @@
           },
           {
             "from": "regex",
-            "fromPin": 0,
+            "fromPin": 2,
             "to": "say",
-            "toPin": 0
+            "toPin": 2
           },
           {
             "from": "regex",
             "fromPin": 2,
+            "to": "cap1_regex",
+            "toPin": 1
+          },
+          {
+            "from": "regex",
+            "fromPin": 0,
+            "to": "cap1_regex",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_regex",
+            "fromPin": 0,
             "to": "say",
-            "toPin": 2
+            "toPin": 0
           }
         ]
       }
@@ -36687,11 +36893,12 @@
         "db",
         "social"
       ],
-      "nodeCount": 11,
-      "connectionCount": 12,
+      "nodeCount": 12,
+      "connectionCount": 14,
       "nodeTypes": [
         "action.reply",
         "data.format",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -36749,7 +36956,7 @@
             "title": "save tell",
             "params": {
               "table": "tells",
-              "key": "{1}",
+              "key": "{cap1_parse}",
               "value": ""
             }
           },
@@ -36856,6 +37063,19 @@
               "key": "{nick}",
               "value": ""
             }
+          },
+          {
+            "id": "cap1_parse",
+            "type": "data.setvar",
+            "x": 426,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 1",
+            "params": {
+              "name": "cap1_parse",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -36870,12 +37090,6 @@
             "fromPin": 1,
             "to": "parse",
             "toPin": 1
-          },
-          {
-            "from": "parse",
-            "fromPin": 0,
-            "to": "store",
-            "toPin": 0
           },
           {
             "from": "parse",
@@ -36929,6 +37143,24 @@
             "from": "deliverRep",
             "fromPin": 0,
             "to": "clear",
+            "toPin": 0
+          },
+          {
+            "from": "parse",
+            "fromPin": 2,
+            "to": "cap1_parse",
+            "toPin": 1
+          },
+          {
+            "from": "parse",
+            "fromPin": 0,
+            "to": "cap1_parse",
+            "toPin": 0
+          },
+          {
+            "from": "cap1_parse",
+            "fromPin": 0,
+            "to": "store",
             "toPin": 0
           }
         ]
@@ -40350,12 +40582,13 @@
         "quotes",
         "db"
       ],
-      "nodeCount": 13,
-      "connectionCount": 14,
+      "nodeCount": 14,
+      "connectionCount": 16,
       "nodeTypes": [
         "action.reply",
         "action.say",
         "data.math",
+        "data.setvar",
         "db.get",
         "db.set",
         "event.command",
@@ -40442,7 +40675,7 @@
             "title": "ask the channel",
             "params": {
               "channel": "",
-              "message": "Who said: \"{2}\"?",
+              "message": "Who said: \"{cap2_splitQuote}\"?",
               "server": ""
             }
           },
@@ -40559,6 +40792,19 @@
               "message": "Nope, that's not who said it. Try again with !whoanswer <name>.",
               "server": ""
             }
+          },
+          {
+            "id": "cap2_splitQuote",
+            "type": "data.setvar",
+            "x": 712,
+            "y": 220,
+            "muted": false,
+            "streamAsTool": false,
+            "title": "capture 2",
+            "params": {
+              "name": "cap2_splitQuote",
+              "value": ""
+            }
           }
         ],
         "connections": [
@@ -40573,12 +40819,6 @@
             "fromPin": 0,
             "to": "splitQuote",
             "toPin": 1
-          },
-          {
-            "from": "splitQuote",
-            "fromPin": 0,
-            "to": "storeAnswer",
-            "toPin": 0
           },
           {
             "from": "splitQuote",
@@ -40644,6 +40884,24 @@
             "from": "checkAnswer",
             "fromPin": 1,
             "to": "wrongSay",
+            "toPin": 0
+          },
+          {
+            "from": "splitQuote",
+            "fromPin": 3,
+            "to": "cap2_splitQuote",
+            "toPin": 1
+          },
+          {
+            "from": "splitQuote",
+            "fromPin": 0,
+            "to": "cap2_splitQuote",
+            "toPin": 0
+          },
+          {
+            "from": "cap2_splitQuote",
+            "fromPin": 0,
+            "to": "storeAnswer",
             "toPin": 0
           }
         ]

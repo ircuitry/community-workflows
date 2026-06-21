@@ -65,8 +65,21 @@
       "title": "post headline",
       "params": {
         "channel": "#news",
-        "message": "📰 {1}",
+        "message": "📰 {cap1_regex}",
         "server": ""
+      }
+    },
+    {
+      "id": "cap1_regex",
+      "type": "data.setvar",
+      "x": 712,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_regex",
+        "value": ""
       }
     }
   ],
@@ -91,15 +104,27 @@
     },
     {
       "from": "regex",
-      "fromPin": 0,
+      "fromPin": 2,
       "to": "say",
-      "toPin": 0
+      "toPin": 2
     },
     {
       "from": "regex",
       "fromPin": 2,
+      "to": "cap1_regex",
+      "toPin": 1
+    },
+    {
+      "from": "regex",
+      "fromPin": 0,
+      "to": "cap1_regex",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_regex",
+      "fromPin": 0,
       "to": "say",
-      "toPin": 2
+      "toPin": 0
     }
   ]
 }

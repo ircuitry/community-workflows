@@ -46,7 +46,7 @@
       "params": {
         "table": "allowed_domains",
         "mode": "value",
-        "key": "{1}",
+        "key": "{cap1_urlRegex}",
         "default": "NO",
         "find": ""
       }
@@ -104,6 +104,19 @@
         "message": "Only approved links allowed, {nick}.",
         "server": ""
       }
+    },
+    {
+      "id": "cap1_urlRegex",
+      "type": "data.setvar",
+      "x": 426,
+      "y": 220,
+      "muted": false,
+      "streamAsTool": false,
+      "title": "capture 1",
+      "params": {
+        "name": "cap1_urlRegex",
+        "value": ""
+      }
     }
   ],
   "connections": [
@@ -118,12 +131,6 @@
       "fromPin": 1,
       "to": "urlRegex",
       "toPin": 1
-    },
-    {
-      "from": "urlRegex",
-      "fromPin": 0,
-      "to": "check",
-      "toPin": 0
     },
     {
       "from": "lookup",
@@ -153,6 +160,24 @@
       "from": "redact",
       "fromPin": 0,
       "to": "warn",
+      "toPin": 0
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 2,
+      "to": "cap1_urlRegex",
+      "toPin": 1
+    },
+    {
+      "from": "urlRegex",
+      "fromPin": 0,
+      "to": "cap1_urlRegex",
+      "toPin": 0
+    },
+    {
+      "from": "cap1_urlRegex",
+      "fromPin": 0,
+      "to": "check",
       "toPin": 0
     }
   ]
